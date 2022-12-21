@@ -1,0 +1,57 @@
+name: Deploy from Notion to Pages
+
+on:
+  # Manual update only.
+  workflow_dispatch:
+
+jobs:
+  download_old-generate-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+        # Download packages
+      - name: Submodule Update
+        run: |
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install ./google-chrome-stable_current_amd64.deb
+          sudo apt-get update
+          
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
+          
+      - name: Download notion4ever
+        uses: actions/checkout@v2
+        with:
+          repository: 'MerkulovDaniil/notion4ever'
+          
+      - name: Install packages
+        run: pip install -r requirements.txt
+             echo "NOTION_PAGE_ID=d8a73a70ab7544e29eb8638603ad9442" >> $GITHUB_ENV
+        
+      - name: Download current version of the site
+        uses: actions/checkout@v2
+        with:
+          # HERE, YOU NEED TO PLACE YOUR REPOSITORY
+          repository: 'KiraCore/docs.kira.network'
+          # TARGET BRANCH
+          ref: master
+          # THE FOLDER, WHERE NOTION4EVER EXPORTS YOUR CONTENT BY DEFAULT
+          path: _site
+          
+      - name: Run notion4ever
+        run: python -m notion4ever
+        env:
+            # HERE YOU NEED TO PLACE URL OF THE ROOT PAGE. PROBABLY IT IS "https://<username>.github.io"
+            SITE_URL: "https://test-docs.kira.network"
+            NOTION_TOKEN: ${{secrets.NOTION_TOKEN}}
+            NOTION_PAGE_ID: ${{env.NOTION_PAGE_ID}}
+      
+      - name: Deploy to Pages
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: master
+          FOLDER: _site
+          COMMIT_MESSAGE: 🤖 Notion page deployed.
