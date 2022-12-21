@@ -25,7 +25,10 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install ./google-chrome-stable_current_amd64.deb
           sudo apt-get update
-
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
       - name: Download notion4ever
         uses: actions/checkout@v2
         with:
@@ -56,7 +59,8 @@ jobs:
             SITE_URL: "https://test-docs.kira.network"
             NOTION_TOKEN: ${{secrets.NOTION_TOKEN}}
             NOTION_PAGE_ID: ${{env.NOTION_PAGE_ID}}
-      
+      - name: List files in the repository
+        run: ls $GITHUB_WORKSPACE
       - name: Deploy to Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
