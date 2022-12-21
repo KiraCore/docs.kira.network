@@ -16,7 +16,10 @@ jobs:
     container: 
       image: ghcr.io/kiracore/docker/base-image:v0.11.2
     steps:
-        # Download packages
+      - name: Add safe.directory
+        run: |
+          git config --global --add safe.directory /github/workspace
+          git config --global --add safe.directory $PWD
       - name: Submodule Update
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -29,9 +32,12 @@ jobs:
           repository: 'MerkulovDaniil/notion4ever'
           
       - name: Install packages
-        run: pip install -r requirements.txt
-             echo "NOTION_PAGE_ID=d8a73a70ab7544e29eb8638603ad9442" >> $GITHUB_ENV
-        
+        run: |
+             NOTION_PAGE_ID="d8a73a70ab7544e29eb8638603ad9442"
+             echo "NOTION_PAGE_ID=$NOTION_PAGE_ID" >> $GITHUB_ENV
+             chmod -R 777 /github/home/.cache/pip
+             echo "NOTION_PAGE_ID: $NOTION_PAGE_ID"
+             pip install -r requirements.txt
       - name: Download current version of the site
         uses: actions/checkout@v2
         with:
