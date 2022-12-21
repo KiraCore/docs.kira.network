@@ -5,12 +5,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  download_old-generate-push:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [  '2.x', '3.x' ]
-    
+ build:
+    name: Repo Build
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      pull-requests: write
+    container: 
+      image: ghcr.io/kiracore/docker/base-image:v0.11.2
     steps:
         # Download packages
       - name: Submodule Update
@@ -18,13 +22,7 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install ./google-chrome-stable_current_amd64.deb
           sudo apt-get update
-          
-      - name: Set up Python ${{ matrix.python-version }} 
-        uses: actions/setup-python@2c3dd9e
-        with:
-          python-version:  ${{ matrix.python-version }}
-          architecture: x64
-          
+
       - name: Download notion4ever
         uses: actions/checkout@v2
         with:
