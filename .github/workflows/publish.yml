@@ -35,7 +35,7 @@ jobs:
         run: |
              NOTION_PAGE_ID="d8a73a70ab7544e29eb8638603ad9442"
              echo "NOTION_PAGE_ID=$NOTION_PAGE_ID" >> $GITHUB_ENV
-             mkdir -rfv /github/home/.cache/pip
+             mkdir -p /github/home/.cache/pip
              chmod -R 777 /github/home/.cache/pip
              echo "NOTION_PAGE_ID: $NOTION_PAGE_ID"
              pip install -r requirements.txt
