@@ -6,7 +6,11 @@ on:
 
 jobs:
   download_old-generate-push:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: ["3.8", "3.9", "3.10"]
+    runs-on: ${{ matrix.os }}
     
     steps:
         # Download packages
@@ -17,9 +21,9 @@ jobs:
           sudo apt-get update
           
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@2c3dd9e
         with:
-          python-version: 3.10.0
+          python-version: 3.10
           
       - name: Download notion4ever
         uses: actions/checkout@v2
