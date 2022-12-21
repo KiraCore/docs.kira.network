@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: igor-kupczynski/notion-exporter@c7457ff
+      - uses: igor-kupczynski/notion-exporter@v1.0.2
         with:
           pages: "d8a73a70ab7544e29eb8638603ad9442"  # Pages IDs identified in (step 2)  
           output-dir: demo-docs
