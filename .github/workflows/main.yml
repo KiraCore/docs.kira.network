@@ -2,14 +2,14 @@ name: Publish Notion website to GitHub Pages
 
 on:
   # Manual update only.
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: igor-kupczynski/notion-exporter@vecd2eebe438a69fe8a9bbfd4e4ac4ec4d9e05007
+      - uses: igor-kupczynski/notion-exporter@c7457ff
         with:
           pages: "d8a73a70ab7544e29eb8638603ad9442"  # Pages IDs identified in (step 2)  
           output-dir: demo-docs
