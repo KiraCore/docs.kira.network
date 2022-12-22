@@ -97,7 +97,7 @@ jobs:
       - name: Create PR from dev to master branch
         # ref. repo-sync/pull-request is broken, using cea2aj/pull-request instead
         uses: cea2aj/pull-request@84eb0c3478f13651e5649367941b867ca02d7926
-        if: ( env.SOURCE_BRANCH == dev || env.SOURCE_BRANCH == 'dev' )
+        if: env.SOURCE_BRANCH == dev
         with:
           github_token: ${{ secrets.REPO_ACCESS }}
           source_branch: ${{ env.SOURCE_BRANCH }}
