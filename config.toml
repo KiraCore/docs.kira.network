@@ -1,0 +1,25 @@
+## Loconotion Site Configuration File ##
+# name of the folder that the site will be generated in
+name = "Demo Docs"
+
+# the notion.so page to being parsing from. This page will become the index.html
+# of the generated site, and loconotion will parse all sub-pages present on the page
+page = "https://kira-network.notion.site/Demo-Docs-d8a73a70ab7544e29eb8638603ad9442"
+
+# optionally apply notion's dark mode, remove the line below to use the default light mode
+# theme = "dark"
+
+## Global Site Settings ##
+# this [site] table defines override settings for the whole site
+# later on we will see how to define settings for a single page
+[site]
+  ## Custom Meta Tags ##
+  # defined as an array of tables (double square brackets)
+  # each key in the table maps to an atttribute in the tag
+  # the following adds the tag <meta name="title" content="Loconotion Test Site"/>
+  [[site.meta]]
+  name = "title"
+  content = "Loconotion Test Site"
+  [[site.meta]]
+  name = "description"
+  content = "A static site generated from a Notion.so page using Loconotion"
