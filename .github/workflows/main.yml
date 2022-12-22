@@ -80,8 +80,8 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.REPO_ACCESS }}
-          branch: ${{ github.ref }}
-          ssh: true
+          branch: master
+          force: true
     # - name: Deploy to Pages
     #    uses: JamesIves/github-pages-deploy-action@3.7.1
     #    with:
