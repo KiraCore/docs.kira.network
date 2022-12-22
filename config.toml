@@ -1,4 +1,4 @@
-## Loconotion Site Configuration File ##
+## Site Configuration File ##
 # name of the folder that the site will be generated in
 name = "Demo Docs"
 

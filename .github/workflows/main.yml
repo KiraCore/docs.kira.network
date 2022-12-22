@@ -69,7 +69,7 @@ jobs:
           [ -z "$IPFS_HASH" ] && echo "ERROR: IPFS Upload Failed" && exit 1
           rm -fv ./ipfs-pin.log
           echo "$IPFS_HASH" > ./ipfs-cid.txt
-          IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}
+          IPFS_HASH_SHORT="${IPFS_HASH::10}...${IPFS_HASH: -3}"
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
           echo "IPFS_HASH_SHORT=$IPFS_HASH_SHORT" >> $GITHUB_ENV
       - name: Deploy to Pages
