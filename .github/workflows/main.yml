@@ -1,4 +1,4 @@
-name: Notion-backup to HTML
+name: Convert public notion page to HTML
 
 on:
   # Manual update only.
@@ -53,8 +53,8 @@ jobs:
           cp -fv ../_site/config.toml ./site.toml
           python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver
           cd ..
-          cp -a ./_site/. ./
-          cp ./loconotion/dist/. ./
+          cp -av ./_site/. ./
+          cp -av ./loconotion/dist/. ./
           rm -rf ./site ./loconotion
           ls -a1 ./
 
