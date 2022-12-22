@@ -71,12 +71,23 @@ jobs:
           echo "$IPFS_HASH" > ./ipfs-cid.txt
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
           echo "IPFS_HASH_SHORT=$IPFS_HASH_SHORT" >> $GITHUB_ENV
-      - name: Deploy to Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Deployed to IPFS: ${{env.IPFS_HASH}}"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
-          BRANCH: master
-          FOLDER: ./
-          COMMIT_MESSAGE: "Deployed to IPFS: ${{env.IPFS_HASH}}"
+          github_token: ${{ secrets.REPO_ACCESS }}
+          branch: ${{ github.ref }}
+          ssh: true
+    # - name: Deploy to Pages
+    #    uses: JamesIves/github-pages-deploy-action@3.7.1
+    #    with:
+    #      GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+    #      BRANCH: master
+    #      FOLDER: ./
+    #      COMMIT_MESSAGE: "Deployed to IPFS: ${{env.IPFS_HASH}}"
 
 #    
