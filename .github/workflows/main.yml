@@ -28,9 +28,10 @@ jobs:
         with:
           python-version: 3.10.0
       - name: Checkout loconotion
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: leoncvlt/loconotion
+          ref: 759697ade3e29d97d5de477f8d39404e2c53789f
           path: loconotion
       - name: Download current version of the site
         uses: actions/checkout@v3
@@ -42,7 +43,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - name: Install Loconotion
+      - name: Install Loconotion & Setup
         run: |
           ls -a1 ./
           cd ./loconotion
@@ -51,6 +52,13 @@ jobs:
           mkdir -p ./dist
           cp -fv ../_site/config.toml ./site.toml
           python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver
+          cd ..
+          cp -a ./_site/. ./
+          cp ./loconotion/dist/. ./
+          rm -rf ./site ./loconotion
+          ls -a1 ./
+
+
 
 
       #- name: Build Loconotion docker image
@@ -70,10 +78,10 @@ jobs:
       #    -v "${GITHUB_WORKSPACE}/config.toml:/app/loconotion/site.toml" \
       #    loconotion "site.toml"
       #  working-directory: loconotion
-      - name: List files in the repository
-        run: ls -a1 $GITHUB_WORKSPACE
-      - name: List files in distro
-        run: ls -a1 ${GITHUB_WORKSPACE}/pages_repo/dist/notion
+     # - name: List files in the repository
+     #   run: ls -a1 $GITHUB_WORKSPACE
+     # - name: List files in distro
+     #   run: ls -a1 ${GITHUB_WORKSPACE}/pages_repo/dist/notion
 
 
 #      - name: Delete previous backup
