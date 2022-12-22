@@ -43,65 +43,35 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - name: Install Loconotion & Setup
+      - name: Install Loconotion & Build
         run: |
           ls -a1 ./
           cd ./loconotion
           pip install -r ./requirements.txt
-          rm -rfv ./dist
-          mkdir -p ./dist
+          rm -rfv ./dist ./src
+          mkdir -p ./dist ./src
           cp -fv ../_site/config.toml ./site.toml
           python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver
           cd ..
           cp -av ./_site/. ./
-          cp -av ./loconotion/dist/. ./
-          rm -rf ./site ./loconotion
-          ls -a1 ./
-
-
-
-
-      #- name: Build Loconotion docker image
-      #  run: docker-compose build loconotion
-      #  working-directory: loconotion
-     
-
-      #- name: Configuration File
-      #  run: |
-      #    cat >  ${GITHUB_WORKSPACE}/loconotion/example/example_site.toml  << EOF
-      #    ${{ secrets.SITE_CONFIG }}
-      #    EOF
-      #- name: Run Loconotion
-      #  run: |
-      #    docker-compose run \
-      #    -v "${GITHUB_WORKSPACE}/pages_repo/dist:/app/loconotion/dist" \
-      #    -v "${GITHUB_WORKSPACE}/config.toml:/app/loconotion/site.toml" \
-      #    loconotion "site.toml"
-      #  working-directory: loconotion
-     # - name: List files in the repository
-     #   run: ls -a1 $GITHUB_WORKSPACE
-     # - name: List files in distro
-     #   run: ls -a1 ${GITHUB_WORKSPACE}/pages_repo/dist/notion
-
-
-#      - name: Delete previous backup
-#        run: rm -rf markdown html *.zip
-#      - name: Setup dependencies
-#        run: npm install -g notion-backup
-#      - name: Run backup
-#        run: notion-backup
-#        env:
-#          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-#          NOTION_SPACE_ID: ${{ env.NOTION_PAGE_ID }}
-#          NODE_OPTIONS: "--max-http-header-size 15000"
-#      - name: Delete zips
-#        run: rm -f *.zip
-#      - name: List files in the repository
-#        run: ls $GITHUB_WORKSPACE
-#      - name: Deploy to Pages
-#        uses: JamesIves/github-pages-deploy-action@3.7.1
-#        with:
-#          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
-#          BRANCH: master
-#          FOLDER: _site
-#          COMMIT_MESSAGE: 🤖 Notion page ${{ env.NOTION_PAGE_ID }} deployed.
+          cp -av "${GITHUB_WORKSPACE}/loconotion/dist/Demo Docs/." ./src
+          rm -rf ./_site ./loconotion
+          ls -a1 ./src
+      - name: Publish to IPFS
+        run: |
+          IPFS_UPLOAD_NAME="docs.kira.network"
+          ipfs-api delete $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true || echo "WARNING: Failed to delete file with name '$IPFS_UPLOAD_NAME' request failed or it might not exist"
+          ipfs-api pin ./src $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true | tee -a ./ipfs-pin.log || ( echo "ERROR: Failed to pin web app" && exit 1)
+          IPFS_HASH=$(cat ./ipfs-pin.log | tail -n 1 | bash-utils jsonParse ".hash" || echo "")
+          echo "$IPFS_HASH" > ./ipfs-cid.txt
+          IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}
+          echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
+          echo "IPFS_HASH_SHORT=$IPFS_HASH_SHORT" >> $GITHUB_ENV
+      - name: Deploy to Pages
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+          BRANCH: master
+          COMMIT_MESSAGE: "Deployed to IPFS: ${{env.IPFS_HASH}}"
+          
+#    FOLDER: _site
