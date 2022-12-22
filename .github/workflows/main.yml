@@ -1,8 +1,8 @@
 name: Convert public notion page to HTML
 
 on:
-  # Manual update only.
-  workflow_dispatch:
+  push:
+    branches: [ master, dev ]
 
 jobs:
  build:
@@ -22,6 +22,22 @@ jobs:
           git config --global --add safe.directory /github/home/.cache/pip
           git config --global --add safe.directory $PWD
           echo "NOTION_PAGE_ID=d8a73a70ab7544e29eb8638603ad9442" >> $GITHUB_ENV
+          REPOSITORY_NAME="${{ github.event.repository.name }}" && echo "REPOSITORY_NAME=$REPOSITORY_NAME" >> $GITHUB_ENV
+          echo "MASTER_REF=$(git ls-remote https://github.com/kiracore/$REPOSITORY_NAME | head -1 | sed 's/HEAD//')" >> $GITHUB_ENV
+          git show-branch "remotes/origin/dev" && echo "DEV_BRANCH_EXISTS=true" >> $GITHUB_ENV || echo "DEV_BRANCH_EXISTS=false" >> $GITHUB_ENV
+      - name: Extract branch name on push
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+      - name: Extract branch name on pull request
+        if: github.event_name == 'pull_request'
+        env:
+          REF_BRANCH: ${{ github.event.pull_request.head.ref }}
+          BASE_REF_BRANCH: ${{ github.base_ref }}
+        shell: bash
+        run: |
+          echo "SOURCE_BRANCH=$(echo ${{ env.REF_BRANCH }})" >> $GITHUB_ENV
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -38,10 +54,6 @@ jobs:
           repository: 'KiraCore/docs.kira.network'
           ref: master
           path: _site
-#      - name: Setup Node
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: '12'
       - name: Install Loconotion & Build
         run: |
           ls -a1 ./
@@ -56,10 +68,11 @@ jobs:
           cp -av "${GITHUB_WORKSPACE}/loconotion/dist/Demo Docs/." ./src
           rm -rf ./_site ./loconotion
           ls -a1 ./src
+          echo "${{env.SOURCE_BRANCH}}" > ./src/source.txt
       - name: Publish HTML to IPFS
         run: |
           set -x
-          IPFS_UPLOAD_NAME="www-docs-kira-network"
+          IPFS_UPLOAD_NAME="www-docs-kira-network-${{env.SOURCE_BRANCH}}"
           set -e
           ipfs-api delete $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true || echo "WARNING: Failed to delete file with name '$IPFS_UPLOAD_NAME' request failed or it might not exist"
           set +e
@@ -74,14 +87,44 @@ jobs:
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add --all
-          git commit -a -m "Deployed to IPFS: ${{env.IPFS_HASH}}"
+          git add -A
+          git commit -m "Deployed to IPFS: ${{env.IPFS_HASH}}"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.REPO_ACCESS }}
-          branch: master
-          force: true
+          branch: ${{ github.ref }}
+      - name: Create PR from dev to master branch
+        # ref. repo-sync/pull-request is broken, using cea2aj/pull-request instead
+        uses: cea2aj/pull-request@84eb0c3478f13651e5649367941b867ca02d7926
+        if: ( env.SOURCE_BRANCH == dev || env.SOURCE_BRANCH == 'dev' )
+        with:
+          github_token: ${{ secrets.REPO_ACCESS }}
+          source_branch: ${{ env.SOURCE_BRANCH }}
+          destination_branch: master
+          pr_title: "${{ env.SOURCE_BRANCH }} -> master" 
+          pr_label: "kira-automation"
+          pr_allow_empty: true
+
+
+#      - name: Publish HTML to IPFS
+#        uses: peterjgrainger/action-create-branch@v2.2.0
+#        env:
+#            GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+#        with:
+#            branch: 'release'
+#      - name: Commit files
+#        run: |
+#          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+#          git config --local user.name "github-actions[bot]"
+#          git add --all
+#          git commit -a -m "Deployed to IPFS: ${{env.IPFS_HASH}}" -b release
+#      - name: Push changes
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.REPO_ACCESS }}
+#          branch: release
+#          force: true
     # - name: Deploy to Pages
     #    uses: JamesIves/github-pages-deploy-action@3.7.1
     #    with:
