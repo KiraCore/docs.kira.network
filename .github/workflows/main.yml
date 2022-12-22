@@ -57,7 +57,7 @@ jobs:
           cp -av "${GITHUB_WORKSPACE}/loconotion/dist/Demo Docs/." ./src
           rm -rf ./_site ./loconotion
           ls -a1 ./src
-      - name: Publish to IPFS
+      - name: Publish HTML to IPFS
         run: |
           set -x
           IPFS_UPLOAD_NAME="www-docs-kira-network"
@@ -69,7 +69,6 @@ jobs:
           [ -z "$IPFS_HASH" ] && echo "ERROR: IPFS Upload Failed" && exit 1
           rm -fv ./ipfs-pin.log
           echo "$IPFS_HASH" > ./ipfs-cid.txt
-          IPFS_HASH_SHORT="${IPFS_HASH::10}...${IPFS_HASH: -3}"
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
           echo "IPFS_HASH_SHORT=$IPFS_HASH_SHORT" >> $GITHUB_ENV
       - name: Deploy to Pages
