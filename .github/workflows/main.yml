@@ -22,10 +22,10 @@ jobs:
           git config --global --add safe.directory /github/home/.cache/pip
           git config --global --add safe.directory $PWD
           echo "NOTION_PAGE_ID=d8a73a70ab7544e29eb8638603ad9442" >> $GITHUB_ENV
-#      - name: Set up Python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: 3.10.0
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
       - name: Checkout loconotion
         uses: actions/checkout@v3
         with:
