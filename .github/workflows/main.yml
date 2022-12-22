@@ -59,10 +59,15 @@ jobs:
           ls -a1 ./src
       - name: Publish to IPFS
         run: |
-          IPFS_UPLOAD_NAME="docs.kira.network"
+          set -x
+          IPFS_UPLOAD_NAME="www-docs-kira-network"
+          set -e
           ipfs-api delete $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true || echo "WARNING: Failed to delete file with name '$IPFS_UPLOAD_NAME' request failed or it might not exist"
-          ipfs-api pin ./src $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true | tee -a ./ipfs-pin.log || ( echo "ERROR: Failed to pin web app" && exit 1)
+          set +e
+          ipfs-api pin ./src $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true | tee -a ./ipfs-pin.log || echo "ERROR: Failed to pin web app"
           IPFS_HASH=$(cat ./ipfs-pin.log | tail -n 1 | bash-utils jsonParse ".hash" || echo "")
+          [ -z "$IPFS_HASH" ] && echo "ERROR: IPFS Upload Failed" && exit 1
+          rm -fv ./ipfs-pin.log
           echo "$IPFS_HASH" > ./ipfs-cid.txt
           IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
@@ -73,5 +78,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
           BRANCH: master
           COMMIT_MESSAGE: "Deployed to IPFS: ${{env.IPFS_HASH}}"
-          
+
 #    FOLDER: _site
