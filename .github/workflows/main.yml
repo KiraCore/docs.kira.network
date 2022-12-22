@@ -1,0 +1,61 @@
+name: Notion-backup to HTML
+
+on:
+  # Manual update only.
+  workflow_dispatch:
+
+jobs:
+ build:
+    name: Repo Build
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      pull-requests: write
+    container: 
+      image: ghcr.io/kiracore/docker/base-image:v0.11.2
+    steps:
+      - name: Init
+        run: |
+          git config --global --add safe.directory /github/workspace
+          git config --global --add safe.directory $PWD
+          echo "NOTION_PAGE_ID=d8a73a70ab7544e29eb8638603ad9442" >> $GITHUB_ENV
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
+      - name: Download current version of the site
+        uses: actions/checkout@v3
+        with:
+          # HERE, YOU NEED TO PLACE YOUR REPOSITORY
+          repository: 'KiraCore/docs.kira.network'
+          # TARGET BRANCH
+          ref: master
+          # THE FOLDER, WHERE NOTION4EVER EXPORTS YOUR CONTENT BY DEFAULT
+          path: _site
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: Delete previous backup
+        run: rm -rf markdown html *.zip
+      - name: Setup dependencies
+        run: npm install -g notion-backup
+      - name: Run backup
+        run: notion-backup
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SPACE_ID: ${{ env.NOTION_PAGE_ID }}
+          NODE_OPTIONS: "--max-http-header-size 15000"
+      - name: Delete zips
+        run: rm -f *.zip
+      - name: List files in the repository
+        run: ls $GITHUB_WORKSPACE
+      - name: Deploy to Pages
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+          BRANCH: master
+          FOLDER: _site
+          COMMIT_MESSAGE: 🤖 Notion page ${{ env.NOTION_PAGE_ID }} deployed.
