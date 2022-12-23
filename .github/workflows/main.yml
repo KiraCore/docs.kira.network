@@ -92,8 +92,9 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.REPO_ACCESS }}
+          github_token: ${{ secrets.ADMIN_ACCESS }}
           branch: ${{ github.ref }}
+          ssh: true
       - name: Create PR from dev to master branch
         # ref. repo-sync/pull-request is broken, using cea2aj/pull-request instead
         uses: cea2aj/pull-request@84eb0c3478f13651e5649367941b867ca02d7926
