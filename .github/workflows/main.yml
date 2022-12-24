@@ -86,10 +86,11 @@ jobs:
       - name: Release
         uses: s0/git-publish-subdir-action@develop
         env:
-            REPO: git@github.com:KiraCore/docs.kira.network.git
+            REPO: self
             BRANCH: "${{ env.SOURCE_BRANCH }}-release"
             FOLDER: src
             SSH_PRIVATE_KEY: ${{ secrets.KIRA_GITHUB_SSH }}
+            KNOWN_HOSTS_FILE: resources/known_hosts
 
     #  - name: Commit files
     #    run: |
