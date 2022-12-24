@@ -93,7 +93,7 @@ jobs:
           pr_title: "${{ env.SOURCE_BRANCH }} -> master" 
           pr_label: "kira-automation"
           pr_allow_empty: true
-          pr_body: |
-             Web app was deployed to IPFS: ```${{env.IPFS_HASH}}```
-             * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)
-             * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)
+#          pr_body: |
+#             Web app was deployed to IPFS: ```${{env.IPFS_HASH}}```
+#             * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)
+#             * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)
