@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+async function getText(url){
+  return new Promise(function (resolve, reject) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.send();
+    request.onload = function () {
+        if (request.status === 200) {
+          resolve(request.responseText);
+        } else {
+          reject(new Error(`Unexpected status ${request.status}`))
+        }
+    }
+  }).catch(function(e) {
+    console.error(`ERROR: Request to '${url}' failed: ${e.message}`)
+  });
+}
+
+function fileExist(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('HEAD', url, false);
+    xhr.send();
+    return xhr.status === 200;
+}
+
+async function main() {
+  // delay redirect by at least 3 seconds
+  var sleepPromise = sleep(4000)
+  var hostname=window.location.hostname
+  var branch = ""
+  var repo = ""
+  var dnsP1 = ""
+  var dnsP2 = ""
+  console.info(`INFO: Extracting branch name from hostname: '${hostname}'`)
+
+  // extract dns name prefix and split into 2 parts by '-' symbol
+  // accepted dns names: xxx-dev.kira.network, dev-xxx.kira.network
+  var dnsP1 = hostname.split('.').join(' ').split('-').join(' ').split(' ')[0].trim().toLowerCase()
+  var dnsP2 = hostname.split('.').join(' ').split('-').join(' ').split(' ')[1].trim().toLowerCase()
+  if ( dnsP1 === "demo" || dnsP1 === "dev" || dnsP1 === "test" )  {
+    branch="dev-release"
+    repo=`${dnsP2}.kira.network`
+  } else if ( dnsP2 === "demo" || dnsP2 === "dev" || dnsP2 === "test" )  {
+    branch="dev-release"
+    repo=`${dnsP1}.kira.network`
+  } else {
+    branch = "master-release"
+    repo=`${dnsP1}.kira.network`
+    console.warn(`WARNING: Branch name was not provided, defaulting to '${branch}'`)
+  }
+
+  console.info(`INFO: The '${branch}' branch and '${repo}' target repo was detected`)
+
+  console.info(`INFO: Searching for '${branch}' release...`)
+  var cid = await getText(`https://raw.githubusercontent.com/KiraCore/${repo}/${branch}/ipfs-cid.txt`)
+
+  // Choose random gateway to distribute the traffic
+  var gateways = [
+     `https://ipfs.kira.network/ipfs/${cid}`,
+  ];
+  var i = Math.floor(Math.random() * gateways.length);
+  var gateway = gateways[i];
+
+  var div_info = document.getElementById('div-info');
+  var div_error = document.getElementById('div-error');
+
+  var video_kira = document.getElementById('vid-kira');
+  var video_404 = document.getElementById('vid-404');
+
+  await sleepPromise;
+
+  console.info("INFO: Checking if web app exist...")
+  if (fileExist(`${gateway}/index.html`)) {
+    console.info("INFO: Success, resources were found!")
+
+    console.info(`INFO: Redirecting -> ${gateway}`)
+    window.location.replace(gateway);
+  } else {
+    console.error("ERROR: Failure, resources were NOT found!")
+    div_info.style.display = 'none'
+    div_error.style.display = ''
+
+    video_404.style.display = ''
+    video_kira.style.display = 'none'
+
+    var rel_link_content = `https://github.com/KiraCore/${repo}`
+    document.getElementById('rel-link').href = rel_link_content
+
+    console.error("ERROR: We were not able to find the app")
+    console.info(`INFO: Visit following github page to find latest release: ${rel_link_content}`)
+  }
+
+  console.info("INFO: Page loader finished")
+}
+
+console.info("INFO: Page loader started")
+main();
+</script>
+
+<style>
+  html, body {background-color: black;justify-content: center;text-align: center;display: block; height: 99% }
+  span {color: #BAC8D7; line-height: 1.7;font-size: 18px;font-family:'Courier New', Courier, monospace;}
+  video {   width: 256px; padding-bottom: 32px;   }
+  p {text-align:center; justify-content: center; align-items: center; padding: 8px; }
+  div {text-align:center; justify-content: center; align-items: center; display: block; margin-left: auto; margin-right: auto; }
+  .container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+</style>
+</head>
+<body>
+  <div class="container">
+  <video id="vid-kira" autoplay loop muted inline style="display:'';">
+    <source src="https://ipfs.kira.network/ipfs/QmbTuX2WLVug1kTFb8L6bVRBgn2NhZz4NANpEAvnP2wwq8" type="video/mp4">
+  </video>
+  <video id="vid-404" autoplay loop muted inline style="display: none; height: 192px;margin-top: 78px;">
+    <source src="https://ipfs.kira.network/ipfs/QmWhmm3tQd6SDq6eAFdnjvT8frTZiA5yERrwD4cFx5o9U6" type="video/mp4">
+  </video>
+  <div>
+    <div id="div-info" style="width: 768px; display:'';">
+      <span>You are leaving </span>
+      <a href="https://kira.network"><span><strong>kira.network</strong></span></a>&nbsp
+      <span>
+        and are being redirected to the independent, community-operated instance of the open source front end, hosted and served on the distributed, peer-to-peer file network IPFS...
+      </span>
+    </div>
+  </div>
+  <div>
+    <div  id="div-error" style="width: 768px; display: none;">
+      <span>The IPFS gateway is currently not available, please visit our </span>
+      <a id="rel-link" href=""><span><strong>github repository</strong></span></a>&nbsp
+      <span>
+        where you can download latest release of the frontend application, or click
+      </span>
+      <a href="#" onclick="window.location.reload(true);"><span><strong>F5</strong></span></a>&nbsp
+      <span>
+        to refresh the page and try connecting again :)
+      </span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
