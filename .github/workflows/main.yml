@@ -84,8 +84,7 @@ jobs:
             FOLDER: "${{ env.DISTRO }}"
             GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
       - name: Create PR from dev to master branch
-        # ref. repo-sync/pull-request is broken, using cea2aj/pull-request instead
-        uses: cea2aj/pull-request@84eb0c3478f13651e5649367941b867ca02d7926
+        uses: repo-sync/pull-request@adae1bbaa57ec7d2028bb3e0a847498d10e6bfbe
         if: env.SOURCE_BRANCH == 'dev'
         with:
           github_token: ${{ secrets.REPO_ACCESS }}
