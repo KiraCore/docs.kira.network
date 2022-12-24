@@ -45,12 +45,11 @@ jobs:
           ls -a1 ./
           cd ./loconotion
           pip install -r ./requirements.txt
-          rm -rfv ./dist
-          mkdir -p ./dist
+          rm -rfv ./dist && mkdir -p ./dist
           cp -fv ../_site/config.toml ./site.toml
           python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver
-          echo "${{env.SOURCE_BRANCH}}" > ${{env.DISTRO}}/source.txt
-          ls -a1 ${{env.DISTRO}}
+          echo "${{env.SOURCE_BRANCH}}" > "${{env.DISTRO}}/source.txt"
+          ls -a1 "${{env.DISTRO}}"
       - name: Publish HTML to IPFS
         run: |
           set -x
@@ -58,10 +57,10 @@ jobs:
           set -e
           ipfs-api delete $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true || echo "WARNING: Failed to delete file with name '$IPFS_UPLOAD_NAME' request failed or it might not exist"
           set +e
-          ipfs-api pin ${{env.DISTRO}} $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true | tee -a ./ipfs-pin.log || echo "ERROR: Failed to pin web app"
+          ipfs-api pin "${{env.DISTRO}}" $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true | tee -a ./ipfs-pin.log || echo "ERROR: Failed to pin web app"
           IPFS_HASH=$(cat ./ipfs-pin.log | tail -n 1 | bash-utils jsonParse ".hash" || echo "")
           [ -z "$IPFS_HASH" ] && echo "ERROR: IPFS Upload Failed" && exit 1
-          echo "$IPFS_HASH" > ${{env.DISTRO}}/ipfs-cid.txt
+          echo "$IPFS_HASH" > "${{env.DISTRO}}/ipfs-cid.txt"
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
           echo "IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}" >> $GITHUB_ENV
       - name: Release
@@ -69,7 +68,7 @@ jobs:
         env:
             REPO: self
             BRANCH: "${{ env.SOURCE_BRANCH }}-release"
-            FOLDER: ${{env.DISTRO}}
+            FOLDER: "${{env.DISTRO}}"
             GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
       - name: Create PR from dev to master branch
         # ref. repo-sync/pull-request is broken, using cea2aj/pull-request instead
