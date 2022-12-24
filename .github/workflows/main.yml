@@ -83,6 +83,15 @@ jobs:
             BRANCH: "${{ env.SOURCE_BRANCH }}-release"
             FOLDER: "${{ env.DISTRO }}"
             GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+      - name: Cleanup
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          rm -rfv ./*
+      - name: Download current version of the site
+        if: env.SOURCE_BRANCH == 'dev'
+        uses: actions/checkout@v3
+        with:
+          ref: dev
       - name: Create PR from dev to master branch
         uses: cea2aj/pull-request@84eb0c3478f13651e5649367941b867ca02d7926
         if: env.SOURCE_BRANCH == 'dev'
@@ -93,7 +102,7 @@ jobs:
           pr_title: "${{ env.SOURCE_BRANCH }} -> master" 
           pr_label: "kira-automation"
           pr_allow_empty: true
-#          pr_body: |
-#             Web app was deployed to IPFS: ```${{env.IPFS_HASH}}```
-#             * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)
-#             * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)
+          pr_body: |
+             Web app was deployed to IPFS: ```${{env.IPFS_HASH}}```
+             * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)
+             * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)
