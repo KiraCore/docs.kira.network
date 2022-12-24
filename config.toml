@@ -1,6 +1,6 @@
 ## Site Configuration File ##
 # name of the folder that the site will be generated in
-name = "Demo Docs"
+name = "notion"
 
 # the notion.so page to being parsing from. This page will become the index.html
 # of the generated site, and loconotion will parse all sub-pages present on the page
@@ -18,8 +18,8 @@ page = "https://kira-network.notion.site/Demo-Docs-d8a73a70ab7544e29eb8638603ad9
   # each key in the table maps to an atttribute in the tag
   # the following adds the tag <meta name="title" content="Loconotion Test Site"/>
   [[site.meta]]
-  name = "title"
-  content = "Loconotion Test Site"
+  name = "docs"
+  content = "KIRA docs"
   [[site.meta]]
   name = "description"
-  content = "A static site generated from a Notion.so page using Loconotion"
+  content = "Public docs of the kira.network"
