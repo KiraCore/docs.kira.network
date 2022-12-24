@@ -89,8 +89,9 @@ jobs:
             REPO: self
             BRANCH: "${{ env.SOURCE_BRANCH }}-release"
             FOLDER: src
-            SSH_PRIVATE_KEY: ${{ secrets.KIRA_GITHUB_SSH }}
-            KNOWN_HOSTS_FILE: resources/known_hosts
+            GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+  #          SSH_PRIVATE_KEY: ${{ secrets.KIRA_GITHUB_SSH }}
+  #          KNOWN_HOSTS_FILE: resources/known_hosts
 
     #  - name: Commit files
     #    run: |
