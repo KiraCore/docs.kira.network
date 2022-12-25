@@ -14,7 +14,7 @@ jobs:
       id-token: write
       pull-requests: write
     container: 
-      image: ghcr.io/kiracore/docker/base-image:v0.11.2
+      image: ghcr.io/kiracore/docker/base-image:v0.12.2
     steps:
       - name: Init
         run: |
@@ -27,10 +27,10 @@ jobs:
           echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
           echo "DISTRO=${GITHUB_WORKSPACE}/loconotion/dist/notion" >> $GITHUB_ENV
           echo "RELEASE=${GITHUB_WORKSPACE}/release" >> $GITHUB_ENV
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10.0
+#      - name: Set up Python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: 3.10.0
       - name: Checkout loconotion
         uses: actions/checkout@v3
         with:
@@ -72,10 +72,10 @@ jobs:
       - name: Save changes to release folder
         run: |
           ZIP_FILENAME="${{env.SUBDOMAIN}}.${{env.DNS}}.zip"
-          cd ${{env.DISTRO}}"
-          rm -fv $ZIP_FILENAME
-          zip -r $ZIP_FILENAME *
-          cp -fv ${{env.DISTRO}}/$ZIP_FILENAME "${{env.RELEASE}}/$ZIP_FILENAME"
+          cd "${{env.DISTRO}}"
+          rm -fv "./$ZIP_FILENAME"
+          zip -r "./$ZIP_FILENAME" ./*
+          cp -fv "${{env.DISTRO}}/$ZIP_FILENAME" "${{env.RELEASE}}/$ZIP_FILENAME"
 
           echo "${{env.IPFS_HASH}}" > "${{env.DISTRO}}/ipfs-cid.txt"
 
