@@ -24,6 +24,7 @@ jobs:
           echo "INDEX_MODE=redirect" >> $GITHUB_ENV
           echo "SUBDOMAIN=docs" >> $GITHUB_ENV
           echo "DNS=kira.network" >> $GITHUB_ENV
+          echo "USERNAME=KiraCore" >> $GITHUB_ENV
       - name: Checkout loconotion
         uses: actions/checkout@v3
         with:
@@ -33,7 +34,7 @@ jobs:
       - name: Download current version of the site
         uses: actions/checkout@v3
         with:
-          repository: "KiraCore/${{env.SUBDOMAIN}}.${{env.DNS}}"
+          repository: "${{env.USERNAME}}/${{env.SUBDOMAIN}}.${{env.DNS}}"
           ref: ${{ env.SOURCE_BRANCH }}
           path: _site
       - name: Init Part 2
@@ -41,7 +42,7 @@ jobs:
           echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
           echo "DISTRO=${GITHUB_WORKSPACE}/loconotion/dist/notion" >> $GITHUB_ENV
           echo "RELEASE=${GITHUB_WORKSPACE}/release" >> $GITHUB_ENV
-          VERSION="$(cat ./version)" && echo "VERSION=$VERSION" >> $GITHUB_ENV
+          VERSION="$(cat ./_site/version)" && echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -87,7 +88,7 @@ jobs:
           sed -i "s/$TARGET_VAR/$ESCAPED_VAR/g" "${{env.RELEASE}}/index.html"
 
           TARGET_VAR="GITHUB_REPO"
-          REPLACE_VAR="https://github.com/KiraCore/${{env.SUBDOMAIN}}.${{env.DNS}}/tree/${{env.SOURCE_BRANCH}}-release"
+          REPLACE_VAR="https://github.com/${{env.USERNAME}}/${{env.SUBDOMAIN}}.${{env.DNS}}/tree/${{env.SOURCE_BRANCH}}-release"
           ESCAPED_VAR=$(echo "$REPLACE_VAR" | sed 's/\//\\\//g; s/&/\\&/g; s/\?/\\?/g')
           sed -i "s/$TARGET_VAR/$ESCAPED_VAR/g" "${{env.RELEASE}}/index.html"
       - name: Publish release folder
