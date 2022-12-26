@@ -16,21 +16,6 @@ jobs:
     container: 
       image: ghcr.io/kiracore/docker/base-image:v0.12.2
     steps:
-      - name: Init
-        run: |
-          mkdir -p /github/home/.cache/pip
-          git config --global --add safe.directory /github/home/.cache/pip
-          git config --global --add safe.directory $PWD
-          echo "INDEX_MODE=redirect" >> $GITHUB_ENV
-          echo "SUBDOMAIN=docs" >> $GITHUB_ENV
-          echo "DNS=kira.network" >> $GITHUB_ENV
-          echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo "DISTRO=${GITHUB_WORKSPACE}/loconotion/dist/notion" >> $GITHUB_ENV
-          echo "RELEASE=${GITHUB_WORKSPACE}/release" >> $GITHUB_ENV
-      #- name: Set up Python
-      #  uses: actions/setup-python@v2
-      #  with:
-      #    python-version: 3.10.0
       - name: Checkout loconotion
         uses: actions/checkout@v3
         with:
@@ -43,14 +28,30 @@ jobs:
           repository: "KiraCore/${{env.SUBDOMAIN}}.${{env.DNS}}"
           ref: ${{ env.SOURCE_BRANCH }}
           path: _site
+      - name: Init
+        run: |
+          mkdir -p /github/home/.cache/pip
+          git config --global --add safe.directory /github/home/.cache/pip
+          git config --global --add safe.directory $PWD
+          echo "INDEX_MODE=redirect" >> $GITHUB_ENV
+          echo "SUBDOMAIN=docs" >> $GITHUB_ENV
+          echo "DNS=kira.network" >> $GITHUB_ENV
+          echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "DISTRO=${GITHUB_WORKSPACE}/loconotion/dist/notion" >> $GITHUB_ENV
+          echo "RELEASE=${GITHUB_WORKSPACE}/release" >> $GITHUB_ENV
+          VERSION="$(cat ./version)" && echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
       - name: Install Loconotion & Build
         run: |
           cd ./loconotion
-          pip3 install -r ./requirements.txt
+          pip install -r ./requirements.txt
           rm -rfv ./dist "${{env.DISTRO}}" "${{env.RELEASE}}"
           mkdir -p ./dist "${{env.DISTRO}}" "${{env.RELEASE}}"
           cp -fv ../_site/config.toml ./site.toml
-          python3 loconotion "./site.toml" --chromedriver /usr/bin/chromedriver --timeout 600 
+          python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver --timeout 600 
           echo "${{env.SOURCE_BRANCH}}" > "${{env.RELEASE}}/source.txt"
           echo "${{env.SUBDOMAIN}}.${{env.DNS}}" > "${{env.RELEASE}}/CNAME"
           cp -fv ../_site/LICENSE.md "${{env.RELEASE}}/LICENSE.md"
@@ -61,7 +62,7 @@ jobs:
       - name: Publish HTML to IPFS
         run: |
           set -x
-          IPFS_UPLOAD_NAME="www-${{env.SUBDOMAIN}}.${{env.DNS}}-${{env.SOURCE_BRANCH}}"
+          IPFS_UPLOAD_NAME="www-${{env.SUBDOMAIN}}.${{env.DNS}}-${{env.SOURCE_BRANCH}}-${{env.VERSION}}"
           set -e
           ipfs-api delete $IPFS_UPLOAD_NAME --key=${{secrets.PINATA_API_JWT}} --verbose=true || echo "WARNING: Failed to delete file with name '$IPFS_UPLOAD_NAME' request failed or it might not exist"
           set +e
@@ -75,7 +76,6 @@ jobs:
           cd "${{env.DISTRO}}"
           rm -fv "./$ZIP_FILENAME"
           zip -r "./$ZIP_FILENAME" ./*
-          cp -fv "${{env.DISTRO}}/$ZIP_FILENAME" "${{env.RELEASE}}/$ZIP_FILENAME"
 
           echo "${{env.IPFS_HASH}}" > "${{env.RELEASE}}/ipfs-cid.txt"
 
@@ -95,6 +95,53 @@ jobs:
             BRANCH: "${{ env.SOURCE_BRANCH }}-release"
             FOLDER: "${{ env.RELEASE }}"
             GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+      - name: Signing release files
+        if: env.SOURCE_BRANCH == 'master'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cd "${{env.RELEASE}}"
+          ZIP_FILENAME="${{env.SUBDOMAIN}}.${{env.DNS}}.zip"
+          cp -fv "${{env.DISTRO}}/$ZIP_FILENAME" "${{env.RELEASE}}/html-web-site.zip"
+
+          echo -e "\n\r\n\r\`\`\`" >> ./RELEASE.md
+          echo -e "       Release Versions: ${env.VERSION}\n\r" >> ./RELEASE.md
+          echo -e "      Release Date Time: $(date --rfc-2822)" >> ./RELEASE.md
+          echo "     html-web-site.zip": sha256:$(sha256sum ./html-web-site.zip  | awk '{ print $1 }')" >> ./RELEASE.md
+          echo "          ipfs-cid.txt": sha256:$(sha256sum ./ipfs-cid.txt  | awk '{ print $1 }')" >> ./RELEASE.md
+          echo "             index.html: sha256:$(sha256sum ./index.html  | awk '{ print $1 }')" >> ./RELEASE.md
+          echo -e "\`\`\`"   >> ./RELEASE.md
+          
+          echo "$KEY" > ../cosign.key
+          for FILE in *; do FILE_NAME=$(basename $FILE); cosign sign-blob --key=../cosign.key --output-signature=./${FILE_NAME}.sig ./$FILE_NAME; done
+          rm -fv ../cosign.key
+      - name: Delete old release
+        if: env.SOURCE_BRANCH == 'master'
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          tag_name: ${{env.VERSION}}
+          delete_release: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
+      - name: Publish release
+        if: env.SOURCE_BRANCH == 'master'
+        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+        with:
+          body_path: ${{env.RELEASE}}/RELEASE.md
+          tag_name: ${{env.VERSION}}
+          name: ${{env.VERSION}}
+          prerelease: false
+          draft: false
+          fail_on_unmatched_files: true
+          files: |
+            "${{env.RELEASE}}/html-web-site.zip"
+            "${{env.RELEASE}}/html-web-site.zip.sig"
+            "${{env.RELEASE}}/ipfs-cid.txt
+            "${{env.RELEASE}}/ipfs-cid.txt.sig"
+            "${{env.RELEASE}}/index.html
+            "${{env.RELEASE}}/index.html.sig"
       - name: Cleanup
         run: |
           cd ${GITHUB_WORKSPACE}
