@@ -88,7 +88,7 @@ jobs:
           echo "${{env.IPFS_HASH}}" > "${{env.RELEASE}}/ipfs-cid.txt"
 
           TARGET_VAR="IPFS_CID"
-          REPLACE_VAR="https://ipfs.${{env.DNS}}/ipfs/${{env.IPFS_HASH}}"
+          REPLACE_VAR="${{env.IPFS_HASH}}"
           ESCAPED_VAR=$(echo "$REPLACE_VAR" | sed 's/\//\\\//g; s/&/\\&/g; s/\?/\\?/g')
           sed -i "s/$TARGET_VAR/$ESCAPED_VAR/g" "${{env.RELEASE}}/index.html"
           
@@ -122,11 +122,12 @@ jobs:
           echo -e " * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./RELEASE.md
           echo -e " * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./RELEASE.md
           echo -e "\n\r\n\r\`\`\`" >> ./RELEASE.md
-          echo -e "       Release Versions: ${{env.VERSION}}\n\r" >> ./RELEASE.md
+          echo -e "       Release Versions: ${{env.VERSION}}" >> ./RELEASE.md
           echo -e "      Release Date Time: $(date --rfc-2822)" >> ./RELEASE.md
-          echo "     html-web-site.zip": sha256:$(sha256sum ./html-web-site.zip  | awk '{ print $1 }')" >> ./RELEASE.md
-          echo "          ipfs-cid.txt": sha256:$(sha256sum ./ipfs-cid.txt  | awk '{ print $1 }')" >> ./RELEASE.md
-          echo "             index.html: sha256:$(sha256sum ./index.html  | awk '{ print $1 }')" >> ./RELEASE.md
+          echo -e "       Release CID Hash: ${{env.IPFS_HASH}}\n\r" >> ./RELEASE.md
+          echo "      html-web-site.zip: sha256:$(sha256sum ./html-web-site.zip | awk '{ print $1 }')" >> ./RELEASE.md
+          echo "           ipfs-cid.txt: sha256:$(sha256sum ./ipfs-cid.txt | awk '{ print $1 }')" >> ./RELEASE.md
+          echo "             index.html: sha256:$(sha256sum ./index.html | awk '{ print $1 }')" >> ./RELEASE.md
           echo -e "\`\`\`"   >> ./RELEASE.md
           
           echo "$KEY" > ${GITHUB_WORKSPACE}/cosign.key
