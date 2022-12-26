@@ -43,6 +43,7 @@ async function main() {
 
   // extract dns name prefix and split into 2 parts by '-' symbol
   // accepted dns names: xxx-dev.kira.network, dev-xxx.kira.network
+  hostname=`${hostname}..`
   var dnsP1 = hostname.split('.').join(' ').split('-').join(' ').split(' ')[0].trim().toLowerCase()
   var dnsP2 = hostname.split('.').join(' ').split('-').join(' ').split(' ')[1].trim().toLowerCase()
   if ( dnsP1 === "demo" || dnsP1 === "dev" || dnsP1 === "test" )  {
