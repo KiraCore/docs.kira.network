@@ -9,7 +9,7 @@ jobs:
     name: Repo Build
     runs-on: ubuntu-20.04
     permissions:
-      contents: read
+      contents: write
       packages: write
       id-token: write
       pull-requests: write
