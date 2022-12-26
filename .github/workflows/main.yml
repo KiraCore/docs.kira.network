@@ -113,7 +113,7 @@ jobs:
 
           echo -e "\n\r\n\rPublished web site:" >> ./RELEASE.md
           echo -e " * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./RELEASE.md
-          echo -e " * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./bin/RELEASE.md
+          echo -e " * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./RELEASE.md
           echo -e "\n\r\n\r\`\`\`" >> ./RELEASE.md
           echo -e "       Release Versions: ${{env.VERSION}}\n\r" >> ./RELEASE.md
           echo -e "      Release Date Time: $(date --rfc-2822)" >> ./RELEASE.md
@@ -122,7 +122,7 @@ jobs:
           echo "             index.html: sha256:$(sha256sum ./index.html  | awk '{ print $1 }')" >> ./RELEASE.md
           echo -e "\`\`\`"   >> ./RELEASE.md
           
-          echo "$KEY" > ../cosign.key
+          echo "$KEY" > ${GITHUB_WORKSPACE}/cosign.key
           for FILE in *; do FILE_NAME=$(basename $FILE); cosign sign-blob --key=../cosign.key --output-signature=./${FILE_NAME}.sig ./$FILE_NAME; done
           rm -fv ../cosign.key
       - name: Delete old release
