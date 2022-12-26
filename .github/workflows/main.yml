@@ -78,6 +78,7 @@ jobs:
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
           IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}
           echo "IPFS_HASH_SHORT=$IPFS_HASH_SHORT" >> $GITHUB_ENV
+          rm -fv ./ipfs-pin.log
       - name: Save changes to release folder
         run: |
           ZIP_FILENAME="${{env.SUBDOMAIN}}.${{env.DNS}}.zip"
@@ -130,7 +131,7 @@ jobs:
           echo "             index.html: sha256:$(sha256sum ./index.html | awk '{ print $1 }')" >> ./RELEASE.md
           echo -e "\`\`\`"   >> ./RELEASE.md
           
-          echo "$KEY" > ${GITHUB_WORKSPACE}/cosign.key
+          echo "$KEY" > ../cosign.key
           for FILE in *; do FILE_NAME=$(basename $FILE); cosign sign-blob --key=../cosign.key --output-signature=./${FILE_NAME}.sig ./$FILE_NAME; done
           rm -fv ../cosign.key
           ls -a1 "${{env.RELEASE}}"
@@ -182,3 +183,9 @@ jobs:
              Web app was deployed to IPFS: ```${{env.IPFS_HASH}}```
              * Private Gateway: [ipfs.${{env.DNS}}/ipfs/${{env.IPFS_HASH}}](https://ipfs.${{env.DNS}}/ipfs/${{env.IPFS_HASH}}/index.html)
              * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)
+      - name: Cleanup all even if some tasks fail
+        shell: bash
+        continue-on-error: true
+        run: |
+          cd ${GITHUB_WORKSPACE} && rm -rfv ./*
+          echo "(current dir): $PWD" && ls -l ./
