@@ -77,6 +77,7 @@ jobs:
           [ -z "$IPFS_HASH" ] && echo "ERROR: IPFS Upload Failed" && exit 1
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
           IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}
+          echo "IPFS_HASH_SHORT=$IPFS_HASH_SHORT" >> $GITHUB_ENV
       - name: Save changes to release folder
         run: |
           ZIP_FILENAME="${{env.SUBDOMAIN}}.${{env.DNS}}.zip"
@@ -90,9 +91,14 @@ jobs:
           REPLACE_VAR="https://ipfs.${{env.DNS}}/ipfs/${{env.IPFS_HASH}}"
           ESCAPED_VAR=$(echo "$REPLACE_VAR" | sed 's/\//\\\//g; s/&/\\&/g; s/\?/\\?/g')
           sed -i "s/$TARGET_VAR/$ESCAPED_VAR/g" "${{env.RELEASE}}/index.html"
+          
+          TARGET_VAR="DNS_ADDRESS"
+          REPLACE_VAR="${{env.SUBDOMAIN}}.${{env.DNS}}"
+          ESCAPED_VAR=$(echo "$REPLACE_VAR" | sed 's/\//\\\//g; s/&/\\&/g; s/\?/\\?/g')
+          sed -i "s/$TARGET_VAR/$ESCAPED_VAR/g" "${{env.RELEASE}}/index.html"
 
           TARGET_VAR="GITHUB_REPO"
-          REPLACE_VAR="https://github.com/${{env.USERNAME}}/${{env.SUBDOMAIN}}.${{env.DNS}}/tree/${{env.SOURCE_BRANCH}}-release"
+          REPLACE_VAR="https://github.com/${{env.USERNAME}}/${{env.SUBDOMAIN}}.${{env.DNS}}/releases/tag/${{env.VERSION}}"
           ESCAPED_VAR=$(echo "$REPLACE_VAR" | sed 's/\//\\\//g; s/&/\\&/g; s/\?/\\?/g')
           sed -i "s/$TARGET_VAR/$ESCAPED_VAR/g" "${{env.RELEASE}}/index.html"
       - name: Publish release folder
