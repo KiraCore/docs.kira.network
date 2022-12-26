@@ -7,23 +7,6 @@ const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-async function getText(url){
-  return new Promise(function (resolve, reject) {
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.send();
-    request.onload = function () {
-        if (request.status === 200) {
-          resolve(request.responseText);
-        } else {
-          reject(new Error(`Unexpected status ${request.status}`))
-        }
-    }
-  }).catch(function(e) {
-    console.error(`ERROR: Request to '${url}' failed: ${e.message}`)
-  });
-}
-
 function fileExist(url) {
     var xhr = new XMLHttpRequest();
     xhr.open('HEAD', url, false);
@@ -34,34 +17,9 @@ function fileExist(url) {
 async function main() {
   // delay redirect by at least 3 seconds
   var sleepPromise = sleep(4000)
-  var hostname=window.location.hostname
-  var branch = ""
-  var repo = ""
-  var dnsP1 = ""
-  var dnsP2 = ""
-  console.info(`INFO: Extracting branch name from hostname: '${hostname}'`)
 
-  // extract dns name prefix and split into 2 parts by '-' symbol
-  // accepted dns names: xxx-dev.kira.network, dev-xxx.kira.network
-  hostname=`${hostname}..`
-  var dnsP1 = hostname.split('.').join(' ').split('-').join(' ').split(' ')[0].trim().toLowerCase()
-  var dnsP2 = hostname.split('.').join(' ').split('-').join(' ').split(' ')[1].trim().toLowerCase()
-  if ( dnsP1 === "demo" || dnsP1 === "dev" || dnsP1 === "test" )  {
-    branch="dev-release"
-    repo=`${dnsP2}.kira.network`
-  } else if ( dnsP2 === "demo" || dnsP2 === "dev" || dnsP2 === "test" )  {
-    branch="dev-release"
-    repo=`${dnsP1}.kira.network`
-  } else {
-    branch = "master-release"
-    repo=`${dnsP1}.kira.network`
-    console.warn(`WARNING: Branch name was not provided, defaulting to '${branch}'`)
-  }
-
-  console.info(`INFO: The '${branch}' branch and '${repo}' target repo was detected`)
-
-  console.info(`INFO: Searching for '${branch}' release...`)
-  var cid = await getText(`https://raw.githubusercontent.com/KiraCore/${repo}/${branch}/ipfs-cid.txt`)
+  console.info("INFO: Setting up load balancing...")
+  var cid = "IPFS_CID"
 
   // Choose random gateway to distribute the traffic
   var gateways = [
@@ -69,12 +27,6 @@ async function main() {
   ];
   var i = Math.floor(Math.random() * gateways.length);
   var gateway = gateways[i];
-
-  var div_info = document.getElementById('div-info');
-  var div_error = document.getElementById('div-error');
-
-  var video_kira = document.getElementById('vid-kira');
-  var video_404 = document.getElementById('vid-404');
 
   await sleepPromise;
 
@@ -86,17 +38,14 @@ async function main() {
     window.location.replace(gateway);
   } else {
     console.error("ERROR: Failure, resources were NOT found!")
-    div_info.style.display = 'none'
-    div_error.style.display = ''
+    document.getElementById('div-info').style.display = 'none'
+    document.getElementById('div-error').style.display = ''
 
-    video_404.style.display = ''
-    video_kira.style.display = 'none'
-
-    var rel_link_content = `https://github.com/KiraCore/${repo}`
-    document.getElementById('rel-link').href = rel_link_content
-
+    document.getElementById('vid-kira').style.display = 'none'
+    document.getElementById('vid-404').style.display = ''
+ 
     console.error("ERROR: We were not able to find the app")
-    console.info(`INFO: Visit following github page to find latest release: ${rel_link_content}`)
+    console.info("INFO: Visit following github page to find latest release: GITHUB_REPO")
   }
 
   console.info("INFO: Page loader finished")
@@ -126,7 +75,7 @@ main();
   <div>
     <div id="div-info" style="width: 768px; display:'';">
       <span>You are leaving </span>
-      <a href="https://kira.network"><span><strong>kira.network</strong></span></a>&nbsp
+      <a href="https://DNS_ADDRESS"><span><strong>DNS_ADDRESS</strong></span></a>&nbsp
       <span>
         and are being redirected to the independent, community-operated instance of the open source front end, hosted and served on the distributed, peer-to-peer file network IPFS...
       </span>
@@ -134,10 +83,15 @@ main();
   </div>
   <div>
     <div  id="div-error" style="width: 768px; display: none;">
+      
+      <span><b>CID: IPFS_CID</b><br><br></span>
+
       <span>The IPFS gateway is currently not available, please visit our </span>
-      <a id="rel-link" href=""><span><strong>github repository</strong></span></a>&nbsp
+      <a id="rel-link" href="GITHUB_REPO"><span><strong>GitHub repository</strong></span></a>&nbsp
       <span>
-        where you can download latest release of the frontend application, or click
+        where you can download latest release, alternatively copy above CID and try another 
+        <a id="rel-link" href="https://ipfs.github.io/public-gateway-checker/"><span><strong>public gateway</strong></span></a>
+        or click
       </span>
       <a href="#" onclick="window.location.reload(true);"><span><strong>F5</strong></span></a>&nbsp
       <span>
