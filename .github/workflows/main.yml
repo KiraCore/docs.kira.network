@@ -125,6 +125,7 @@ jobs:
           echo "$KEY" > ${GITHUB_WORKSPACE}/cosign.key
           for FILE in *; do FILE_NAME=$(basename $FILE); cosign sign-blob --key=../cosign.key --output-signature=./${FILE_NAME}.sig ./$FILE_NAME; done
           rm -fv ../cosign.key
+          ls -a1 "${{env.RELEASE}}"
       - name: Delete old release
         if: env.SOURCE_BRANCH == 'master'
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
@@ -135,7 +136,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
       - name: Publish release
         if: env.SOURCE_BRANCH == 'master'
-        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
         with:
           body_path: "${{env.RELEASE}}/RELEASE.md"
           tag_name: "${{env.VERSION}}"
@@ -144,12 +145,12 @@ jobs:
           draft: false
           fail_on_unmatched_files: true
           files: |
-            "${{env.RELEASE}}/html-web-site.zip"
-            "${{env.RELEASE}}/html-web-site.zip.sig"
-            "${{env.RELEASE}}/ipfs-cid.txt
-            "${{env.RELEASE}}/ipfs-cid.txt.sig"
-            "${{env.RELEASE}}/index.html
-            "${{env.RELEASE}}/index.html.sig"
+            ${{env.RELEASE}}/html-web-site.zip
+            ${{env.RELEASE}}/html-web-site.zip.sig
+            ${{env.RELEASE}}/ipfs-cid.txt
+            ${{env.RELEASE}}/ipfs-cid.txt.sig
+            ${{env.RELEASE}}/index.html
+            ${{env.RELEASE}}/index.html.sig
       - name: Cleanup
         run: |
           cd ${GITHUB_WORKSPACE}
