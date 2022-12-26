@@ -25,13 +25,16 @@ jobs:
           echo "SUBDOMAIN=docs" >> $GITHUB_ENV
           echo "DNS=kira.network" >> $GITHUB_ENV
           echo "USERNAME=KiraCore" >> $GITHUB_ENV
+          echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "DISTRO=${GITHUB_WORKSPACE}/loconotion/dist/notion" >> $GITHUB_ENV
+          echo "RELEASE=${GITHUB_WORKSPACE}/release" >> $GITHUB_ENV
       - name: Checkout loconotion
         uses: actions/checkout@v3
         with:
           repository: leoncvlt/loconotion
           ref: 759697ade3e29d97d5de477f8d39404e2c53789f
           path: loconotion
-      - name: Download current version of the site
+      - name: Checkout ${{env.SUBDOMAIN}}.${{env.DNS}}
         uses: actions/checkout@v3
         with:
           repository: "${{env.USERNAME}}/${{env.SUBDOMAIN}}.${{env.DNS}}"
@@ -39,10 +42,8 @@ jobs:
           path: _site
       - name: Init Part 2
         run: |
-          echo "SOURCE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo "DISTRO=${GITHUB_WORKSPACE}/loconotion/dist/notion" >> $GITHUB_ENV
-          echo "RELEASE=${GITHUB_WORKSPACE}/release" >> $GITHUB_ENV
           VERSION="$(cat ./_site/version)" && echo "VERSION=$VERSION" >> $GITHUB_ENV
+          git ls-remote https://github.com/${{env.USERNAME}}/${{env.SUBDOMAIN}}.${{env.DNS}} | egrep -q "refs/tags/${VERSION}$" && echo "RELEASE_EXISTS=true" >> $GITHUB_ENV || echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -63,6 +64,7 @@ jobs:
           ls -a1 "${{env.DISTRO}}"
           ls -a1 "${{env.RELEASE}}"
       - name: Publish HTML to IPFS
+        shell: bash
         run: |
           set -x
           IPFS_UPLOAD_NAME="www-${{env.SUBDOMAIN}}.${{env.DNS}}-${{env.SOURCE_BRANCH}}-${{env.VERSION}}"
@@ -73,6 +75,7 @@ jobs:
           IPFS_HASH=$(cat ./ipfs-pin.log | tail -n 1 | bash-utils jsonParse ".hash" || echo "")
           [ -z "$IPFS_HASH" ] && echo "ERROR: IPFS Upload Failed" && exit 1
           echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
+          IPFS_HASH_SHORT=${IPFS_HASH::10}...${IPFS_HASH: -3}
       - name: Save changes to release folder
         run: |
           ZIP_FILENAME="${{env.SUBDOMAIN}}.${{env.DNS}}.zip"
@@ -108,6 +111,9 @@ jobs:
           ZIP_FILENAME="${{env.SUBDOMAIN}}.${{env.DNS}}.zip"
           cp -fv "${{env.DISTRO}}/$ZIP_FILENAME" "${{env.RELEASE}}/html-web-site.zip"
 
+          echo -e "\n\r\n\rPublished web site:" >> ./RELEASE.md
+          echo -e " * Private Gateway: [ipfs.kira.network/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.kira.network/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./RELEASE.md
+          echo -e " * Public Gateway: [ipfs.io/ipfs/${{env.IPFS_HASH_SHORT}}](https://ipfs.io/ipfs/${{env.IPFS_HASH}}/index.html)" >> ./RELEASE.md
           echo -e "\n\r\n\r\`\`\`" >> ./RELEASE.md
           echo -e "       Release Versions: ${{env.VERSION}}\n\r" >> ./RELEASE.md
           echo -e "      Release Date Time: $(date --rfc-2822)" >> ./RELEASE.md
@@ -116,14 +122,14 @@ jobs:
           echo "             index.html: sha256:$(sha256sum ./index.html  | awk '{ print $1 }')" >> ./RELEASE.md
           echo -e "\`\`\`"   >> ./RELEASE.md
           
-          echo "$KEY" > ../cosign.key
+          echo "$KEY" > ${GITHUB_WORKSPACE}/cosign.key
           for FILE in *; do FILE_NAME=$(basename $FILE); cosign sign-blob --key=../cosign.key --output-signature=./${FILE_NAME}.sig ./$FILE_NAME; done
           rm -fv ../cosign.key
       - name: Delete old release
         if: env.SOURCE_BRANCH == 'master'
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
-          tag_name: ${{env.VERSION}}
+          tag_name: "${{env.VERSION}}"
           delete_release: true
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
@@ -131,9 +137,9 @@ jobs:
         if: env.SOURCE_BRANCH == 'master'
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
         with:
-          body_path: ${{env.RELEASE}}/RELEASE.md
-          tag_name: ${{env.VERSION}}
-          name: ${{env.VERSION}}
+          body_path: "${{env.RELEASE}}/RELEASE.md"
+          tag_name: "${{env.VERSION}}"
+          name: "${{env.VERSION}}"
           prerelease: false
           draft: false
           fail_on_unmatched_files: true
