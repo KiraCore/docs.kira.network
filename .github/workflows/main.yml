@@ -99,7 +99,6 @@ jobs:
             FOLDER: "${{ env.RELEASE }}"
             GITHUB_TOKEN: ${{ secrets.REPO_ACCESS }}
       - name: Signing release files
-        if: env.SOURCE_BRANCH == 'master'
         shell: bash
         env:
           KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
@@ -110,7 +109,7 @@ jobs:
           cp -fv "${{env.DISTRO}}/$ZIP_FILENAME" "${{env.RELEASE}}/html-web-site.zip"
 
           echo -e "\n\r\n\r\`\`\`" >> ./RELEASE.md
-          echo -e "       Release Versions: ${env.VERSION}\n\r" >> ./RELEASE.md
+          echo -e "       Release Versions: ${{env.VERSION}}\n\r" >> ./RELEASE.md
           echo -e "      Release Date Time: $(date --rfc-2822)" >> ./RELEASE.md
           echo "     html-web-site.zip": sha256:$(sha256sum ./html-web-site.zip  | awk '{ print $1 }')" >> ./RELEASE.md
           echo "          ipfs-cid.txt": sha256:$(sha256sum ./ipfs-cid.txt  | awk '{ print $1 }')" >> ./RELEASE.md
