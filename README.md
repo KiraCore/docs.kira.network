@@ -5,7 +5,7 @@ Release workflow of Notion pages to IPFS
 ### Overview
 
 1. Our [custom docker image](ghcr.io/kiracore/docker/base-image:v0.11.2) with preinstalled chromedriver is launched
-2. Python [Loconotion](https://github.com/leoncvlt/loconotion) tool and its dependencies installed
+2. Python [Loconotion](https://github.com/leoncvlt/loconotion) tool and its dependencies are installed
 3. Loconotion is configured using [config.toml](./config.toml) to scrape public Notion page and save it as HTML in the `./dist/notion` folder
 4. Our [custom ipfs-api](https://github.com/KiraCore/tools/tree/main/ipfs-api) tool communicates with pinata to pin the `./dist/notion` folder
 5. The `./dist/notion` folder is pushed to the dedicated repository with a prefix `<branch>-release` alongside CID hash in ./ipfs-cid.txt
