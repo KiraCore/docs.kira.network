@@ -37,3 +37,10 @@ page = "https://kira-network.notion.site/KIRA-Docs-1b60a7e5f21341ff8a1e4b2eeb2cc
   # Page Roles-Permissions fails for unknown reasons, CLI is not explicit why
   [pages.5f513124609d4c63a9f0af7a1fab8be8]
     no-links = true
+  # Page Network-properties fails for unknown reasons, CLI is not explicit why
+  [pages.1d343fd1edc14d6a9922d0a72d863e7f]
+    no-links = true
+
+
+
+    
