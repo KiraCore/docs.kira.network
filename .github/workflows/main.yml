@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: leoncvlt/loconotion
-          ref: 759697ade3e29d97d5de477f8d39404e2c53789f
+          ref: 58a118c615bddb6f0a26f95a0d00eeb4fb6ff863
           path: loconotion
       - name: Checkout ${{env.SUBDOMAIN}}.${{env.DNS}}
         uses: actions/checkout@v3
@@ -55,7 +55,7 @@ jobs:
           rm -rfv ./dist "${{env.DISTRO}}" "${{env.RELEASE}}"
           mkdir -p ./dist "${{env.DISTRO}}" "${{env.RELEASE}}"
           cp -fv ../_site/config.toml ./site.toml
-          python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver --timeout 600 
+          python loconotion "./site.toml" --chromedriver /usr/bin/chromedriver --timeout 1800 
           echo "${{env.SOURCE_BRANCH}}" > "${{env.RELEASE}}/source.txt"
           echo "${{env.SUBDOMAIN}}.${{env.DNS}}" > "${{env.RELEASE}}/CNAME"
           cp -fv ../_site/RELEASE.md "${{env.RELEASE}}/RELEASE.md"
@@ -147,6 +147,7 @@ jobs:
         if: env.SOURCE_BRANCH == 'master'
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
         with:
+          token: ${{secrets.REPO_ACCESS}}
           body_path: "${{env.RELEASE}}/RELEASE.md"
           tag_name: "${{env.VERSION}}"
           name: "${{env.VERSION}}"
