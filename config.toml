@@ -33,10 +33,10 @@ page = "https://kira-network.notion.site/Roles-Permissions-1cde3b7e9e7a4734a0e99
 # the [pages] table defines override settings for individual pages, by defining
 # a sub-table named after the page url (or part of the url, but careful about
 # not using a string that appears in multiple page urls)
-[pages]
+#[pages]
   # Page Roles-Permissions fails for unknown reasons, CLI is not explicit why
-  [pages.1cde3b7e9e7a4734a0e9981f2014447a]
-    no-links = true
+ # [pages.1cde3b7e9e7a4734a0e9981f2014447a]
+  #  no-links = true
   # Page Network-properties fails for unknown reasons, CLI is not explicit why
  # [pages.da26b948f9af4a969024324ebe38c9fb]
   #  no-links = true
