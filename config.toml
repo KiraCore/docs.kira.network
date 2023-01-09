@@ -4,7 +4,7 @@ name = "notion"
 
 # the notion.so page to being parsing from. This page will become the index.html
 # of the generated site, and loconotion will parse all sub-pages present on the page
-page = "https://kira-network.notion.site/Roles-and-permissions-test-1d71032894cc444e968ce26ca4b91fd7"
+page = "https://kira-network.notion.site/Roles-test-2-df53307173db4e1fa3e7be9ed2e7508e"
 
 # optionally apply notion's dark mode, remove the line below to use the default light mode
 # theme = "dark"
