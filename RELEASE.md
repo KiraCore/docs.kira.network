@@ -1,4 +1,3 @@
 #### Features
-* First test release to IPFS
-* Auto redirect to the gateway
-* New logo, favicon & loader
+* New structure of the docs
+* Added INTERX & MIRO sections
