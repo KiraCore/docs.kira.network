@@ -4,7 +4,7 @@ name = "notion"
 
 # the notion.so page to being parsing from. This page will become the index.html
 # of the generated site, and loconotion will parse all sub-pages present on the page
-page = "https://kira-network.notion.site/KIRA-Docs-0b19176eff7f401e8cc519b542f8282d" 
+page = "https://kira-network.notion.site/KIRA-Docs-f7f5f0bfa8af42609c6e58bb33e8a876" 
 
 # optionally apply notion's dark mode, remove the line below to use the default light mode
 # theme = "dark"
@@ -37,5 +37,5 @@ page = "https://kira-network.notion.site/KIRA-Docs-0b19176eff7f401e8cc519b542f82
   # Page Roles-Permissions
   # This page uses a database to store permissions. Permissions are backlinked throughout the documentation 
   # therefore "no-links" might actually not work here because of necessity to create the permission's page for all exisiting backlinks.
-  [pages.1cde3b7e9e7a4734a0e9981f2014447a]
-    no-links = true
+  #[pages.1cde3b7e9e7a4734a0e9981f2014447a]
+  # no-links = true
