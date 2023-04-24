@@ -1,3 +1,3 @@
 #### Features
-* New structure of the docs
-* Added INTERX & MIRO sections
+* Github workflow update
+* Native Cosmos SDK modules docs added
