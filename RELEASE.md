@@ -1,4 +1,3 @@
 #### Features
-* First test release to IPFS
-* Auto redirect to the gateway
-* New logo, favicon & loader
+* Github workflow update
+* Native Cosmos SDK modules docs added
