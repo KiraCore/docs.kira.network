@@ -14,7 +14,7 @@ jobs:
       id-token: write
       pull-requests: write
     container: 
-      image: ghcr.io/kiracore/docker/base-image:v0.12.2
+      image: ghcr.io/kiracore/docker/base-image:v0.13.7
     steps:
       - name: Init Part 1
         run: |
