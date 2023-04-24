@@ -59,7 +59,7 @@ jobs:
           echo "${{env.SOURCE_BRANCH}}" > "${{env.RELEASE}}/source.txt"
           echo "${{env.SUBDOMAIN}}.${{env.DNS}}" > "${{env.RELEASE}}/CNAME"
           cp -fv ../_site/RELEASE.md "${{env.RELEASE}}/RELEASE.md"
-          cp -fv ../_site/LICENSE.md "${{env.RELEASE}}/LICENSE.m
+          cp -fv ../_site/LICENSE.md "${{env.RELEASE}}/LICENSE.md"
           cp -fv ../_site/${INDEX_MODE}.html "${{env.RELEASE}}/index.html"
           ls -a1 ../_site
           ls -a1 "${{env.DISTRO}}"
