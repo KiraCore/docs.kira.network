@@ -1,3 +1,2 @@
 #### Features
-- minor correction
-- tools/sekai version update
+- updates : identity registrar, consensus nodes, delegators, network properties
