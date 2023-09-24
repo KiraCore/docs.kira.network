@@ -31,8 +31,8 @@ jobs:
       - name: Checkout loconotion
         uses: actions/checkout@v3
         with:
-          repository: leoncvlt/loconotion
-          ref: 58a118c615bddb6f0a26f95a0d00eeb4fb6ff863
+          repository: kmlbgn/loconotion
+          ref: master
           path: loconotion
       - name: Checkout repo
         uses: actions/checkout@v3
