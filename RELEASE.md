@@ -1,3 +1,2 @@
 #### Features
-- minor correction
-- tools/sekai version update
+- config.toml changed back to normal (full docs)
