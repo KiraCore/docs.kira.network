@@ -1,2 +1,2 @@
 #### Features
-- config.toml changed back to normal (full docs)
+- Updated modules: Network Properties / Identity Registrar / Data Registry / Poor Network Conditions
