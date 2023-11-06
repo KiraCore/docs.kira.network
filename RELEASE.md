@@ -1,2 +1,2 @@
 #### Features
-- Updated modules: Distributor / Delegators
+- Updated modules: Spending Pools
