@@ -29,11 +29,39 @@ page = "https://kira-network.notion.site/KIRA-README-nfo-6c87c9f708514570a89b874
   type="image/png"
   href="https://ipfs.kira.network/ipfs/QmRqfyEvBoSj6sapjyhQqTJfwQPmsDkMQrxyqtTC6bZcTU"
 
+  ## Custom JavaScript for clickable links in code blocks ##
+  [[site.inject.body.script]]
+  inner_html="""
+  document.addEventListener('DOMContentLoaded', (event) => {
+      const linkMappings = {
+          "DOCS": "https://www.notion.so/Stack-Documentation-033e00dfc5a445a2966eef226a5d7d1a?pvs=21",
+          "BLOG": "https://mirror.xyz/0xEc44c03Ff46cfDB7754bc1c0D39a7C5e0D8fd9B2",
+          "TWITTER": "https://twitter.com/Kira_Official",
+          "TELEGRAM": "https://t.me/kira_network_official",
+          "DOCUMENTATION": "https://www.notion.so/Stack-Documentation-033e00dfc5a445a2966eef226a5d7d1a?pvs=21"
+      };
+
+      const codeBlocks = document.querySelectorAll('pre code');
+      codeBlocks.forEach((block) => {
+          let text = block.innerText;
+          Object.keys(linkMappings).forEach(key => {
+              const regex = new RegExp('\\b' + key + '\\b', 'g');
+              text = text.replace(regex, `<a href="${linkMappings[key]}" target="_blank">${key}</a>`);
+          });
+          block.innerHTML = text;
+      });
+  });
+  """
+
 ## Individual Page Settings ##
 # the [pages] table defines override settings for individual pages, by defining
 # a sub-table named after the page url (or part of the url, but careful about
 # not using a string that appears in multiple page urls)
 [pages]
+  # Apply no-links to the index page for testing
+  [pages.6c87c9f708514570a89b87407d354dac]
+    no-links = true
+
   # Page Roles-Permissions
   # This page uses a database to store permissions. Permissions are backlinked throughout the documentation 
   # therefore "no-links" might actually not work here because of necessity to create the permission's page for all exisiting backlinks.
