@@ -41,14 +41,15 @@ page = "https://kira-network.notion.site/KIRA-README-nfo-6c87c9f708514570a89b874
           "DOCUMENTATION": "https://www.notion.so/Stack-Documentation-033e00dfc5a445a2966eef226a5d7d1a?pvs=21"
       };
 
-      const codeBlocks = document.querySelectorAll('pre code');
-      codeBlocks.forEach((block) => {
-          let text = block.innerText;
-          Object.keys(linkMappings).forEach(key => {
-              const regex = new RegExp('\\b' + key + '\\b', 'g');
-              text = text.replace(regex, `<a href="${linkMappings[key]}" target="_blank">${key}</a>`);
+      document.querySelectorAll('div[data-content-editable-leaf="true"]').forEach(div => {
+          div.querySelectorAll('span').forEach(span => {
+              Object.keys(linkMappings).forEach(key => {
+                  if (span.innerText.includes(key)) {
+                      const updatedHtml = span.innerHTML.replace(key, `<a href="${linkMappings[key]}" target="_blank">${key}</a>`);
+                      span.innerHTML = updatedHtml;
+                  }
+              });
           });
-          block.innerHTML = text;
       });
   });
   """
