@@ -1,3 +1,2 @@
 #### Features
-- Docmap new structure + added README.nfo as landing page
-- Updated modules: Spending Pools, Polls
+Testing solution for missing links in README.nfo 
