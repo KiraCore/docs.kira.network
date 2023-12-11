@@ -4,7 +4,7 @@ name = "notion"
 
 # the notion.so page to being parsing from. This page will become the index.html
 # of the generated site, and loconotion will parse all sub-pages present on the page
-page = "https://kira-network.notion.site/KIRA-README-nfo-6c87c9f708514570a89b87407d354dac" 
+page = "https://kira-network.notion.site/Stack-Documentation-7a48e201ab1b47b8a41361ed0559d1f7" 
 
 # optionally apply notion's dark mode, remove the line below to use the default light mode
 # theme = "dark"
@@ -28,31 +28,6 @@ page = "https://kira-network.notion.site/KIRA-README-nfo-6c87c9f708514570a89b874
   sizes="192x192"
   type="image/png"
   href="https://ipfs.kira.network/ipfs/QmRqfyEvBoSj6sapjyhQqTJfwQPmsDkMQrxyqtTC6bZcTU"
-
-  ## Custom JavaScript for clickable links in code blocks ##
-  [[site.inject.body.script]]
-  inner_html="""
-  document.addEventListener('DOMContentLoaded', (event) => {
-      const linkMappings = {
-          "DOCS": "https://www.notion.so/Stack-Documentation-033e00dfc5a445a2966eef226a5d7d1a?pvs=21",
-          "BLOG": "https://mirror.xyz/0xEc44c03Ff46cfDB7754bc1c0D39a7C5e0D8fd9B2",
-          "TWITTER": "https://twitter.com/Kira_Official",
-          "TELEGRAM": "https://t.me/kira_network_official",
-          "DOCUMENTATION": "https://www.notion.so/Stack-Documentation-033e00dfc5a445a2966eef226a5d7d1a?pvs=21"
-      };
-
-      document.querySelectorAll('div[data-content-editable-leaf="true"]').forEach(div => {
-          div.querySelectorAll('span').forEach(span => {
-              Object.keys(linkMappings).forEach(key => {
-                  if (span.innerText.includes(key)) {
-                      const updatedHtml = span.innerHTML.replace(key, `<a href="${linkMappings[key]}" target="_blank">${key}</a>`);
-                      span.innerHTML = updatedHtml;
-                  }
-              });
-          });
-      });
-  });
-  """
 
 ## Individual Page Settings ##
 # the [pages] table defines override settings for individual pages, by defining
