@@ -3858,10 +3858,10 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-docu-notion-kira@1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/docu-notion-kira/-/docu-notion-kira-1.3.2.tgz#87fc76e8c7499e82be4145335af95c0d8da706cf"
-  integrity sha512-kbmYuVCGsLMp9daY+5UUPzsXl1WRJBvhwByBvTc6kI6UkndyY9RBkYndJYJvdQrmJNgcs02W3f8UYFtismj/7A==
+docu-notion-kira@1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/docu-notion-kira/-/docu-notion-kira-1.3.4.tgz#c7752c6fdbe403c229e2d24f736219f2ea395c9e"
+  integrity sha512-UJ+hDeqaRcqtl+jk3ORWW2ow33rwJod0E8SBWGNBvmbr24sh/vfccbINhhTI3byCEjtoVNSAFl8TnCQfIEkJwg==
   dependencies:
     "@notionhq/client" "2.2.3"
     chalk "^4.1.2"

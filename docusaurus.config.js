@@ -10,7 +10,7 @@ const config = {
   title: "KIRA",
   tagline: "Public documentation of the KIRA network",
   url: "https://docs.kira.network",
-  baseUrl: "/docs.kira.network/",
+  baseUrl: "/",
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "https://ipfs.kira.network/ipfs/QmRqfyEvBoSj6sapjyhQqTJfwQPmsDkMQrxyqtTC6bZcTU",
