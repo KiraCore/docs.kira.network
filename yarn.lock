@@ -6570,10 +6570,10 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-nocusaurus@1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/nocusaurus/-/nocusaurus-1.5.0.tgz#54c0c2771f28ec3065576aeb14cf52ddeb6fe04e"
-  integrity sha512-7C0ZcsFz8zUFSo94KCktJpObiL89SaP15SW9syl4kCuDzXWiK32GFBn2gE+AFnfA69qwJ0jmtrbBUdwd/Ew1FA==
+nocusaurus@1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/nocusaurus/-/nocusaurus-1.5.1.tgz#b797cb7aad5769424eb0093380457423f765f5e3"
+  integrity sha512-hrlvIFxKaVrXj80FXtmmz0sA8Tczx2g1ismkt6wBWdQyvEcH9jpC2raewPjZK7KKnR4D9IfcyGHGAHCsAP149Q==
   dependencies:
     "@notionhq/client" "2.2.3"
     chalk "^4.1.2"
