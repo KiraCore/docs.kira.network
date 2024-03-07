@@ -23,12 +23,12 @@ const config = {
     [
       '@docusaurus/preset-classic',
       {
-        docs: {
-          path: 'tabs/learn/', 
-          routeBasePath: '/',
-          remarkPlugins: [require('remark-math')],
-          rehypePlugins: [require('rehype-katex')],
-        },
+        docs: false,
+        //   path: 'tabs/learn/', 
+        //   routeBasePath: '/learn/',
+        //   remarkPlugins: [require('remark-math')],
+        //   rehypePlugins: [require('rehype-katex')],
+        // },
         blog: false,
         theme: {
           customCss: [
@@ -54,9 +54,9 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'learn',
+        // id: 'learn', // omitted => default instance
         path: 'tabs/Learn',
-        routeBasePath: '/',
+        routeBasePath: '/learn/',
         sidebarPath: undefined,
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
@@ -130,6 +130,7 @@ const config = {
         logo: {
           alt: "Logo",
           src: "https://ipfs.kira.network/ipfs/QmcNyQRYDBD6qBH19Ab7eqtWZ59nLqBjvM4BCwnkexd78y/LOGO-SYMBOL/KIRA-WT-V2.svg",
+          href: '/learn/',
         },
 
         items: [
@@ -146,9 +147,9 @@ const config = {
           },
           {
             label: 'Learn',
-            to: '/',
+            to: '/learn/',
             position: 'left',
-            activeBaseRegex: '^/docs.kira.network/',
+            activeBaseRegex: '^/docs.kira.network/learn/',
           },
           {
             label: 'Testnet',

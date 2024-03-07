@@ -4,10 +4,10 @@
   "private": false,
   "scripts": {
     "clear-docs": "rimraf ./tabs/",
-    "pull-test-tagged": "yarn run clear-docs && npx docu-notion-kira -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE -m ./docs -i ./static/notion_imgs -p /notion_imgs/ --status-tag test",
-    "pull:latest": "yarn run clear-docs && npx docu-notion-kira -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE -m ./docs -i ./static/notion_imgs -p /notion_imgs/",
-    "//pull": "This uses the specific version of docu-notion-kira in package-lock.json, not necessarily the latest",
-    "pull": "yarn run clear-docs && npx docu-notion-kira -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE_DOC -i ./static/notion_imgs -p /notion_imgs/ --yes --log-level verbose",
+    "pull-test-tagged": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE -m ./docs -i ./static/notion_imgs -p /notion_imgs/ --status-tag test",
+    "pull:latest": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE -m ./docs -i ./static/notion_imgs -p /notion_imgs/",
+    "//pull": "This uses the specific version of nocusaurus in package-lock.json, not necessarily the latest",
+    "pull": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE_DOC -i ./static/notion_imgs -p /notion_imgs/ --yes --log-level verbose",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
@@ -15,7 +15,7 @@
     "serve": "docusaurus serve"
   },
   "dependencies": {
-    "docu-notion-kira": "1.4.0",
+    "nocusaurus": "1.5.0",
     "@docusaurus/core": "3.0.1",
     "@docusaurus/preset-classic": "3.0.1",
     "@easyops-cn/docusaurus-search-local": "0.40.1",
