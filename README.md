@@ -11,9 +11,37 @@ This repository is responsible for creating the documentation for KIRA Network. 
 - The ./dist/notion folder, along with the CID hash in ./ipfs-cid.txt, is pushed to a dedicated repository. The push uses the format <branch>-release.
 - A simple HTML page utilizes <branch>-release/ipfs-cid.txt to locate the IPFS-hosted page, allowing user redirection via a DNS name.
 
-## How to Use This Repository
+## How to Use
 
-- Make a commit to the dev branch.
-- Push the changes and await the completion of GitHub Actions.
-GitHub Actions will publish the results to IPFS and provide a demo link in the comments of the automatically created pull request (PR).
-- Review the IPFS demo. If satisfactory, merge the PR into the master branch.
+### Installation:
+
+1. **Clone Repository**: Clone the repository to your local machine.
+2. **Set Required Environment Variables**: Set `GIT_PASS` and `GIT_USER` for GitHub deployment, and `DOCU_NOTION_SAMPLE_ROOT_PAGE` and `DOCU_NOTION_INTEGRATION_TOKEN` for Notion integration.
+   - For GitHub Deployment:
+     ```bash
+     export GIT_PASS=[***]
+     export GIT_USER=[***]
+     ```
+   - For Notion Integration:
+     ```bash
+     export DOCU_NOTION_SAMPLE_ROOT_PAGE=[***]
+     export DOCU_NOTION_INTEGRATION_TOKEN=[***]
+     ```
+   Follow the [Docusaurus deployment documentation](https://docusaurus.io/docs/deployment#environment-settings) and [Notion's integration setup guide](https://developers.notion.com/docs/create-a-notion-integration#give-your-integration-page-permissions) for more details.
+
+### Site Update & Deployment:
+
+Update content on Notion and fetch it: 
+
+```bash
+yarn install    # Install dependencies
+yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN )
+yarn build      # Build Docusaurus static site
+```
+
+Test and deploy with the following commands:
+
+```bash
+yarn serve      # Serve Docusaurus static site locally for testing before production deployment
+yarn deploy     # Deploy to GitHub Pages (needs $GIT_PASS and $GIT_USER)
+```
