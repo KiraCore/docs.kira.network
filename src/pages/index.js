@@ -8,7 +8,7 @@ function RedirectToLearn() {
     history.push('/learn/');
   }, [history]);
 
-  return null; // or a loader component if you prefer
+  return null;
 }
 
 export default RedirectToLearn;
