@@ -1,0 +1,32 @@
+name: Documentation Issue Report
+description: Report an issue with the documentation
+title: "[DOC ISSUE] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for taking the time to report an issue with our documentation."
+  - type: input
+    id: page-found
+    attributes:
+      label: "Issue found in page"
+      description: "The specific page where the issue was found. This field is not modifiable."
+      placeholder: "e.g., /docs/introduction"
+    validations:
+      required: true
+  - type: input
+    id: kira-testnet-address
+    attributes:
+      label: "Your KIRA testnet address (optional)"
+      description: "If you'd like, provide your KIRA testnet address."
+      placeholder: "e.g., kira1..."
+    validations:
+      required: false
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: "Description"
+      description: "Please describe the issue succinctly."
+      placeholder: "Detail the issue you've encountered..."
+    validations:
+      required: true
