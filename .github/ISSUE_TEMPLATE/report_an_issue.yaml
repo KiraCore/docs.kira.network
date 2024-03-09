@@ -1,6 +1,6 @@
 name: Documentation Issue Report
 description: Report an issue with the documentation
-title: ""
+title: "[ISSUE REPORT]"
 labels: ["documentation"]
 body:
   - type: markdown

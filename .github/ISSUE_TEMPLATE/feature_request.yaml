@@ -1,0 +1,40 @@
+name: Feature Request
+description: Suggest a feature or improvement for the documentation
+title: "[FEATURE REQUEST]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "We appreciate your contribution and interest in improving our documentation. Please share your feature suggestion or enhancement idea with us."
+  - type: input
+    id: feature-title
+    attributes:
+      label: "Feature or Improvement Title"
+      description: "A concise title for the feature or improvement you're suggesting."
+      placeholder: "e.g., Improved Search Functionality"
+    validations:
+      required: true
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: "Detailed Description"
+      description: "Please describe the feature or improvement in detail. Include any specific pages or sections where you think this could be applied."
+      placeholder: "Detail your feature or improvement idea..."
+    validations:
+      required: true
+  - type: textarea
+    id: benefit-description
+    attributes:
+      label: "Expected Benefits"
+      description: "Describe the benefits this feature or improvement would provide."
+      placeholder: "Explain how this change would improve the documentation..."
+    validations:
+      required: false
+  - type: input
+    id: kira-testnet-address
+    attributes:
+      label: "Your KIRA testnet address (optional)"
+      description: "If you'd like, feel free to provide your KIRA testnet address."
+      placeholder: "e.g., kira1..."
+    validations:
+      required: false
