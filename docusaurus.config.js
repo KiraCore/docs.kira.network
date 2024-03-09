@@ -15,6 +15,7 @@ const config = {
   deploymentBranch: "docs.kira.network",
 
   baseUrl: "/",
+  trailingSlash: true,
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
 
@@ -150,25 +151,25 @@ const config = {
             label: 'Docs',
             to: '/docs/',
             position: 'left',
-            activeBaseRegex: '^/docs.kira.network/docs/',
+            activeBaseRegex: '^/docs/',
           },
           {
             label: 'Learn',
             to: '/learn/',
             position: 'left',
-            activeBaseRegex: '^/docs.kira.network/learn/',
+            activeBaseRegex: '^/learn/',
           },
           {
             label: 'Testnet',
             to: '/testnet/',
             position: 'left',
-            activeBaseRegex: '^/docs.kira.network/testnet/',
+            activeBaseRegex: '^/testnet/',
           },
           {
             label: 'Links',
             to: '/links/',
             position: 'right',   
-            activeBaseRegex: '^/docs.kira.network/links/',         
+            activeBaseRegex: '^/links/',         
           },
         ],
       },
