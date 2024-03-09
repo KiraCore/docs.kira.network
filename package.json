@@ -7,7 +7,7 @@
     "pull-test-tagged": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE -m ./docs -i ./static/notion_imgs -p /notion_imgs/ --status-tag test",
     "pull:latest": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE -m ./docs -i ./static/notion_imgs -p /notion_imgs/",
     "//pull": "This uses the specific version of nocusaurus in package-lock.json, not necessarily the latest",
-    "pull": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE_DOC -i ./static/notion_imgs -p /notion_imgs/ --yes --log-level verbose",
+    "pull": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE_DOC -i ./static/notion_imgs -p /notion_imgs/ --yes --log-level verbose & mv tabs/srcpages/*.mdx src/pages/",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
