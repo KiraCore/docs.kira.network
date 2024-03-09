@@ -7,7 +7,7 @@ body:
     attributes:
       value: "Thank you for taking the time to report an issue with our documentation."
   - type: input
-    id: page-found
+    id: page-local
     attributes:
       label: "Issue page path (local)"
       description: "The specific page local path where the issue was found. This field shouldn't be modified."
@@ -15,7 +15,7 @@ body:
     validations:
       required: true
   - type: input
-    id: build-found
+    id: page-github
     attributes:
       label: "Issue page path (docs.kira.network branch)"
       description: "The specific deployed page path where the issue was found. This field shouldn't be modified."
