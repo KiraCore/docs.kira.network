@@ -5,30 +5,24 @@ const { themes } = require("prism-react-renderer");
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
 
-/** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "KIRA",
   tagline: "Public documentation of the KIRA network",
   url: "https://docs.kira.network",
-  baseUrl: "/",
-  onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
   favicon: "https://ipfs.kira.network/ipfs/QmRqfyEvBoSj6sapjyhQqTJfwQPmsDkMQrxyqtTC6bZcTU",
-
   organizationName: "KiraCore",
   projectName: "docs.kira.network",
   deploymentBranch: "docs.kira.network",
+
+  baseUrl: "/",
+  onBrokenLinks: "warn",
+  onBrokenMarkdownLinks: "warn",
 
   presets: [
     [
       '@docusaurus/preset-classic',
       {
         docs: false,
-        //   path: 'tabs/learn/', 
-        //   routeBasePath: '/learn/',
-        //   remarkPlugins: [require('remark-math')],
-        //   rehypePlugins: [require('rehype-katex')],
-        // },
         blog: false,
         theme: {
           customCss: [
@@ -40,6 +34,7 @@ const config = {
     ],
   ],
   plugins: [
+    
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -50,8 +45,14 @@ const config = {
         showLastUpdateTime: true,
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
+        editUrl: ({docPath, permalink}) => {
+          docPath = docPath.toLowerCase();
+          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
+          return repoUrl;
+        },
       },
     ],
+
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -62,6 +63,11 @@ const config = {
         showLastUpdateTime: true,
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
+        editUrl: ({docPath, permalink}) => {
+          docPath = docPath.toLowerCase();
+          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
+          return repoUrl;
+        },
       },
     ],
     [
@@ -74,6 +80,11 @@ const config = {
         showLastUpdateTime: true,
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
+        editUrl: ({docPath, permalink}) => {
+          docPath = docPath.toLowerCase();
+          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
+          return repoUrl;
+        },
       },
     ],
   ],
@@ -86,21 +97,14 @@ const config = {
       crossorigin: 'anonymous',
     },
   ],
-  // Langage options
-  // i18n: {
-  //   defaultLocale: "en",
-  //   locales: ["en"],
-  //   localeConfigs: {
-  //     en: {
-  //       label: "English",
-  //       direction: "ltr",
-  //       htmlLang: "en-US",
-  //       calendar: "gregory",
-  //     },
-  //   },
-  // },
+
+  // Langage options (this is used to custom certain things such as "Edit this page" button)
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+
   themes: [
-    // ... Your other themes.
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
       {

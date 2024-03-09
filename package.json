@@ -11,6 +11,8 @@
     "start": "docusaurus start",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
+    "swizzle": "docusaurus swizzle",
+    "write-translations": "docusaurus write-translations",
     "//serve": "Needed, for example, to test the search functionality locally",
     "serve": "docusaurus serve"
   },
