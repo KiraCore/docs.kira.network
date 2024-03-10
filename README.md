@@ -25,22 +25,22 @@ Deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.net
 
 ## Documentation Update & Deployment:
 
-1. Update content on Notion and pull it (temp/): 
+1. Update content on Notion and pull in `temp/` folder: 
 
 ```bash
 yarn install    # Install dependencies
 yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN)
 ```
-2. Update (sync) the `tabs/` folder and launch on localhost for test.
+2. Sync the `tabs/` folder and launch on localhost for test:
 
-> `rsync --checksum` (`yarn update`) is used to maintain the accuracy of the `showLastUpdateTime` feature in Docusaurus documentation. The approach circumvents the issue of the documentation build process, which involves deleting and recreating the output folder (`tabs`), thereby updating all files regardless of changes. This way, only files with actual content changes are updated, ensuring the `showLastUpdateTime` timestamps reflect authentic modifications.
+> `rsync --checksum` (`yarn update`) is used to maintain the accuracy of the `showLastUpdateTime` feature in Docusaurus documentation. The approach circumvents the issue of the documentation pull process by Nocusaurus, which deletes and recreates the output folder, thereby updating all files regardless of changes. Syncing from a temporary output folder ensures only files with actual content changes are updated, preserving accurate `showLastUpdateTime` timestamps.
 
 ```bash
 yarn update
 yarn start
 ```
 
-3. Confirm tests, then commit, push, build, serve if needed, and deploy.
+3. Confirm tests, then commit, push, build, serve if needed, and deploy:
 
 > Committing and pushing updates made to `tabs` is necessary to maintain the Git history, essential for tracking each page's `showLastUpdateTime`.
 
