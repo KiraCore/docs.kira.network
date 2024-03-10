@@ -171,6 +171,12 @@ const config = {
             position: 'right',   
             activeBaseRegex: '^/links/',         
           },
+          {
+            href: "https://github.com/KiraCore",
+            position: "right",
+            className: "header-github-link",
+            "aria-label": "GitHub repository",
+          },
         ],
       },
 
