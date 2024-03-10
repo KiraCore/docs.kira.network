@@ -4,12 +4,13 @@ This repository holds KIRA's documentation. It leverages Nocusaurus to extract c
 
 Deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.network/tree/docs.kira.network)
 
-## How to Use
+# How to Use
 
-### Installation:
+## Installation:
 
 1. **Clone Repository**: Clone the repository to your local machine.
 2. **Set Required Environment Variables**: Set `GIT_PASS` and `GIT_USER` for GitHub deployment, and `DOCU_NOTION_SAMPLE_ROOT_PAGE` and `DOCU_NOTION_INTEGRATION_TOKEN` for Notion integration.
+
    - For GitHub Deployment:
      ```bash
      export GIT_PASS=[***]
@@ -22,13 +23,13 @@ Deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.net
      ```
    Follow the [Docusaurus deployment documentation](https://docusaurus.io/docs/deployment#environment-settings) and [Notion's integration setup guide](https://developers.notion.com/docs/create-a-notion-integration#give-your-integration-page-permissions) for more details.
 
-### Documentation Update & Deployment:
+## Documentation Update & Deployment:
 
 1. Update content on Notion and pull it (temp/): 
 
 ```bash
 yarn install    # Install dependencies
-yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN )
+yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN)
 ```
 2. Update (sync) the `tabs/` folder and launch on localhost for test.
 
