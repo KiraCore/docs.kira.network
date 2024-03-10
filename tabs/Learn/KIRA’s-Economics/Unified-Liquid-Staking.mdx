@@ -1,0 +1,56 @@
+---
+title: Unified Liquid Staking
+sidebar_position: 4
+slug: /492e443f-5703-4d95-8508-a101405efde3
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+KIRA allows Consensus nodes to stake any combination of multiple whitelisted assets through its [Multiple Bonded Proof of Stake](/learn/cf661a9f-09e0-4bc3-8248-bf0e545f0418#38c624fbdc324bd093974d2abb46c689) mechanism. Depositors are automatically issued redeemable receipt tokens representing their staked assets, making them LSDs by default. 
+
+
+Liquid staking has multiple pain points in the current DeFi landscape. Due to competition within the LSD sector, LSD liquidity is fragmented across DeFi. Furthermore, each LSD must be integrated individually for use within DeFi protocols, which introduces coordination overhead, additional attack vectors, and value leaks.
+
+
+KIRA's Token Basketing module solves for the friction associated with liquid staking by aggregating users' receipt tokens by their liquidity denominations, into cohesive fungible assets. 
+
+
+The Token Basketing module's AMM is self-rebalancing and offers swaps without price impact. 
+
+
+A important aspect of the swap mechanism is that the sum of products of individual token amounts and their weights remain constant before and after the swap. This is expressed mathematically as:
+
+
+$$
+\left \lfloor{ \sum_{i=0}^{tokens.Length - 1}tokens[i].weight \cdot tokens[i].amount}\right \rfloor  = constant
+$$
+
+
+This means that the cumulative value of the tokens in the basket remain unchanged (or slightly larger due to rounding errors). Any additional tokens due to the applied slippage is accounted for in the surplus, while the swap fee is be paid to the network as a fee reward. This ensures that the value of the basket remains constant, providing stability to the system.
+
+
+Assets within the pool are weighted according to their underlying staked value - these predetermined weights dictate the fixed price ratios at which incoming swaps are filled. 
+
+
+Governance must ensure that the weights of each token in the basket are properly configured to maintain the value of the issued basket tokens. Should the governance decide to re-configure one or many of the weight properties of the basket (for example due to peg changes), it is important to ensure that the sum of the products of the weight and amount of each token in the basket must be greater than or equal to the amount of issued basket tokens B&lt;id&gt; otherwise there will not be enough tokens in the basket to redeem. For example, if the basket B&lt;id&gt; includes tokens A, B, and C, the governance must ensure that
+
+
+$$
+\left(A_{amount} \times A_{weight}\right) + \left(B_{amount} \times B_{weight}\right) + \left(C_{amount} \times C_{weight}\right) \geq B_{<ID>\_<denom>.total\_amount\_issued}
+$$
+
+
+If the weights are not correctly configured, the governance proposal to update the basket weights will fail.
+
+
+To protect against depegging scenarios, each token has a configurable maximum limit within its basket. In the event that an incoming swap would disbalance the composition of a particular basket, dynamic fees are adjusted to return it to equilibrium, incentivizing swaps rebalancing the basket over swaps that do not.
+
+
+As token baskets are built into the base layer, this same weighting system adjusts automatically for changes in underlying staked value. Staking rewards and slashing penalties are automatically accounted for, without dependence on any third-party oracle.
+
+
+Should intervention be required from onchain governance, multiple failsafe mechanisms exist. Consensus nodes can vote to include or exclude tokens from baskets. In the event of an ongoing emergency, swaps can be halted by governance until the situation is resolved. Additionally, swap fees accumulate toward a surplus which functions like an insurance fund controlled by chain governance. In the unlikely event that an asset does become depegged within its basket, governance can mobilize these surplus funds toward the asset’s peg restoration.
+

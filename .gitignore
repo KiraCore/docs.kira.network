@@ -1,7 +1,7 @@
 # Dependencies
 /node_modules
 
-# Production
+# Production (ignoring build folder will disable showLastUpdateTime feature)
 /build
 
 # Generated files
