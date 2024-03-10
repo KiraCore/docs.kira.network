@@ -1,6 +1,9 @@
 # Dependencies
 /node_modules
 
+# Temporary pull (rsync is used to selectively update the tabs folder)
+/temp 
+
 # Production (ignoring build folder will disable showLastUpdateTime feature)
 /build
 

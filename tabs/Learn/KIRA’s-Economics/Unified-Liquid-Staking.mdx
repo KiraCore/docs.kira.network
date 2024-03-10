@@ -9,6 +9,9 @@ import TabItem from '@theme/TabItem';
 
 
 
+## Overview {#17f41ac6a17e4753a0358b8d8fb55a26}
+
+
 KIRA allows Consensus nodes to stake any combination of multiple whitelisted assets through its [Multiple Bonded Proof of Stake](/learn/cf661a9f-09e0-4bc3-8248-bf0e545f0418#38c624fbdc324bd093974d2abb46c689) mechanism. Depositors are automatically issued redeemable receipt tokens representing their staked assets, making them LSDs by default. 
 
 
@@ -18,10 +21,10 @@ Liquid staking has multiple pain points in the current DeFi landscape. Due to co
 KIRA's Token Basketing module solves for the friction associated with liquid staking by aggregating users' receipt tokens by their liquidity denominations, into cohesive fungible assets. 
 
 
-The Token Basketing module's AMM is self-rebalancing and offers swaps without price impact. 
+## Constant Product Amm Model {#6913f654fbf94d1daed46a4167609f77}
 
 
-A important aspect of the swap mechanism is that the sum of products of individual token amounts and their weights remain constant before and after the swap. This is expressed mathematically as:
+Token Baskets are simple automated market makers (AMM) following a constant product model, which is self-rebalancing and offers swaps without price impact. A key aspect is that the sum of products of each token's amount multiplied by its weight remains constant before and after any trade, expressed mathematically as:
 
 
 $$
@@ -29,13 +32,13 @@ $$
 $$
 
 
-This means that the cumulative value of the tokens in the basket remain unchanged (or slightly larger due to rounding errors). Any additional tokens due to the applied slippage is accounted for in the surplus, while the swap fee is be paid to the network as a fee reward. This ensures that the value of the basket remains constant, providing stability to the system.
+In other words, this ensures the cumulative value of tokens in the basket remains unchanged (or slightly larger due to rounding). Any additional tokens from slippage account for surplus, while swap fees are paid to the network as [fee rewards](/learn/5b32eede-3889-4f8e-baf5-0f0dc9179a6b). This constant product model provides stability by preserving the basket's overall value.
 
 
 Assets within the pool are weighted according to their underlying staked value - these predetermined weights dictate the fixed price ratios at which incoming swaps are filled. 
 
 
-Governance must ensure that the weights of each token in the basket are properly configured to maintain the value of the issued basket tokens. Should the governance decide to re-configure one or many of the weight properties of the basket (for example due to peg changes), it is important to ensure that the sum of the products of the weight and amount of each token in the basket must be greater than or equal to the amount of issued basket tokens B&lt;id&gt; otherwise there will not be enough tokens in the basket to redeem. For example, if the basket B&lt;id&gt; includes tokens A, B, and C, the governance must ensure that
+Governance ensures each token's weight is properly configured to maintain the issued basket tokens' value. If weights are reconfigured (e.g. due to peg changes), the sum of each token's weighted amount must be greater than or equal to the issued basket tokens. For a basket B&lt;id&gt; containing tokens A, B, and C, governance ensure that:
 
 
 $$
@@ -43,14 +46,20 @@ $$
 $$
 
 
-If the weights are not correctly configured, the governance proposal to update the basket weights will fail.
+This safeguards redemption by ensuring sufficient tokens in the basket to cover outstanding basket tokens.
 
 
-To protect against depegging scenarios, each token has a configurable maximum limit within its basket. In the event that an incoming swap would disbalance the composition of a particular basket, dynamic fees are adjusted to return it to equilibrium, incentivizing swaps rebalancing the basket over swaps that do not.
+## Maintaining Peg Stability {#77f3a6ca3eaf4e9594ae7bcc38e3fa14}
 
 
-As token baskets are built into the base layer, this same weighting system adjusts automatically for changes in underlying staked value. Staking rewards and slashing penalties are automatically accounted for, without dependence on any third-party oracle.
+To protect against depegging scenarios, each token has a configurable maximum limit within its basket. If an incoming swap would disbalance a particular basket's composition, dynamic fees adjust to incentivize rebalancing swaps over those that exacerbate the imbalance, returning it to equilibrium.
 
 
-Should intervention be required from onchain governance, multiple failsafe mechanisms exist. Consensus nodes can vote to include or exclude tokens from baskets. In the event of an ongoing emergency, swaps can be halted by governance until the situation is resolved. Additionally, swap fees accumulate toward a surplus which functions like an insurance fund controlled by chain governance. In the unlikely event that an asset does become depegged within its basket, governance can mobilize these surplus funds toward the asset’s peg restoration.
+As Token Baskets are built into the base layer, this weighting system automatically adjusts for changes in underlying staked value. Staking rewards and slashing penalties are natively accounted for, without reliance on third-party oracles.
 
+
+Should intervention be required, on-chain governance has multiple failsafe mechanisms:
+
+- Consensus nodes can vote to include or exclude tokens from baskets
+- In ongoing emergencies, swaps can be halted by governance until resolved
+- Accumulated surplus swap fees function as an insurance fund controlled by chain governance. In the unlikely event an asset depegges within its basket, governance can mobilize this surplus fund toward restoring the asset's peg.
