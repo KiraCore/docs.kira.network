@@ -1,0 +1,753 @@
+---
+title: Roles & Permissions
+sidebar_position: 4
+slug: /980ceb2f-9bc1-4133-aad0-bfb8a5c55536
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Concept {#c77098bc9e8041d3acd7dd398e7ce168}
+
+
+KIRA governance system utilizes a combination of Roles & Permissions to create a multi-layered governance structure that enables a diverse range of councilors to participate and contribute to the network's decision-making processes. The system operates with just two rules enabling it to bootstrap and evolve almost any imaginable governance model. The rules state that : 
+
+- Only whitelisted actors can execute on-chain actions (submit transactions of a given type).
+- Whitelisted actors can only execute on-chain actions that they have been given the permission to execute.
+
+For example, a multicameral system can be created where subsets of councilors specialize in creating and voting on specific subsets of proposals. Alternatively, a separation of power through checks and balances can be implemented, preventing a single governance branch from achieving a privileged position. Overall, the KIRA governance system is designed to be flexible and adaptable, allowing it to constantly improve its efficiency and decentralization without relying on factors such as wealth or stake distribution. This makes it an effective tool for ensuring that network actors are motivated and aligned towards common goals, which is crucial for achieving consensus within the network.
+
+
+#### Permissions {#ea6396ff8b684c33be953070bdcf0c51}
+
+
+In KIRA network, every type of transaction that can be sent to SEKAI has a unique permission identifier associated with it and there exist two types of permissions: governance permissions and sudo permissions. Governance permissions allow changes to be made through a governance proposal process, and is always associated with two permissions: proposal creation and voting. Sudo permissions, on the other hand, allow users to make changes directly, bypassing any governance proposal. These permission identifiers can be added to the whitelist or blacklist of an individual KIRA account or a role — more on this in the following section. If the permission identifier is on the account's whitelist, the account is able to send the corresponding transaction to the blockchain. If the identifier is not on the account's whitelist or is on its blacklist, the account is not able to send the transaction, with the exception of `MsgSend`, and `MsgMultiSend` transactions. For example, if you want to allow a KIRA account to claim a validator seat on the blockchain, you must add the 2[broken link] permission to its whitelist. Only then will the account be able to use the `claim-validator-seat` CLI command to send the `MsgClaimValidator` transaction.
+
+
+#### Roles {#f7f0069d7e1946fdb56c457decd61991}
+
+
+To make it easier to manage hundreds of different permissions, KIRA uses a concept of roles. A role is a collection of permissions that can be associated to a specific KIRA address. This allows the network to manage the permissions of all addresses associated with a role at once, rather than having to change permissions for each individual address. Each permission assigned to a role or individual address can have its own defined parameters, which can be used as input for the function that is triggered when a network actor submits a particular type of transaction. These parameters allow for more granular control of permissions, ensuring that the responsibilities and power of individual network actors can vary widely within the governance model. If the permissions associated with a role are changed, the permissions of all accounts that have been assigned that role will also be changed. Roles can be assigned either by a group of governance members with the appropriate permissions 22[broken link] and 23[broken link], or by a sudo member  9[broken link] .
+
+
+#### Role & Account Permission Conflicts {#52640fd598564b83a8e9fb3cdfce60fb}
+
+
+Permissions in the KIRA governance system can be managed at both account and role levels, each with separate whitelists and blacklists. Within the same type (account or role), a permission cannot be present on both the whitelist and the blacklist. In other words, if a permission is on a role's blacklist, it cannot be added to the role's whitelist, and vice versa. The same rule applies to account whitelists and blacklists.
+
+
+It is important to note that conflicting permissions between account and role levels are possible. In cases where conflicts arise between an account's and a role's whitelists and blacklists, the blacklisted permissions always take precedence. This means that if a permission is blacklisted at either the account or role level, the user will be denied that permission, regardless of any whitelists.
+
+
+:::tip
+
+Suppose a user has permission 10[broken link] whitelisted on their account and is also assigned to a role that has permission 10[broken link] blacklisted. In this case, the user will be denied permission 10[broken link], as the blacklisted permission takes precedence over the whitelisted permission.
+
+:::
+
+
+
+
+## Parameters  {#7a84ff7ef7da4a5788f659d6e6b40ef9}
+
+
+#### Permissions {#a516249604cb46369b786e5027ea2e21}
+
+
+Existing permissions and their correspond types and identifiers are listed [here](https://github.com/KiraCore/sekai/blob/master/proto/kira/gov/permission.proto), or in the following page: 
+
+
+#### Roles {#7e46e604d88f4bf5a973278b7a07fc98}
+
+
+| **NAME**      | **TYPE** | **EXAMPLE** | **DESCRIPTION**                                   |
+| ------------- | -------- | ----------- | ------------------------------------------------- |
+| `id`          | `int`    | `1`         | Identification number of the role - auto assigned |
+| `sid`         | `string` | `some name` | Unique identification name of the role            |
+| `description` | `string` | `some text` | Description of the role                           |
+
+
+## CLI Syntax & Examples {#20129a3a61f14bba9861c2ce8a335580}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#6956f08df3304390b41be91ffec19717}
+
+
+| `role create role`                   | Create a new role with permissions.              |
+| ------------------------------------ | ------------------------------------------------ |
+| `role assign`                        | Assign a role to an account.                     |
+| `role unassign role`                 | Remove a role from an account.                   |
+| `role blacklist-permission`          | Blacklist a permission for a role.               |
+| `role remove-whitelisted-permission` | Remove a whitelisted permission from a role.     |
+| `role remove-blacklisted-permission` | Remove a blacklisted permission from a role.     |
+| `role whitelist-permission`          | Whitelist a permission for a role.               |
+| `permission whitelist`               | Assign a permission to an account's whitelist.   |
+| `permission blacklist`               | Assign a permission to an account's blacklist.   |
+| `permission remove-whitelisted`      | Remove a whitelisted permission from an account. |
+| `permission remove-blacklisted`      | Remove a blacklisted permission from an account. |
+
+
+#### Create Role {#05f8eb77251f4664b5db97fd10c85434}
+
+
+Create a new role with sudo permissions using the `create` command followed by the role's unique identifier `$ROLE_SID` and a description `$ROLE_DESCRIPTION`.
+
+
+**Variables**
+
+	- `$ROLE_SID`: Unique string identifier for the role.
+	- `$ROLE_DESCRIPTION`: A brief description of the role.
+
+```bash
+sekaid tx customgov role create role \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_SID $ROLE_DESCRIPTION
+```
+
+
+#### Assign Role {#de3cc4eb44cc480f9f85d2613a052e2c}
+
+
+Assign a role with sudo permissions to an account using the `assign` command followed by the role's identifier `$ROLE_ID`.
+
+
+**Args**
+
+	- `$ROLE_ID`: The unique identifier of the role to be assigned.
+
+**Flags**
+
+	- `$TARGET_ADDRESS`: The target address to which the role will be assigned.
+
+```bash
+sekaid tx customgov role assign \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_ID --addr=$TARGET_ADDRESS
+```
+
+
+#### Remove Role {#86664c10b2854fcea46b0fc465fc7133}
+
+
+Remove a role with sudo permissions from an account using the `remove role` command followed by the role's identifier `$ROLE_ID`.
+
+
+**Args**
+
+	- `$ROLE_ID`: The unique identifier of the role to be removed.
+
+**Flags**
+
+	- `$TARGET_ADDRESS`: The target address from which the role will be removed.
+
+```bash
+sekaid tx customgov role remove role \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_ID --addr=$TARGET_ADDRESS
+```
+
+
+#### Whitelist Role Permission {#9412158de9b64d889bcb9957f4c9d8a2}
+
+
+Whitelist a permission to a role with sudo permissions using the `whitelist-permission` command followed by the role's identifier `$ROLE_ID` and the permission's identifier `$PERMISSION_ID`.
+
+
+**Args**
+
+	- `$ROLE_ID`: The unique identifier of the role.
+	- `$PERMISSION_ID`: The unique identifier of the permission to be whitelisted.
+
+```bash
+sekaid tx customgov role whitelist-permission \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_ID $PERMISSION_ID
+```
+
+
+#### Blacklist Role’s Permission {#dd9cce6cffdb4b06b89242b13892d8ee}
+
+
+Blacklist a permission for a governance role with sudo permissions using the `blacklist-permission` command followed by the role's identifier `$ROLE_ID` and the permission's identifier `$PERMISSION_ID`.
+
+
+**Args**
+
+	- `$ROLE_ID`: The unique identifier of the role.
+	- `$PERMISSION_ID`: The unique identifier of the permission to be blacklisted.
+
+```bash
+sekaid tx customgov role blacklist-permission \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_ID $PERMISSION_ID
+```
+
+
+#### Remove Role’s Whitelisted Permission {#08639ca85c164ac4bd0c035bfe232a9f}
+
+
+Remove a whitelisted permission from a governance role with sudo permissions using the `remove-whitelisted-permission` command followed by the role's identifier `$ROLE_ID` and the permission's identifier `$PERMISSION_ID`.
+
+
+**Args**
+
+	- `$ROLE_ID`: The unique identifier of the role.
+	- `$PERMISSION_ID`: The unique identifier of the whitelisted permission to be removed.
+
+```bash
+sekaid tx customgov role remove-whitelisted-permission \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_ID $PERMISSION_ID
+```
+
+
+#### Remove Role’s Blacklisted Permission {#41e4a72abd5349489db98323b5ba9d73}
+
+
+Remove a blacklisted permission from a governance role with sudo permissions using the `remove-blacklisted-permission` command followed by the role's identifier `$ROLE_ID` and the permission's identifier `$PERMISSION_ID`.
+
+
+**Args**
+
+	- `$ROLE_ID`: The unique identifier of the role.
+	- `$PERMISSION_ID`: The unique identifier of the blacklisted permission to be removed.
+
+```bash
+sekaid tx customgov role remove-blacklisted-permission \
+--from=$SIGNER $FLAGS_TX \
+$ROLE_ID $PERMISSION_ID
+```
+
+
+#### Whitelist Account Permission {#806238882b114b9b818e6a4b93ae3dee}
+
+
+Assign permission to a Kira address whitelist with sudo permissions using the `whitelist` command.
+
+
+**Flags**
+
+- `$ADDRESS`: The address for which permissions should be set.
+- `$PERMISSION`: The permission value to be assigned.
+
+```bash
+sekaid tx customgov permission whitelist \
+--from=$SIGNER $FLAGS_TX \
+--addr=$ADDRESS --permission=$PERMISSION
+```
+
+
+#### Remove Account Whitelisted Permission {#73c6b6b57b1e40d19dd9b4b091a2ac10}
+
+
+Remove whitelisted permission from an address with sudo permissions using the `remove-whitelisted` command.
+
+
+**Flags**
+
+- `$ADDRESS`: The address from which permissions should be removed.
+- `$PERMISSION`: The permission value to be removed.
+
+```bash
+sekaid tx customgov permission remove-whitelisted \
+--from=$SIGNER $FLAGS_TX \
+--addr=$ADDRESS --permission=$PERMISSION
+```
+
+
+#### Blacklist Account’s Permission {#7e6f13bfe51a44f4a2d1125572528767}
+
+
+Assign permission to a Kira account blacklist with sudo permissions using the `blacklist` command.
+
+
+**Flags**
+
+- `$ADDRESS`: The address for which permissions should be set.
+- `$PERMISSION`: The permission value to be assigned.
+
+```bash
+sekaid tx customgov permission blacklist \
+--from=$SIGNER $FLAGS_TX \
+--addr=$ADDRESS --permission=$PERMISSION
+```
+
+
+#### Remove Account’s Blacklisted Permissions {#c254a608b08b401b98a80afa5c721cbf}
+
+
+Remove blacklisted permission from an address with sudo permissions using the `remove-blacklisted` command.
+
+
+**Flags**
+
+- `$ADDRESS`: The address from which permissions should be removed.
+- `$PERMISSION`: The permission value to be removed.
+
+```bash
+sekaid tx customgov permission remove-blacklisted \
+--from=$SIGNER $FLAGS_TX \
+--addr=$ADDRESS --permission=$PERMISSION
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#d4546bd70d5747b0b56c7b5a5f90ba05}
+
+
+| `permissions`                      | Query permissions of a specific KIRA address.                      |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `whitelisted-permission-addresses` | Query addresses associated with a whitelisted permission.          |
+| `blacklisted-permission-addresses` | Query addresses associated with a blacklisted permission.          |
+| `all-roles`                        | Query all registered roles in the KIRA network.                    |
+| `roles`                            | Query roles assigned to a specific KIRA address.                   |
+| `role`                             | Query information about a role using its Service Identifier (SID). |
+| `whitelisted-role-addresses`       | Query addresses associated with a whitelisted role.                |
+
+
+#### Query Address Permissions {#1018f8a098ca4fc9891ecaffe65b0339}
+
+
+Retrieve the permissions associated with a specific KIRA address using the `permissions` command.
+
+
+**Args**
+
+- `$ADDR`: The address whose permissions are to be queried.
+
+```shell
+sekaid query customgov permissions $ADDR $FLAGS_QR | jq
+```
+
+
+#### Query Addresses by Whitelisted Permission {#d64eae3fd3ce4145a744034780ddc81a}
+
+
+List all KIRA addresses that are associated with a specific whitelisted permission using the `whitelisted-permission-addresses` command.
+
+
+**Args**
+
+- `$PERM`: The whitelisted permission value to be queried.
+
+```shell
+sekaid query customgov whitelisted-permission-addresses $PERM $FLAGS_QR | jq
+```
+
+
+#### Query Addresses by Blacklisted Permission {#ec0852ec6a0a40a787bd2e8a8836a769}
+
+
+List all KIRA addresses that are associated with a specific blacklisted permission using the `blacklisted-permission-addresses` command.
+
+
+**Args**
+
+- `$PERM`: The blacklisted permission value to be queried.
+
+```shell
+sekaid query customgov blacklisted-permission-addresses $PERM $FLAGS_QR | jq
+```
+
+
+#### Query All Registered Roles {#848cd8553b3944c9bc4cf25bb3bd85b2}
+
+
+Retrieve a list of all registered roles in the KIRA network using the `all-roles` command.
+
+
+```shell
+sekaid query customgov all-roles $FLAGS_QR | jq
+```
+
+
+#### Query Roles Assigned to an Address {#a719c37b64024561a35c9ad33b079087}
+
+
+Retrieve the roles assigned to a specific KIRA address using the `roles` command.
+
+
+**Args**
+
+- `$ADDR`: The address whose roles are to be queried.
+
+```shell
+sekaid query customgov roles $ADDR $FLAGS_QR | jq
+```
+
+
+#### Query Role by Sid {#77f5556c25ce49bb873b2fccd2a75877}
+
+
+Retrieve information about a specific role using its SID (Service Identifier) with the **`role`** command.
+
+
+**Args**
+
+- `$ROLE_IDENTIFIER`: The SID of the role to be queried.
+
+```shell
+sekaid query customgov role $ROLE_IDENTIFIER $FLAGS_QR | jq
+```
+
+
+#### Query Addresses by Whitelisted Role {#ff2f390f256f426494b137a77239437f}
+
+
+List all KIRA addresses associated with a specific whitelisted role using the `whitelisted-role-addresses` command.
+
+
+**Args**
+
+- `$ROLE`: The whitelisted role value to be queried.
+
+```shell
+sekaid query customgov whitelisted-role-addresses $ROLE $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#f8617dce42da4177a1015785d162b8d0}
+
+
+To assign governance permissions, a group of governance members must submit and vote a proposal using `whitelist-permission` with the appropriate proposal creation permission 4 and voting permission 5. Sudo permissions can be assigned by an account which has the permission 1.
+
+
+| `proposal account assign-role`                   | Proposal to assign a role to an address.                     |
+| ------------------------------------------------ | ------------------------------------------------------------ |
+| `proposal account unassign-role`                 | Proposal to unassign a role from an address.                 |
+| `proposal account blacklist-permission`          | Proposal to blacklist a permission for an account.           |
+| `proposal account remove-blacklisted-permission` | Proposal to remove a blacklisted permission from an account. |
+| `proposal account whitelist-permission`          | Proposal to whitelist a permission for an account.           |
+| `proposal account remove-whitelisted-permission` | Proposal to remove a whitelisted permission from an account. |
+| `proposal role create`                           | Proposal to create a new role.                               |
+| `proposal role remove`                           | Proposal to remove an existing role.                         |
+| `proposal role whitelist-permission`             | Proposal to whitelist a permission for a role.               |
+| `proposal role remove-whitelisted-permission`    | Proposal to remove a whitelisted permission from a role.     |
+| `proposal role blacklist-permission`             | Proposal to blacklist a permission for a role.               |
+| `proposal role remove-blacklisted-permission`    | Proposal to remove a blacklisted permission from a role.     |
+
+
+#### Assign Role to Account {#2cba8bc4ac50409f9af216999523c632}
+
+
+The CLI command, `assign-role`, is utilized to create a proposal for assigning a role to an address.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role to be assigned.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$ADDRESS`: The address to which the role will be assigned. Requires a valid blockchain address.
+
+```shell
+sekaid tx customgov proposal account assign-role \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--address=$ADDRESS \
+$ROLE_SID
+```
+
+
+#### Unassign Role From Account {#e99b9d5473494b51b34730686f4d8e1a}
+
+
+The CLI command, `unassign-role`, creates a proposal for unassigning a role from an address.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role to be unassigned.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$ADDRESS`: The address from which the role will be unassigned. Requires a valid blockchain address.
+
+```shell
+sekaid tx customgov proposal account unassign-role \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--address=$ADDRESS \
+$ROLE_SID
+```
+
+
+#### Blacklist Permission for Account {#b17783c615fe489f9a6550edb1bcc84f}
+
+
+The CLI command, `blacklist-permission`, is for creating a proposal to blacklist a specific permission for an address.
+
+
+**Args**
+
+- `$PERMISSION_ID`: The ID of the permission to be blacklisted. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$ADDRESS`: The address for which permissions will be set. Requires a valid blockchain address.
+
+```shell
+sekaid tx customgov proposal account blacklist-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--address=$ADDRESS \
+$PERMISSION_ID
+```
+
+
+#### Remove Blacklisted Permission From Account {#7c12a8e15a03468d87431ea5d4468b3d}
+
+
+The CLI command, `remove-blacklisted-permission`, removes a blacklisted permission from an address.
+
+
+**Args**
+
+- `$PERMISSION_ID`: The ID of the blacklisted permission to be removed. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$ADDRESS`: The address from which the blacklisted permission will be removed. Requires a valid blockchain address.
+
+```shell
+sekaid tx customgov proposal account remove-blacklisted-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--address=$ADDRESS \
+$PERMISSION_ID
+```
+
+
+#### Whitelist Permission for Account {#1074bc39423844269d35aded62d9f3b4}
+
+
+The CLI command, `whitelist-permission`, is used for creating a proposal to whitelist a specific permission for an address.
+
+
+**Args**
+
+- `$PERMISSION_ID`: The ID of the permission to be whitelisted. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$ADDRESS`: The address for which permissions will be set. Requires a valid blockchain address.
+
+```shell
+sekaid tx customgov proposal account whitelist-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--address=$ADDRESS \
+$PERMISSION_ID
+```
+
+
+#### Remove Whitelisted Permission From Account {#dc2d828fb55e44dd88188df10db25cf1}
+
+
+The CLI command, `remove-whitelisted-permission`, removes a whitelisted permission from an address.
+
+
+**Args**
+
+- `$PERMISSION_ID`: The ID of the whitelisted permission to be removed. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$ADDRESS`: The address from which the whitelisted permission will be removed. Requires a valid blockchain address.
+
+```bash
+sekaid tx customgov proposal account remove-whitelisted-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--address=$ADDRESS \
+$PERMISSION_ID
+```
+
+
+#### Create Role {#a5fc56bdaaf2483187994e6efcae14f5}
+
+
+The CLI command, `create`, is for raising a governance proposal to create a new role.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the new role.
+- `$ROLE_DESCRIPTION`: The description of the new role.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+- `$WHITELIST_PERMS`: A comma-separated list of permission IDs to be whitelisted for the role.
+- `$BLACKLIST_PERMS`: A comma-separated list of permission IDs to be blacklisted for the role.
+
+```bash
+sekaid tx customgov proposal role create \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--whitelist-perms=$WHITELIST_PERMS \
+--blacklist-perms=$BLACKLIST_PERMS \
+$ROLE_SID $ROLE_DESCRIPTION
+```
+
+
+#### Remove Role {#539e8162fe6a4eb6833a3e99172225c5}
+
+
+The CLI command, `remove`, raises a governance proposal for removing an existing role.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role to be removed.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+
+```bash
+sekaid tx customgov proposal role remove \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$ROLE_SID
+```
+
+
+#### Whitelist Permission for Role {#6ecd24fdd2934c9c8c163afea00da82d}
+
+
+The CLI command, `whitelist-permission`, is for whitelisting permissions for a specific role.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role.
+- `$PERMISSION_ID`: The ID of the permission to be whitelisted. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+
+```bash
+sekaid tx customgov proposal role whitelist-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$ROLE_SID $PERMISSION_ID
+```
+
+
+#### Remove Whitelisted Permission From Role {#1b6b5015b7d34dfb8779e5f3752c56fb}
+
+
+The CLI command, `remove-whitelisted-permission`, removes a whitelisted permission from a role.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role.
+- `$PERMISSION_ID`: The ID of the permission to be removed. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+
+```bash
+sekaid tx customgov proposal role remove-whitelisted-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$ROLE_SID $PERMISSION_ID
+```
+
+
+#### Blacklist Permission for Role {#e6cd57ceb5544e7c948187a8ce51b704}
+
+
+The CLI command, `blacklist-permission`, is for blacklisting permissions for a specific role.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role.
+- `$PERMISSION_ID`: The ID of the permission to be blacklisted. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+
+```bash
+sekaid tx customgov proposal role blacklist-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$ROLE_SID $PERMISSION_ID
+```
+
+
+#### Remove Blacklisted Permission From Role {#6cff372affa745ef8edbe5525b774a4e}
+
+
+The CLI command, `remove-blacklisted-permission`, removes a blacklisted permission from a role.
+
+
+**Args**
+
+- `$ROLE_SID`: The string identifier of the role.
+- `$PERMISSION_ID`: The ID of the permission to be removed. Must be an integer.
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The proposal’s description.
+
+```bash
+sekaid tx customgov proposal role remove-blacklisted-permission \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$ROLE_SID $PERMISSION_ID
+```
+
+
+
+</TabItem></Tabs>
+

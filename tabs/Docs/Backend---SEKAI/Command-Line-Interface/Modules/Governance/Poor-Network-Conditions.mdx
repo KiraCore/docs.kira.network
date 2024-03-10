@@ -1,0 +1,164 @@
+---
+title: Poor Network Conditions
+sidebar_position: 9
+slug: /65e3e6fe-040a-4716-b13b-9e27def6ff9d
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Concept {#e1a58e9de5854012944a7cf97ad0fab4}
+
+
+The robustness of the KIRA network is maintained by a set of active consensus nodes who ensure the smooth operation and security of the system. However, external factors or unforeseen events can sometimes hinder their ability to maintain the integrity of the network. Such a scenario where the number of active consensus nodes drops below the defined `min_validators` [**network property**](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) is termed as "Poor Network Conditions".
+
+
+This condition could be attributed to various potential causes:
+
+- Malicious DOS/DDOS attacks targeting consensus nodes not utilizing sentry nodes.
+- Coordinated interference from multiple ISPs used by consensus nodes.
+- Anomalies in DNS servers or incorrect address routing.
+- Failed network upgrades leading to unexpected behaviors.
+- Global political events affecting internet connectivity, like the "Great Firewall 2.0".
+- Among other unforeseen circumstances...
+
+In response to these challenges, this module activates specific protocols and safeguards designed to protect the network and its users. These measures include limiting certain transactions and adjusting network properties to ensure asset safety and network stability until normal conditions are restored.
+
+
+### Ensuring Network & Users Safety {#b3ef892b6bbc41808a8d360e4608dfda}
+
+
+The primary objective during poor network conditions is to safeguard user assets until the network regains its strength. The `poor_network_max_bank_send` [**network property**](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) is instrumental in this context. It dictates the upper limit for asset transfers during compromised network states. By equating this value with the `max_tx_fee`, the network can prevent potential asset misappropriation by malicious entities.
+
+
+Furthermore, custodians can monitor the `min_validators` and `poor_network_max_bank_send` to decide whether to accept transfers from a network or a fork, especially if the consensus nodes count dips below the safety threshold. Essentially, these measures deter malicious consensus nodes from gaining undue advantages, such as attempting to sideline honest consensus nodes for their own gain.
+
+
+### Restricted Transaction Types {#95043ba1a6d445d2aeba125aad215bba}
+
+
+In light of such situations, the network can determine which [**Transaction Message Types**](https://github.com/KiraCore/sekai/blob/master/types/Msg.go) are permissible. This proactive approach halts any unexpected network activities until a sufficient number of nodes is available for secure chain operation.
+
+
+The default set of allowed messages during poor network conditions are:
+
+
+| **MESSAGE TYPE**                            | **DESCRIPTION**                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------ |
+| `MsgTypeSubmitProposal`                     | Submit a new governance proposal                                         |
+| `MsgTypeSetNetworkProperties`               | Update network-level properties/settings                                 |
+| `MsgTypeVoteProposal`                       | Cast a vote on an existing governance proposal                           |
+| `MsgTypeClaimCouncilor`                     | Request to claim a councilor role                                        |
+| `MsgTypeWhitelistPermissions`               | Grant certain permissions to an entity                                   |
+| `MsgTypeBlacklistPermissions`               | Revoke certain permissions from an entity                                |
+| `MsgTypeCreateRole`                         | Create a new network role                                                |
+| `MsgTypeAssignRole`                         | Assign an existing role to an entity                                     |
+| `MsgTypeUnassignRole`                       | Remove a role from an entity                                             |
+| `MsgTypeWhitelistRolePermission`            | Grant specific permissions to a role                                     |
+| `MsgTypeBlacklistRolePermission`            | Revoke specific permissions from a role                                  |
+| `MsgTypeRemoveWhitelistRolePermission`      | Remove granted permissions from a role's whitelist                       |
+| `MsgTypeRemoveBlacklistRolePermission`      | Remove permissions from a role's blacklist                               |
+| `MsgTypeClaimValidator`                     | Request to claim validator seat                                          |
+| `MsgTypeActivate`                           | Activate the consensus node that was previously inactivated for downtime |
+| `MsgTypePause`                              | Temporarily pause the consensus node                                     |
+| `MsgTypeUnpause`                            | Resume a previously paused consensus node                                |
+| `MsgTypeRegisterIdentityRecords`            | Register new identity records                                            |
+| `MsgTypeEditIdentityRecord`                 | Modify an existing identity record                                       |
+| `MsgTypeRequestIdentityRecordsVerify`       | Request verification for an identity record                              |
+| `MsgTypeHandleIdentityRecordsVerifyRequest` | Handle incoming verification requests                                    |
+| `MsgTypeCancelIdentityRecordsVerifyRequest` | Cancel a previously made verification request                            |
+
+
+## Parameters {#f76721f5b3a845d483bd30cafdb0a488}
+
+
+| **NAME**                | **TYPE**   | **EXAMPLE**                                           | **DESCRIPTION**                                                              |
+| ----------------------- | ---------- | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `poor_network_messages` | `[]string` | `MsgTypeSubmitProposal,MsgTypeSetNetworkProperties,…` | A list defining the type of messages allowed during poor network conditions. |
+
+
+## CLI Syntax & Examples {#55563826bad845afa3dfea091debbfb2}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions " label="Transactions ">
+
+
+## Transactions  {#8c33550d55ec4863abaa5a6b2030a061}
+
+
+There is no transactions other than the governance proposals for this sub-module
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#81e1f96b40384b0fa0f8294e1765e57d}
+
+
+| `poor-network-messages` | Retrieve a list of allowed transaction message types during poor network conditions. |
+| ----------------------- | ------------------------------------------------------------------------------------ |
+
+
+#### Query Allowed Messages {#5fbfe6c6f9c34359ba2c5c89dd565820}
+
+
+Retrieve a list of allowed transaction message types during poor network conditions using the `poor-network-messages` command.
+
+
+```bash
+sekaid query customgov poor-network-messages $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#b0d04288f92840e5913b44d432e62d5a}
+
+
+| `set-poor-network-msgs` | Create a proposal for updating allowed transaction message types during poor network conditions. |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+
+
+#### Update Poor Network Messages List {#45e91f5f88a84e02bb77a00af6bf8ebb}
+
+
+The CLI command, `set-poor-network-msgs`, is utilized to create a proposal for updating the allowed transaction message types during poor network conditions. The command accepts the following arguments and flags:
+
+
+**Args**
+
+- `$MESSAGES`: A list of transaction message types that should be allowed during poor network conditions. List of existing messages is vailable [here](https://github.com/KiraCore/sekai/blob/master/types/Msg.go).
+
+**Flags**
+
+- `$TITLE`: The title of the proposal, defaulting to "Update poor network messages".
+- `$DESCRIPTION`: The description of the proposal, defaulting to "Allowing submission of '[$MESSAGES]' during poor network conditions".
+
+```bash
+sekaid tx customgov proposal set-poor-network-msgs \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$MESSAGES
+```
+
+
+
+</TabItem></Tabs>
+

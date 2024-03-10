@@ -1,0 +1,102 @@
+---
+title: Evidence module
+sidebar_position: 2
+slug: /bd4cce67-2cee-4d9f-9b81-e5643d130438
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+### Concept {#9da6c82434ad47c5908a9dd18371ae39}
+
+
+The Evidence module, extended from the Cosmos SDK's, enhances existing evidence handling that relies on the underlying consensus engine to automatically submit evidence upon discovery. It achieves this by implementing abstractions and interfaces that enable developers to define custom evidence messages and methods for penalizing misbehaving consensus nodes. Tendermint detects double-signing by consensus nodes and reports this to the Evidence module, which then manages the verification process and determines the appropriate penalty for the offending consensus nodes. Penalties may include slashing a portion of their stake and removing them from the active consensus node set.
+
+
+In KIRA, the only misbehavior that is handled is double signing. In this case the consensus node is automatically jailed upon detection but not automatically slashed. Instead, the slashing process is managed by governance through the slashing module. [Jailing & slashing](/docs/d6fee8b3-1948-493e-bbdd-796bcc996c2b) provides all the necessary information regarding how this process works.
+
+
+```go
+// https://github.com/KiraCore/sekai/blob/master/x/evidence/keeper/infraction.go
+// (...)
+
+if !validator.IsJailed() {
+    k.slashingKeeper.Jail(ctx, consAddr)
+}
+k.slashingKeeper.JailUntil(ctx, consAddr, ctx.BlockTime())
+k.SetEvidence(ctx, evidence)
+```
+
+
+## CLI Syntax & Examples {#f2eddfbd285d437cab18755acfd6fab9}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions " label="Transactions ">
+
+
+## Transactions  {#723e137d9712400c842928f221446573}
+
+
+There is no transactions for this sub-module.
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#fce8b27770f04b908c78f06bd198ef57}
+
+
+|  `evidence` | List all submitted evidence in a paginated format. |
+| ----------- | -------------------------------------------------- |
+
+
+#### List All Submitted Evidence (paginated) {#3f5710a330774094b495f67a3c3ab6f4}
+
+
+This command lists all submitted evidence in a paginated format. Replace `<page_number>` with the desired page number and `<page_size>` with the number of items per page. Default values will be used if these are not provided.
+
+
+```shell
+sekaid query evidence $FLAGS_QR --page=<page_number> --limit=<page_size> | jq
+```
+
+
+#### Query Specific Evidence by Its Hash {#a4fd48a0733f4fce8bd47809d8a6dedc}
+
+
+To query a specific piece of evidence by its hash, use the following command.
+
+
+```shell
+sekaid query evidence $HASH $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#9a2dbce1f8ac4af589baf48fa108385f}
+
+
+There is no governance proposal for this sub-module.
+
+
+
+</TabItem></Tabs>
+

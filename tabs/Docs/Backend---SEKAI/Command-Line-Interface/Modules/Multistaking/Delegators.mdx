@@ -1,0 +1,342 @@
+---
+title: Delegators
+sidebar_position: 3
+slug: /94e4d0a6-8e45-469c-89a5-8ec65ca16381
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Concept {#5c4703c095ef4be7a1ba267af6071f66}
+
+
+Delegators are KIRA token holders who want to participate in network security by delegating assets as collateral to one or more consensus nodes' staking pools in exchange for a share of their revenue. Because delegators share revenue and responsibility with their chosen consensus nodes, they should carefully consider which nodes to delegate to and monitor their stakes regularly. Consensus nodes can also be delegators, but they <u>are not required to</u>. Staked assets are directly affected by the conduct of the elected nodes, so it is important for delegators to exercise diligence and diversification in their choices.
+
+
+### Native Liquid Staking  {#fdb23dc5af87468898b340eda95f2ede}
+
+
+Consensus nodes on the Kira Network have staking pools that are designed equivalently to regular AMM liquidity pools like Uniswap, in order to achieve native liquid staking. When a certain number of tokens `<denom>` are deposited in the staking pool of a consensus node `V<ID>`, an equal number of derivative tokens `V<ID>/<denom>` are issued in return (similar to AMM LP tokens). These derivative tokens `V<ID>/<denom>` can be freely moved and traded on and off-chain, while the underlying `<denom>` tokens remain staked. If V1 is slashed for double signing, the staked `<denom>` tokens can either be moved to the treasury, a governance [spending pool](/docs/812fdf31-d225-4daf-a4cd-4501cbc00d95) or destroyed, while the derivative tokens `V<ID>/<denom>` representing them would lose their 1-to-1 peg (similar to impermanent loss in AMM).
+
+
+:::note
+
+E.g.: If 50% of `XYZ` tokens staked with block proposer `V1` get slashed, unstaking 2 `V1/XYZ` from `V1`'s pool would only return 1 `XYZ`.
+
+:::
+
+
+
+
+### Staking Pools & Consensus Nodes Status  {#c898af44293e44ef96a6c6cae5ed1186}
+
+
+In KIRA's network, each consensus node operates its own staking pool where delegators can stake their assets. The staking pool has a unique ID and is linked to the consensus node's address. The consensus node has control over the staking pool's status and can enable or disable it, as well as set the commission rate on block rewards. In addition, a consensus node can be `active`, `inactive`, `paused`, or `jailed` depending on its performance, behavior or choice. While it is important to understand that the status of the staking pool is independent of the status of the consensus node, if a consensus node's status is `inactive`, `paused`, or `jailed` , and/or if its staking pool is `disabled`, delegators are not able to delegate any additional tokens to that node’s staking pool. They will only be able to undelegate their existing stake.
+
+
+_For more information regarding consensus nodes status and ranking system please refer to the_ [_Consensus nodes ranks & statuses_](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f) _module.
+For more information regarding consensus nodes staking pool status please refer to the_ [_Consensus nodes & staking pools_](/docs/4b7f76b2-83c1-4f7f-91cf-77f1105fbc6b) _section._
+
+
+### Delegating and Associated Parameters {#c3d993328dfe4b9e85b1f93f390796af}
+
+
+KIRA allows users to delegate and pay [execution fees](/docs/184c11ed-4849-4ec5-acd0-f795b7abf467) with any token that has been whitelisted by governance. To ensure proper network functionality and security, specific management rules and limitations are defined and curated for each foreign token, such as exchange rates and staking pool rewards allowance. These rules are monitored by the [Token Rates Registrar](/docs/f19a45b3-88c4-469c-8642-772b941a1b24) module, which sets bounds on the staking mechanism through the use of three parameters:
+
+- `stake_cap` : Sets the maximum share (%) of staking reward a given whitelisted staking token will be entitled per staking pool to prevent a malicious user from diluting the pool with any particular token in order to claim all the rewards. Setting specific shares also simplifies reward distribution by sidestepping the need to track how much eligible staking tokens are worth in terms of USD or KEX.
+- `stake_min`: Sets the minimum delegation and undelegation amount per transaction for a particular token. This is designed to prevent dust spam attacks, where an attacker might attempt to disrupt block production by continuously staking or withdrawing trivial amounts of tokens with numerous accounts. Importantly, this parameter also ensures that a user cannot undelegate an amount that would leave behind a residual stake less than this minimum. Such a residual would be locked and become non-withdrawable. Detailed considerations related to dust-spam can be found in the [Fees and staking rewards distribution](/docs/85d4757d-f36d-4a39-b7ab-62866c1689ba) section.
+- `fee_rate` : Sets the conversation rate for foreign tokens in terms of KEX to use them as execution fees. `fee_rate` is also used to determine if the `stake_min` value is respected in case of delegation or if `min_delegation_pushout` is reached when a staking pool reaches its [maximum delegators capacity](/docs/94e4d0a6-8e45-469c-89a5-8ec65ca16381).
+
+_For more information regarding delegators staking rewards distribution please refer to_[ _this section_](/docs/85d4757d-f36d-4a39-b7ab-62866c1689ba) _of the_ [_Fees and staking rewards distribution_](/docs/85d4757d-f36d-4a39-b7ab-62866c1689ba) _module._
+
+
+### Registration Mechanism for Offshore Staking Pool Delegators {#08bfc2b8fbcf411bae24ca442fa49e6a}
+
+
+As explained earlier, owning some staking pool's derivatives `V<ID>/<denom>` is equivalent to having some token `<denom>` staked with consensus node `V<ID>`. However, because the Cosmos SDK does not provide a hook on token transfers (yet?) and derivatives can be traded freely inside or outside the KIRA network, it is impossible to track staking pool delegators' shares in real time. To solve this problem, KIRA has implemented a registration mechanism where "offshore" delegators, such as users or smart contracts that acquired KIRA's native staking derivative tokens on the open market, can register those derivatives to the corresponding staking pool to earn the corresponding rewards. Additionally, each staking pool performs a balance check on its current delegators whenever it receives rewards (whenever the consensus nodes produces a block) and will automatically deregister any registered delegators that do not hold more than the minimum `stake_min` of derivative tokens.
+
+
+### Managing Staking Rewards {#df8d14384a764c199e8d69de637577af}
+
+
+#### Claiming Rewards {#7e84cbf07ad941c8b29dad7f14b4884f}
+
+
+With auto-compounding activated, rewards are automatically reinvested, increasing the delegator's stake. However, the staking derivatives, representing these newly compounded rewards, aren't instantly transferred to the delegator's address to reduce overhead. They accumulate in the staking pool and must be claimed manually. Conversely, if a delegator decides not to use auto-compounding, they will have to manually claim all the rewards they accrue. Hence, in both scenarios, the delegator must manually intervene to include their rewards or rewards’ derivatives into their active balance.
+
+
+#### Enabling Auto-compounding {#8095488798c1432baa345bae81d3dd4e}
+
+
+Delegators have the flexibility to decide how they manage rewards earned from staking. They can opt for automatic reinvestment through the auto-compounding feature or claim them manually. This decision can be made for any token eligible for staking, as determined by the [Token Rates Registrar](/docs/f19a45b3-88c4-469c-8642-772b941a1b24) . When enabled, rewards are automatically added to the delegator's stake. However, the corresponding staking derivatives are not sent to the delegator's address, as this would be too much of an overhead for the module to handle. Instead, they are simply accumulated in the staking pool and become claimable in the same way as standard rewards. In other words, when a user disables auto compounding, it will have to claim <u>its rewards</u> manually; when it is enabled, it will have to claim <u>its newly issued staking derivatives</u> manually. Each delegator has their unique auto-compounding schedule, distributing the computational demands and preventing the network from being overwhelmed by simultaneous compounding events. Configurations for this feature are maintained per user. Delegators can enable this feature for all tokens or for particular ones.
+
+
+Auto-compounding operates based on a consistent interval set across the network by the `autocompound_interval_num_blocks` [network property](/docs/b9b95792-b936-4603-8a46-15566f24e3c0). The exact block at which a user's rewards get compounded depends on when they activate this feature. For example, with a network interval set at 10,000 blocks, a delegator enabling auto-compounding at block `3` will see their rewards compounded at blocks `10003`, `20003` and so on. This property is set to `17280` blocks at genesis. 
+
+
+#### Undelegating & Cooling Period {#55d34613a10e460bb772b415455b2038}
+
+
+A delegator can undelegate their stake at anytime to get back its original tokens. Any undelegation will trigger a fixed cooling period during which the stake remain locked and do not yield any reward. Once the cooling period expires, staked tokens `<denom>` can be claimed by providing the respective pool’s derivative `V<ID>/<denom>` which are then burned. The cooling period is the same for all staking tokens and defined by the governance through the following `unstaking_period` network property (1 month by default). 
+
+
+#### Delegators Push Out {#0a9ed94ceee64117a44cf6658c22a213}
+
+
+KIRA has a feature that protects against dust spam attacks by limiting the maximum number of delegators for each individual staking pool with a network property called `max_delegators` (which is set to 100 by default). If this maximum number of delegators is reached, new delegators will need to provide a higher stake than the smallest delegator in the pool in order to push them out. To prevent large stakeholders from easily pushing out smaller delegators from good consensus nodes, the minimum required stake to push out a delegator is set by the `min_delegation_pushout` property (which is a multiplier of the smallest stake value, 10 by default). This [network property](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) can be adjusted by KIRA's governance and increased as the network grows. When a delegator is pushed out, they automatically receive any outstanding rewards they are owed.
+
+
+## CLI Syntax & Examples {#bf9bed7d9d334bfd9d3d2af659f3437b}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#82a71b23509544a2a7ed389e996d72b3}
+
+
+| `delegate`                    | Delegate to a pool.                                                      |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| `undelegate`                  | Start undelegation from a pool.                                          |
+| `claim-rewards`               | Claim rewards from a pool.                                               |
+| `claim-undelegation`          | Claim matured undelegation.                                              |
+| `claim-matured-undelegations` | Claim all matured undelegations in a single transaction.                 |
+| `set-compound-info`           | Set auto compounding mode.                                               |
+| `register-delegator`          | Register as a pool delegator when acquiring pool derivatives externally. |
+
+
+#### Delegating  {#9f9b21196a384f8984764f64df053d49}
+
+
+Delegate tokens to a specific staking pool. This action locks the specified amount of `<denom>` tokens to a staking pool using the consensus node’s address. It returns the corresponding pool’s derivative `V<ID>/<denom>`. The delegation amount cannot be lower than `stake_min`. Delegation is only possible to an active consensus node.
+
+
+**Args**
+
+- `$VAL`: Consensus node’s address (`kiravaloper...`).
+- `$COIN`: Comma-separated list of coins and their amounts to delegate in the format `<amount><denom>` (e.g., `20000ukex`).
+
+```bash
+sekaid tx multistaking delegate \
+--from=$SIGNER $FLAGS_TX \
+$VAL $COIN
+```
+
+
+#### Undelegating {#5a5b0ec50c254a57804362266ba59c01}
+
+
+Undelegating burns the corresponding `V<ID>/<denom>` derivatives and initiates the claim of any outstanding rewards/compounds. The undelegated `<denom>` tokens are assigned an undelegation ID and become claimable after the `unstaking_period`. The undelegation amount must meet the `stake_min` requirements.
+
+
+**Args**
+
+- `$VAL`: Consensus node’s address (`kiravaloper...`).
+- `$COIN`: Comma-separated list of coins and their amounts to undelegate in the format `<amount><denom>` (e.g., `20000ukex`).
+
+```bash
+sekaid tx multistaking undelegate \
+--from=$SIGNER $FLAGS_TX \
+$VAL $COIN
+```
+
+
+#### Set Compounding Mode {#4a865e4b207d4b01b5d42a932989412f}
+
+
+Delegators can activate or deactivate auto compounding for their staked tokens. This can be set for all tokens or specific denominations.
+
+
+**Args**
+
+- `$ALL`: Set compound mode on all tokens (true/false).
+- `$DENOM`: Set compound mode on a specific token denomination (e.g., ukex).
+
+```bash
+sekaid tx multistaking set-compound-info \
+--from=$SIGNER $FLAGS_TX \
+$ALL $DENOM
+```
+
+
+#### Claim Rewards/pool’s Derivatives {#a20c73c980d645b697ce49666e11ffee}
+
+
+Delegators can claim all outstanding rewards (or pool’s derivatives if auto-compounding is active). 
+
+
+```bash
+sekaid tx multistaking claim-rewards \
+--from=$SIGNER $FLAGS_TX
+```
+
+
+#### Claim Undelegation {#d81199ad78c94ef1a1aac0d9b8d4cb3f}
+
+
+Undelegations can be claimed using corresponding [delegation ID](/docs/94e4d0a6-8e45-469c-89a5-8ec65ca16381) and at the end of their respective `unstaking_period`. 
+
+
+**Args**
+
+- `$ID`: Undelegation ID.
+
+```bash
+sekaid tx multistaking claim-undelegation \
+--from=$SIGNER $FLAGS_TX \
+$ID
+```
+
+
+#### Claiming Matured Undelegations {#1c2c1213febd4a98b8c3d3e4edda0f39}
+
+
+`claim-matured-undelegations`, allows users to submit a transaction to claim all matured undelegations in one action. It's a convenient way to handle multiple matured undelegations without specifying each ID individually.
+
+
+```bash
+sekaid tx multistaking claim-matured-undelegations \
+--from=$SIGNER $FLAGS_TX
+```
+
+
+#### Delegator Registration {#7e12db69b62845f19f519ccf675e7eb2}
+
+
+Users or smart contracts that have acquired KIRA’s native staking derivative tokens can register as delegators to the respective staking pools. Registration is subject to the minimum staking amount requirement `stake_min`.
+
+
+```bash
+sekaid tx multistaking register-delegator \
+--from=$SIGNER $FLAGS_TX
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#ba7958814c1e4cec8d89051b5bce8d0d}
+
+
+| `undelegations`           | Query all the undelegation records.                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------------- |
+| `staking-pool-delegators` | Query staking pool delegators.                                                                  |
+| `compound-info`           | Query compound information of a delegator.                                                      |
+| `outstanding-rewards`     | Query outstanding rewards for a delegator.                                                      |
+| `pools`                   | Query all existing staking pools and their parameters and metrics.                              |
+| `query-delegations`       | Query delegations and rewards by delegator address and specific pool id or validator's address. |
+
+
+#### Staking Pool Delegators {#d4c36c977d1242f4b0955e6ff9c5b439}
+
+
+Retrieve delegators associated with a specific staking pool.
+
+
+**Args**
+
+- `$VALIDATOR_ADDRESS`: Address of the staking pool node.
+
+```bash
+sekaid query multistaking staking-pool-delegators $VALIDATOR_ADDRESS \
+$FLAGS_QR | jq
+```
+
+
+#### All Staking Pool Information {#2570ce21001f4c8591815b04d233f18f}
+
+
+Query metrics and parameters of staking pools.
+
+
+```bash
+sekaid query multistaking pools $FLAGS_QR | jq
+```
+
+
+#### All Pending Undelegations {#78231b53b6694172857f1c9ed8917be0}
+
+
+Retrieve information about pending undelegations using the `undelegations` query. This query allows for filtering based on the delegator's address and the validator's address.
+
+
+:::note
+
+If both `$DELEGATOR_ADDRESS` and `$VALIDATOR_ADDRESS` are left as empty strings, the query will return all existing undelegations. To specify an empty string as an argument in the command line, use `""`.
+
+:::
+
+
+
+
+**Args**
+
+- `$DELEGATOR_ADDRESS`: Delegator's address (optional).
+- `$VALIDATOR_ADDRESS`: Validator's address (optional).
+
+```shell
+sekaid query multistaking undelegations $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS \
+$FLAGS_QR | jq
+```
+
+
+#### Compounding Information {#8310aaae479a4f4e807e83e7a7db5e91}
+
+
+Retrieve a delegator's compounding information.
+
+
+**Args**
+
+- `$DELEGATOR_ADDRESS`: Delegator's address.
+
+```bash
+sekaid query multistaking compound-info $DELEGATOR_ADDRESS \
+$FLAGS_QR | jq
+```
+
+
+#### Outstanding Rewards {#ded77962e7e84ed398e024bfb5744e30}
+
+
+Query a delegator's outstanding rewards.
+
+
+**Args**
+
+- `$DELEGATOR_ADDRESS`: Delegator's address.
+
+```bash
+sekaid query multistaking outstanding-rewards $DELEGATOR_ADDRESS \
+$FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#aea5c0245c4e4bea8ecfe4c4d2b9c177}
+
+
+There is no governance proposal for this sub-module.
+
+
+
+</TabItem></Tabs>
+

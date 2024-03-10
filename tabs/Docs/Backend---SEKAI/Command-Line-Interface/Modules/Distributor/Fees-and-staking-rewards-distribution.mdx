@@ -1,0 +1,249 @@
+---
+title: Fees and staking rewards distribution
+sidebar_position: 3
+slug: /85d4757d-f36d-4a39-b7ab-62866c1689ba
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+### Concept {#ebfe9bca3b1a41f9a99263de7a6859d0}
+
+
+Committee-based blockchains are among the most popular alternatives to proof-of-work based blockchains, such as Bitcoin. These blockchains use a committee, a.k.a consensus nodes set or “validator” set, that executes Byzantine fault tolerant distributed consensus to determine the next block to add to the blockchain. Unlike Bitcoin, where one creator produce a block based on probabilities, in a committee-based blockchain blocks are cooperatively created. As such, properly designing the consensus rewarding schemes is crucial to incentivize consensus nodes in achieving consensus while preventing centralization forces from arising, such as those stemming from miner extractable value (MEV) leakage. 
+
+
+By designing the consensus rewarding schemes effectively, committee-based blockchains can achieve a balance between decentralization and incentivization.
+
+
+### Network Inflation & Dynamic Adjustments {#7af658e285c24b3db1f55295cf4aa3da}
+
+
+KEX, the native asset of the KIRA network, undergoes controlled inflation as a strategy to stimulate activity and engagement. Its inflation parameters are defined by network governance, which, in tandem with the Untitled[broken link], orchestrates a harmony of incentives that align with the broader strategic vision of the network. The central ambition here is not just about maintaining KEX's economic value, but also ensuring the very security fabric of the network through stakeholder retention and active transactions.
+
+
+Here's a detailed look at the relevant [network properties](/docs/b9b95792-b936-4603-8a46-15566f24e3c0):
+
+- `inflation_rate`: Specifies the KEX inflation percentage.
+	- Default: `18`
+	- Range: `0` (Minimum) to `50` (Maximum)
+- `inflation_period`: Denotes the time duration in seconds over which the current KEX supply is inflated based on the `inflation_rate`.
+	- Default: `31557600` (equates to 1 year)
+	- Range: `2629800` (roughly a month) to `31557600`
+- `max_annual_inflation`: This sets a ceiling on the yearly percentage growth of the KEX total supply from the original genesis time.
+
+The inflation is calculated on a per-block basis and adjusts dynamically through periodic snapshots of the KEX supply taken at the start of each `inflation_period`. This mechanism guarantees precise reward allocations and compliance with the set `max_annual_inflation` cap. It accounts for potential inflationary variations that could emerge from diverse sources like the UBI module or the L2 burning mechanisms. In this context, the network proactively assesses for any projected cap breaches and modulates minting from these sources, ensuring the network's stability is always maintained.
+
+
+#### Inflation Equation {#a277515bae6a470ead9f4c3449637a5e}
+
+
+Given:
+
+- $S_{start}$ = KEX token supply at the start of the `inflation_period`
+- $R$ = `inflation_rate`
+- $T_{block}$ = Time for a single block
+
+The inflation for each block is computed as:
+$\boxed{\text{Inflation for block} = \dfrac{S_{\text{start}} \times R}{\text{inflation\_period}} \times T_{\text{block}}}$
+
+
+> Example over a period of 3600 seconds: For a starting KEX token supply at $\small{T1}$ of 300500000, an `inflation_rate` of 15%, and an `inflation_period` of 31557600 seconds, all delegators staking their coins from $\small {T2-T1 = 3600}$ seconds would cumulatively qualify to claim $\small{ \dfrac{300500000 \times 0.15}{31557600} \times 3600 \approx 5142}$ KEX at $\small{T2}$.
+
+
+### Inflation and Fees Distribution Mechanisms {#4426f62703204963a8cd5d882b829fe2}
+
+
+This section explores how block and fee rewards are calculated for each participant: Consensus nodes and Delegators. Both play distinct roles in maintaining and securing the KIRA network, and their reward mechanisms are underpinned by specific parameters that measure their contributions and engagement. For Consensus nodes, it is the performance parameter that evaluates their consistency and efficiency in the network's consensus. In contrast, for Delegators, it's about the magnitude of their stake, representing their vested interest and commitment to the network. These foundational parameters ensure that rewards are allocated fairly, recognizing genuine efforts and investments in the network's growth and stability.
+
+
+:::note
+
+Rewards are allocated to the proposer and its associated staking pools <u>**at the beginning of the following new block**</u>. Make sure to account for this one-block lag when considering rewards allocation across all roles in the network.
+
+:::
+
+
+
+
+#### Consensus Nodes Rewards {#efacc54986a74017bc7122e407a8022e}
+
+
+Consensus nodes are not rewarded based on the amount of stake backing them. Instead, they charge a self-defined `commission` rate on block rewards (KEX inflation). They also benefit from up to 50% of fee rewards, which consist of a basket of different tokens used for paying transaction fees, including KEX. This percentage is defined by the `validators_fee_share` [network property](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) set by governance.
+
+
+_For more information regarding network consensus nodes commissions please refer to the_  _module._
+
+
+**Performance parameter**
+
+
+A critical aspect of reward distribution for Consensus nodes is the performance parameter, denoted as $P$. This parameter evaluates a node's participation in the network consensus. Specifically, it measures how often that node has successfully signed blocks over the last `snapshot-period`, which defaults to 1000 blocks. The $P$ value is then used to scale its rewards when it poposes a block; if $P$ is below 100%, the node will only receive a corresponding fraction of the available rewards.
+
+
+$\boxed{P = \dfrac{N_{signed}}{S_{period}}}$
+
+
+**Block rewards** distribution works as follow:
+
+
+Assuming a block $C$ yieldin_g_ $K$`ukex`, if $C$’s proposer has a `commission` rate $R$ and a performance $P$ , it will be entitled to the following block reward $BR_c$: 
+
+
+$\boxed{BR_{c} = K*R*P}$ 
+
+
+:::note
+
+_E.g: assuming a block yielding 100 KEX, if its proposer has a_ _`commission`_ _rate set to 30% and a current_ `snapshot-period-performance` _of 50%, it will only receive 15 KEX and 15 KEX will be transferred to the community treasury. The remaining 70 KEX are split between its delegators and the proposer itself IF it has a self-stake._ 
+
+:::
+
+
+
+
+**Fee rewards** distribution works as follow:
+
+
+The amount of fee rewards a block proposer will receive for a current block $C$ carrying a basket of fee rewards $[\texttt{ueth}_{c},\texttt{ubnb}_{c},...,\texttt{u<denom>}_{c}]$ from its transactions, given a current network property `validators_fee_share` $VFS$ and the proposer's current performance $P$, is $[Fr^\texttt{ueth}_{c},Fr^\texttt{ubnb}_{c},...,Fr^\texttt{u<denom>}_{c}]$ with: 
+
+
+ $\boxed{Fr^\texttt{u<denom>}_{c} = \texttt{u<denom>}_{c} * VFS * P}$
+
+
+#### Delegators Rewards {#a962a05151634f10a212361112abccec}
+
+
+The distribution of remaining rewards incentives to delegators is proportional to their shares, which are calculated in two distinct ways. Delegators' shares regarding block rewards are determined by their global stake (total staked to all consensus nodes), while the shares regarding fee rewards are determined by the stakes they have delegated locally (total staked to the block proposer). This means that consensus nodes with less stake and greater implied risk will offer better returns on investment to delegators than those with more stake and lower implied risk, provided they do not trigger any slashing events. This incentivizes delegators who are in the network solely for profit to gradually shift their preferences to lower-staked consensus nodes that gain a sufficient amount of reputation in order to maximize their revenues. As a result, stakes across consensus nodes will tend to be evenly distributed, preventing the centralization of stakes among a few consensus nodes.
+
+
+Whitelisted tokens that are eligible for staking, including KEX, are entitled to a limited amount of rewards (block or fee rewards) as determined by governance through their individual parameter `reward_cap` in the [Token Rates Registrar](/docs/f19a45b3-88c4-469c-8642-772b941a1b24). Allocating a defined percentage of rewards to each eligible staking token has the effect of attracting users from other networks. This is because if no one is staking a specific token, its annual percentage yield (APY) is infinite as no one is able to claim the respective share of rewards, which are instead sent to the community treasury. This incentivizes users to stake these tokens in order to receive a share of the rewards.
+
+
+**Delegators shares**
+
+
+Understanding the calculation of delegators shares is important due to the system's inherent token diversity. The key takeaway is that a delegator's share $S_{D}$ is obtained by calculating the distinctive share $S_{D_{i<denom>}}$ for each of the eligible staking tokens $i_{<denom>}$. This allows to avoid comparing each token nominal value, or any other reference value, which would be an unnecessary overhead. The delegator's share $S_D$ is then calculated by summing each $S_{D_{i<denom>}}$ multiplied by the corresponding token's `reward_cap` $RC_{i<denom>}$:
+
+
+$\boxed{S_D = \sum_{i=1}^{n} S_{D_{i<denom>}} * RC_{i<denom>}}$
+
+
+The difference lies in whether the calculation is intended to represent the delegator's global share for block rewards, which is determined by considering all different tokens staked by the delegator in the network, or the local share for fee rewards, which is determined by considering only the tokens staked by the delegator in the current block proposer's staking pool.
+
+
+**Block rewards** distribution works as follow:
+
+
+Assuming a block $C$ yieldin_g_ $K_c*R \texttt{ ukex}$ ($R$ being the proposer `commission` rate), a delegator with a local share $S_D$ will be entitled to the following block reward $Br_c$: 
+
+
+$\boxed{Br_{c} = K*R*S_D}$ 
+
+
+**Fee rewards** distribution works as follow:
+
+
+Given a current block $C$ yielding a basket of fee rewards $[\texttt{ueth}_{c},\texttt{ubnb}_{c},...,\texttt{u<denom>}_{c}]$, with $VFS$ the current `validators_fee_share`, a delegator with a global share $S_D$ will receive $[Fr^\texttt{ueth}_{c},Fr^\texttt{ubnb}_{c},...,Fr^\texttt{u<denom>}_{c}]$ with 
+
+
+$\boxed{Fr^\texttt{u<denom>}_{c} = \texttt{u<denom>}_{c} *S_D*VFS}$ 
+
+
+## Parameters {#7c2e2b6063ab4eeab948bfa912382577}
+
+
+N/A
+
+
+## CLI Syntax & Examples {#0a27e950c1bf4bd693101d9dd2a30b6d}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#619d389fbbc74cccb1a3989aa0e84431}
+
+
+There is no transactions other than queries for this sub-module
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#d40fd29982094b8f90a363cc2c22c314}
+
+
+| `snapshot-period-performance` | Retrieve the current performance of a specific consensus node. |
+| ----------------------------- | -------------------------------------------------------------- |
+| `fees-treasury`               | Get fees treasury details.                                     |
+| `snapshot-period`             | Retrieve snapshot period performance details.                  |
+
+
+#### Validator Performance {#d0ead7ce0a154e1d915ef6e9dc2317c2}
+
+
+Retrieve the current performance of a specific validator using the `snapshot-period-performance` subcommand followed by the validator’s address.
+
+
+**Args**
+
+
+	**`$`**`ADDR` Address of the consensus node.
+
+
+```bash
+sekaid query distributor snapshot-period-performance $ADDR $FLAGS_QR | jq
+```
+
+
+#### Treasury {#d03e0ebaef66469aa062d0c2c496cc46}
+
+
+Fetch the treasury details using the `fees-treasury` subcommand.
+
+
+```bash
+sekaid query distributor fees-treasury $FLAGS_QR | jq
+```
+
+
+#### Performance Snapshot Period {#1a33e1fe4f854f179fa8c0c9a6506d67}
+
+
+Retrieve the current snapshot period performance details using the `snapshot-period` subcommand.
+
+
+```bash
+sekaid query distributor snapshot-period $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#f4c3d227c8254e8bb227b30563d52072}
+
+
+There is no transactions other than queries for this sub-module
+
+
+
+</TabItem></Tabs>
+
