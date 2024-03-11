@@ -2,8 +2,6 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const { themes } = require("prism-react-renderer");
-const lightCodeTheme = themes.github;
-const darkCodeTheme = themes.dracula;
 
 const config = {
   title: "KIRA",
@@ -203,8 +201,8 @@ const config = {
       },
 
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        darkTheme: themes.dracula,
+        additionalLanguages: ['bash','go'],
       },
     }),
 };
