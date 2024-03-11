@@ -177,6 +177,18 @@ const config = {
             className: "header-github-link",
             "aria-label": "GitHub repository",
           },
+          {
+            href: "https://tg.kira.network",
+            position: "right",
+            className: "header-tg-link",
+            "aria-label": "Official Telegram Channel",
+          },
+          {
+            href: "https://twitter.kira.network",
+            position: "right",
+            className: "header-x-link",
+            "aria-label": "Twitter",
+          },
         ],
       },
 
