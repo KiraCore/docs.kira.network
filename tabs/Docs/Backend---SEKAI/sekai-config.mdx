@@ -48,7 +48,6 @@ By default, config and data files are stored in the folder located at the `~/.s
       ├── genesis.json# The genesis file.
       ├── node_key.json# Private key to use for node authentication in the p2p protocol.
       └── priv_validator_key.json# Private key to use as a validator in the consensus protocol.
-
 ```
 
 
@@ -66,11 +65,11 @@ We can view the default client config setting by using the `sekaid config` comma
 ```bash
 sekaid config
 {
-"chain-id": "",
-"keyring-backend": "os",
-"output": "text",
-"node": "tcp://localhost:26657",
-"broadcast-mode": "sync"
+	"chain-id": "",
+	"keyring-backend": "os",
+	"output": "text",
+	"node": "tcp://localhost:26657",
+	"broadcast-mode": "sync"
 }
 ```
 
@@ -82,17 +81,14 @@ Changes to the default settings can be made according to users preferences. For 
 sekaid config "chain-id" sekai_1
 sekaid config
 {
-"chain-id": "sekai_1",
-"keyring-backend": "os",
-"output": "text",
-"node": "tcp://localhost:26657",
-"broadcast-mode": "sync"
+	"chain-id": "sekai_1",
+	"keyring-backend": "os",
+	"output": "text",
+	"node": "tcp://localhost:26657",
+	"broadcast-mode": "sync"
 }
 ```
 
 
-Other values can be changed in the same manner.
-
-
-Alternatively, modification can be made directly on in the client.toml.
+Other values can be changed in the same manner. Alternatively, modification can be made directly in the `client.toml` file.
 
