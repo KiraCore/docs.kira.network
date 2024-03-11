@@ -33,7 +33,7 @@ yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE
 ```
 2. Sync the `tabs/` folder, move pages from "srcpage" tabs into `src/page/`folder if needed, then launch on localhost for testing:
 
-> `rsync --checksum` (`yarn update`) is used to maintain the accuracy of the `showLastUpdateTime` feature in Docusaurus documentation. The approach circumvents the issue of the documentation pull process by Nocusaurus, which deletes and recreates the output folder, thereby updating all files regardless of changes. Syncing from a temporary output folder ensures only files with actual content changes are updated, preserving accurate `showLastUpdateTime` timestamps.
+> `rsync --checksum` (`yarn update`) syncs from a temporary folder, updating only changed files. It is used to preserve `showLastUpdateTime` in Docusaurus by avoiding the Nocusaurus pull process, which refreshes the entire output folder, falsely updating timestamps. However, renaming a page will not preserve history as it changes its file name and create a new one without git history.
 
 ```bash
 yarn update     # Install dependencies
