@@ -2,7 +2,10 @@
 /node_modules
 
 # Temporary pull (rsync is used to selectively update the tabs folder)
-/temp 
+/temp
+
+# Custom srcpages tabs
+tabs/srcpages/
 
 # Production (ignoring build folder will disable showLastUpdateTime feature)
 /build
