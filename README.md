@@ -9,6 +9,10 @@ Deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.net
 ## Installation:
 
 1. **Clone Repository**: Clone the repository to your local machine.
+3. **Install dependencies**:
+```bash
+yarn install    # Install dependencies
+```
 2. **Set Required Environment Variables**: Set `GIT_PASS` and `GIT_USER` for GitHub deployment, and `DOCU_NOTION_SAMPLE_ROOT_PAGE` and `DOCU_NOTION_INTEGRATION_TOKEN` for Notion integration.
 
    - For GitHub Deployment:
@@ -28,15 +32,14 @@ Deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.net
 1. Update content on Notion and pull in `temp/` folder: 
 
 ```bash
-yarn install    # Install dependencies
 yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN)
 ```
+
 2. Sync the `tabs/` folder, move pages from "srcpage" tabs into `src/page/`folder if needed, then launch on localhost for testing:
 
-> `rsync --checksum` (`yarn update`) syncs from a temporary folder, updating only changed files. It is used to preserve `showLastUpdateTime` in Docusaurus by avoiding the Nocusaurus pull process, which refreshes the entire output folder, falsely updating timestamps. However, renaming a page will not preserve history as it changes its file name and create a new one without git history.
+> `rsync --checksum` (`yarn update`) syncs `tabs/` from the temporary folder, updating only changed files. It is used to preserve `showLastUpdateTime` in Docusaurus by avoiding the Nocusaurus pull process, which refreshes the entire output folder, falsely updating timestamps. However, renaming a page will not preserve history as it changes its file name and create a new one without git history.
 
 ```bash
-yarn update     # Install dependencies
 yarn srcpages   # (Optional) This automatically move all custom pages from the tabs "srcpage" into the src/pages/ folder 
 yarn start      # Start http://localhost:3000/ for testing
 ```
