@@ -9,7 +9,7 @@ export default function EditThisPageWrapper(props) {
     <>
       <EditThisPage {...props} /> or&nbsp;
       <Link to='https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yaml&title=%5BFEATURE+REQUEST%5D' className={ThemeClassNames.common.editThisPage}>
-        Make a suggestion
+        make a suggestion
     </Link>
     </>
   );
