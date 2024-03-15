@@ -12,10 +12,19 @@ import TabItem from '@theme/TabItem';
 KIRA is a hypermodular network that supports execution of trustless, blockchain-less applications operating as L2 systems. It provides a programmable verification framework, allowing each application's execution validity to be verified through customizable consensus rules. While modular by design, KIRA consolidates the entire full-stack into one all-inclusive solution, avoiding the compounded complexity and risks associated with integrating across separate external systems. This unified stack provides the infrastructure, scalable hardware resources, data availability, sequencing, and shared security required by this new generation of decentralized web2-like applications.
 
 
+## Rollapps: Virtualized, Scalable, With Programmable Finality {#7b0c7e64cbc54f9c99a7f9c6cc57b4d2}
+
+
 KIRA L2 applications, also referred to as RollApps, run virtualized inside dedicated Docker containers. They are managed by an unbounded set of Consensus nodes, who individually choose which RollApps to operate while collectively securing and governing the entire KIRA network. In KIRA, RollApps benefit from the [Virtual Finality Gadget](/learn/bba461ae-7c67-4b66-8f1b-c51c887f2671) (VFG) which allows developers to use any programming language as well as implement bespoke finality rules, including optimistic and pessimistic verification, ZK proofs, non-deterministic verification or any customized verification logic. KIRA empowers its RollApps to rival Web2 in user access scale, ease of building, deployment time, and operational costs, with independence from traditional blockchain infrastructures and Virtual Machines.
 
 
-### Key Components of KIRA {#688908768d9540f7aeadc964ce849d56}
+## Rollapp Liquidity Bootstrapping Mechanism  {#f158579a4606412e9fccf9f64d4a14d7}
+
+
+KIRA introduces the [Initial Liquidity Offering](/learn/a6a660a6-3e5c-4a53-9ec3-14aa07f00351) (ILO), a novel economic model ensuring that applications launched on the network meet user demand, and provide sufficient liquidity for their ownership tokens after launch. By aligning the incentives of users, developers, [Executors](/learn/22c36797-10c8-40e4-9457-d8f1b6b4563b#feafa1b612854a9db40223bc3eeec3eb), and [Fishermen](/learn/22c36797-10c8-40e4-9457-d8f1b6b4563b#28e654b37c964ea79c36135ff0986a20), the ILO model promotes the development and enjoyment of high-quality RollApps while enabling all stakeholders to share in these applications' success.
+
+
+## Key Components of KIRA {#688908768d9540f7aeadc964ce849d56}
 
 
 KIRA Network combines several modular components to provide a full-stack experience:
@@ -25,13 +34,7 @@ KIRA Network combines several modular components to provide a full-stack experie
 - [**MIRO**](/learn/b5188aa1-563f-45e3-906a-9d71b80bd47a): MIRO is KIRA's front-end application, web wallet, and a design pattern for all KIRA RollApp to follow. It is designed to offer a Web2-like user experience. MIRO is a static and fully self-contained application, enabling users to seamlessly interact with the KIRA blockchain through INTERX from within the security of their browser, with no centralized parties (including certificate authorities) in the middle (or at the security core) of the communication channel between the user and blockchain/RollApp.
 - [**RYOKAI**](/learn/2ac3bfb7-478c-4207-a290-051d9fa6124f): RYOKAI supports network operations by automating on-chain and off-chain upgrades, scaling, RollApp deployment, simplifying consensus nodes' management tasks, and enhancing the network's efficiency and security. In other words, RYOKAI is an all-in-one DevOps tool that turns any network participant into an infrastructure expert without the need for years of experience.
 
-### L2 Economic Model and Liquidity {#f158579a4606412e9fccf9f64d4a14d7}
-
-
-KIRA introduces the [Initial Liquidity Offering](/learn/a6a660a6-3e5c-4a53-9ec3-14aa07f00351) (ILO), a novel economic model ensuring that applications launched on the network meet user demand, and provide sufficient liquidity for their ownership tokens after launch. By aligning the incentives of users, developers, [Executors](/learn/22c36797-10c8-40e4-9457-d8f1b6b4563b#feafa1b612854a9db40223bc3eeec3eb), and [Fishermen](/learn/22c36797-10c8-40e4-9457-d8f1b6b4563b#28e654b37c964ea79c36135ff0986a20), the ILO model fosters the development and enjoyment of high-quality RollApps while enabling all stakeholders to share in these applications' success.
-
-
-### Why KIRA ? {#a7c50e68381848c1a94eb42f4f597725}
+## Why KIRA ? {#a7c50e68381848c1a94eb42f4f597725}
 
 1. **Virtual Finality Gadget** - [VFG](/learn/bba461ae-7c67-4b66-8f1b-c51c887f2671) enables next-gen blockchain-less and resource-heavy applications to exist without the the coordination overhead associated with creation of new networks for every single new use case such as AI, streaming, or gaming.
 2. **Infrastructure** - KIRA provides the decentralized infrastructure and essential hardware resources like CPU and GPU required to run applications natively on the network. Uniquely, developers can define and choose the specific resources needed for their applications. With decentralized middleware (INTERX) integrated, RollApps are self-contained and do not rely on external providers for RPC, execution, or data availability. This flexible and all-inclusive approach empowers developers to focus solely on building their application's core business logic.
