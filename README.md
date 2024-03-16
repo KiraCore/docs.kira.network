@@ -45,13 +45,19 @@ yarn srcpages   # (Optional) This automatically move all custom pages from the t
 yarn start      # Start http://localhost:3000/ for testing
 ```
 
-3. Confirm tests, then commit, push, build, serve if needed, and deploy:
+3. Confirm tests, then commit and push: 
 
 > Committing and pushing updates made to `tabs` is necessary to maintain the Git history, essential for tracking each page's `showLastUpdateTime`.
 
 ```bash
+git add .       # add all new created pages
 git commit -a -m "commit message" # commit changes made to tabs/ etc...
 git push
+```
+
+4. Build, serve if needed, and deploy:
+
+```bash
 yarn build      # Build Docusaurus static site
 yarn serve      # (Optional) Serve the build for additional testing before production deployment
 yarn deploy     # Deploy to GitHub Pages (needs $GIT_PASS and $GIT_USER)
