@@ -29,13 +29,13 @@ yarn install    # Install dependencies
 
 ## Documentation Update & Deployment:
 
-1. Update content on Notion and pull in `temp/` folder: 
+1. Pull: Update content on Notion and pull in `temp/` folder: 
 
 ```bash
 yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN)
 ```
 
-2. Sync the `tabs/` folder, move pages from "srcpage" tabs into `src/page/`folder if needed, then launch on localhost for testing:
+2. Test: Sync the `tabs/` folder, move pages from "srcpage" tabs into `src/page/`folder if needed, then launch on localhost for testing
 
 > `rsync --checksum` (`yarn update`) syncs `tabs/` from the temporary folder, updating only changed files. It is used to preserve `showLastUpdateTime` in Docusaurus by avoiding the Nocusaurus pull process, which refreshes the entire output folder, falsely updating timestamps. However, renaming a page will not preserve history as it changes its file name and create a new one without git history.
 
@@ -45,17 +45,18 @@ yarn srcpages   # (Optional) This automatically move all custom pages from the t
 yarn start      # Start http://localhost:3000/ for testing
 ```
 
-3. Confirm tests, then commit and push: 
+3. Commit: Confirm tests, then commit and push
 
 > Committing and pushing updates made to `tabs` is necessary to maintain the Git history, essential for tracking each page's `showLastUpdateTime`.
 
 ```bash
-git add .       # add all new created pages
+git status      # (Optional) Lists pages that are modified + new pages that need to be added to commit
+git add .       # (Optional) Add all new created pages
 git commit -a -m "commit message" # commit changes made to tabs/ etc...
 git push
 ```
 
-4. Build, serve if needed, and deploy:
+4. Deploy: Build, serve if needed, and deploy:
 
 ```bash
 yarn build      # Build Docusaurus static site
