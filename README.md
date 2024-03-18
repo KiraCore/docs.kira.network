@@ -29,7 +29,7 @@ yarn install    # Install dependencies
 
 ## Documentation Update & Deployment:
 
-1. Pull: Update content on Notion and pull in `temp/` folder: 
+1. Pull: Update content on Notion and pull in `temp/` folder
 
 ```bash
 yarn pull       # Fetch content from Notion (needs $DOCU_NOTION_SAMPLE_ROOT_PAGE and $DOCU_NOTION_INTEGRATION_TOKEN)
@@ -47,7 +47,7 @@ yarn start      # Start http://localhost:3000/ for testing
 
 3. Commit: Confirm tests, then commit and push
 
-> Committing and pushing updates made to `tabs` is necessary to maintain the Git history, essential for tracking each page's `showLastUpdateTime`.
+> Committing and pushing updates made to `tabs` is necessary to maintain the Git history, essential for tracking each page's `showLastUpdateTime`
 
 ```bash
 git status      # (Optional) Lists pages that are modified + new pages that need to be added to commit
@@ -56,7 +56,7 @@ git commit -a -m "commit message" # commit changes made to tabs/ etc...
 git push
 ```
 
-4. Deploy: Build, serve if needed, and deploy:
+4. Deploy: Build, serve if needed, and deploy
 
 ```bash
 yarn build      # Build Docusaurus static site
