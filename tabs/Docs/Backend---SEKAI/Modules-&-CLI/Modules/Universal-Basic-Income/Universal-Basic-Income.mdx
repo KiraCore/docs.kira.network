@@ -1,0 +1,162 @@
+---
+title: Universal Basic Income
+sidebar_position: 1
+slug: /c8f1129d-1fa0-4f24-bc4d-b9fa32b28c0e
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+### Concept {#7ffc9017e29c48478adefa4f1f84dd92}
+
+
+The Universal Basic Income (UBI) module in the KIRA network is designed to incentivize non-sybil network participants, such as validators and governance members, through the distribution of a fixed amount of the native KEX token on a regular basis. This helps to ensure the long-term maintenance of network operations and enables these actors to perform their roles effectively. The UBI module uses [Spending Pools](/docs/812fdf31-d225-4daf-a4cd-4501cbc00d95) to distribute the funds to eligible beneficiaries, who can then claim their allotted tokens. The supply of KEX tokens is inflated by a fixed amount at regular intervals, and these tokens are deposited into the designated spending pool(s) for distribution.
+
+
+To prevent potential abuse or faults, a `ubi-hard-cap` is set in the [network properties](/docs/b9b95792-b936-4603-8a46-15566f24e3c0), limiting the maximum amount of additional KEX that can be created per year (`6000000` KEX by default). Governance members are not allowed to create or modify UBI records in a way that would exceed this hard cap. 
+
+
+#### Dynamic Mode  {#2737f72a27dc4d3cab060bdbe4055e83}
+
+
+Similar to the spending pool, the UBI module provides two modes: dynamic and static, which use the dynamic field. In dynamic mode, the total amount distributed per period decreases by the amount left in the pool. In other words, if some users don't claim their UBI during a particular period, the unclaimed tokens are lost and redistributed in the next period. This is done to limit token inflation and ensure that users are actively claiming their tokens.  If the `dynamic` parameter is set to `false`, the spending pool operates in static mode and distributes a fixed amount of tokens every time period. This way, users can be sure of the amount of tokens they will receive during each period, provided they still respect the target spending pool’s `claim-expiry`.
+
+
+### Parameters {#f028bb65c4b0422bb3b62ccd2e0a52c5}
+
+
+| **NAME**             | **TYPE** | **EXAMPLE**   | **DESCRIPTION**                                                                                                       |
+| -------------------- | -------- | ------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `name`               | `string` | `KEX-UBI`     | The name of the UBI contract.                                                                                         |
+| `distribution_start` | `uint64` | `1643577600`  | Unix timestamp of the start of the distribution period.                                                               |
+| `distribution_end`   | `uint64` | `1675113600`  | Unix timestamp of the end of the distribution period.                                                                 |
+| `distribution_last`  | `uint64` | `1651401600`  | Unix timestamp of the last distribution.                                                                              |
+| `pool`               | `string` | `"community"` | The spending pool name where the exact amount of KEX should be deposited.                                             |
+| `amount`             | `uint64` | `1000`        | The amount of KEX tokens to be minted and distributed every period into `pool`.                                       |
+| `period`             | `uint64` | `86400`       | Time in seconds that must elapse since distribution_last for the funds to be distributed automatically into the pool. |
+| `dynamic`            | `bool`   | `true`        | A boolean field that defines if UBI is dynamic `true` or static `false`.                                              |
+
+
+## CLI Syntax & Examples {#b3dc078c85c4427c95c52958d0ca5ab6}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#47b1445d3df3460e85daf175a211506e}
+
+
+There is no transactions other than the governance proposals for this sub-module.
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#7c4238e3fedc40b2b2d46a697485a072}
+
+
+| `ubi-records`        | List all existing UBI records.           |
+| -------------------- | ---------------------------------------- |
+| `ubi-record-by-name` | Query a specific UBI record by its name. |
+
+
+#### List All Existing Ubi Records {#d1d882fb51014efd91039863bae07ed1}
+
+
+```bash
+sekaid query ubi ubi-records $FLAGS_QR | jq
+```
+
+
+#### Query a Specific Ubi Record {#b7c6ad0b47b744eba829f570ddfe7c3e}
+
+
+**Args**
+
+- `$NAME`: The name of the UBI record.
+
+```bash
+sekaid query ubi ubi-record-by-name $NAME $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#c9550a2bcc6247049aeec0176a8f6060}
+
+
+| `proposal-upsert-ubi` | Create a proposal to insert or update a Universal Basic Income (UBI) distribution. |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| `proposal-remove-ubi` | Create a proposal to remove a Universal Basic Income (UBI) distribution.           |
+
+
+#### Upsert Ubi Proposal {#96e2058b1db94fe9a1332559fad3d2a2}
+
+
+The CLI command, `proposal-upsert-ubi`, creates a proposal to upsert (insert or update) a Universal Basic Income (UBI) distribution.
+
+
+**Flags**
+
+- `$TITLE`: The title of a proposal.
+- `$DESCRIPTION`: The description of the proposal, which can be a URL, text, etc.
+- `$NAME`: Name of the UBI record (e.g., `ValidatorPerMinuteIncome`).
+- `$POOLNAME`: Name of the associated spending pool registry for depositing `$AMOUNT` of KEX (e.g., `ValidatorBasicRewardsPool`).
+- `$DISTRIBUTIONSTART`: The exact starting time of the UBI, in Unix timestamps.
+- `$DISTRIBUTIONEND`: The exact ending time of the UBI, in Unix timestamps.
+- `$PERIOD`: Period in seconds for the KEX supply inflation by `$AMOUNT` and deposit in the UBI pool.
+- `$AMOUNT`: The amount of KEX tokens to be minted and distributed per `$PERIOD` into the pool.
+
+```shell
+sekaid tx customgov proposal-upsert-ubi \
+--from=$SIGNER $FLAGS_TX \
+--name=$NAME \
+--distribution-start=$DISTRIBUTION_START \
+--distribution-end=$DISTRIBUTION_END \
+--amount=$AMOUNT \
+--period=$PERIOD \
+--pool-name=$POOL_NAME \
+--title=$TITLE --description=$DESCRIPTION
+```
+
+
+#### Remove Ubi Proposal {#caae0d4732a441a0a3187300c9593e6e}
+
+
+The CLI command, `proposal-remove-ubi`, creates a proposal to remove a Universal Basic Income (UBI) distribution.
+
+
+**Flags**
+
+- `$NAME`: The name of the UBI.
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The description of the proposal.
+
+```shell
+sekaid tx customgov proposal-remove-ubi \
+--from=$SIGNER $FLAGS_TX \
+--name=$NAME \
+--title=$TITLE --description=$DESCRIPTION
+```
+
+
+
+</TabItem></Tabs>
+

@@ -1,0 +1,352 @@
+---
+title: Identity Registrar
+sidebar_position: 6
+slug: /d482180d-165a-4c09-8c32-167f061ceb92
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Concept {#9c97a6c6054d453c8245d2973adc7759}
+
+
+The Identity Registrar (IR) is a central component of the KIRA network, designed to bolster the integrity and authenticity of user accounts. It addresses the critical challenge of "Sybil attacks", where a single entity poses as multiple users. Through the IR, KIRA emphasizes the significance of genuine, unique user representation, ensuring a more democratic and fair governance structure.
+
+
+At its core, the IR provides a mechanism for users to authenticate assertions about themselves, such as ownership of a website or an online handle. Unlike traditional centralized verification systems, the IR operates on mutual verification principles within the community. Users within the KIRA network can endorse the validity of claims made by others by giving their attestation, fostering an environment of collective trust. The framework of the IR is akin to a digital dictionary, allowing users to define key-value pairs relevant to their identity. For instance, associating a key `website` with the value `example.com` serves as proof of ownership of said website. Importantly, any alteration to these authenticated records necessitates re-verification, preserving the integrity of claims.
+
+
+The essence of IR transcends mere claim verification. Addressing concerns of true sovereignty, IR refines the concept of social attestations. Instead of uniformly weighing attestations, the focus pivots to the trustworthiness of the attestor from an individual or application's perspective. This subjectivity highlights that in the vast sea of approvals, the ones deemed trustworthy to the user or a specific application are the ones that truly matter. It recognizes that while multiple individuals may appear non-sovereign from a network's viewpoint, in reality, their distinct identities hold weight. The IR thus fosters a nuanced, relative view of identity that adapts across applications and purposes, emphasizing the notion that when it comes to digital identity, objective truths are often overshadowed by the diverse perspectives they cater to.
+
+
+### Record Verification Process {#5c2105975b574720828df7a8b4e61ce6}
+
+
+The process of verifying an identity record involves a few steps:
+
+1. An user creates an on-chain transaction that includes the desired key and value for the identity record.
+2. It then requests verification from a publicly trusted KIRA account for the key-value pair, and include a tip as payment for the service provided.
+3. If the verification is successful, the record will remain verified unless any changes are made to the verified key.
+4. If any changes are made to the key after the verification process, the record will no longer be considered verified.
+5. If any changes are made to the key, any pending request are automatically canceled.
+
+It is important to note that verification requests must include a tip, which cannot be less than the `min_identity_approval_tip` [network property](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) (default: 2x the transaction cost of the approval/rejection transaction). This tip is meant to incentivize other accounts to verify identity records, or at least provide them with a refund of the transaction cost. Tips are paid regardless of whether the records are rejected or approved, ensuring that approvers are honest and trusted, rather than motivated solely by financial gain. The network governance can also choose to distrust any account at any time through a proposal process, marking them as potentially malicious and referencing the evidence.
+
+
+### Unique Identity Keys {#7cc44d12adbc452199448907f6756306}
+
+
+KIRA offers a range of dedicated identity keys designed to make interactions with the network more user-friendly. These keys store various user-related information that can be interpreted by wallets, explorers, visualizers, and other front-end applications. Notably, KIRA allows for the creation of **any** custom key within the Identity Registrar, but it reserves certain key names like `username` and `moniker` by default. These reserved keys have special significance, affecting the visibility of nodes or accounts across different applications. What's more, the governance of the KIRA network can enforce these key-value pairs to remain globally unique, provided they do not already exist, which is managed by modifying the `unique_identity_keys` [network property](/docs/b9b95792-b936-4603-8a46-15566f24e3c0). As a result, users can send assets not just to a KIRA address, but also by simply providing a unique username or moniker. Once these unique keys are created, they cannot be deleted, ensuring a more streamlined and user-friendly experience.
+
+
+#### Consensus Node Records Examples {#2c29fae12274406b915c3f6df714c39a}
+
+
+Governance can create one or more of the following keys in the Identity Registrar as unique to increase consensus node public recognition and trust
+
+
+| **NAME**            | **TYPE**  | **DESCRIPTION**                                                                         |
+| ------------------- | --------- | --------------------------------------------------------------------------------------- |
+| `moniker`           | `string`  | Identifies validator name as seen on the leaderboard table.                             |
+| `description`       | `string`  | A longer description of validator node                                                  |
+| `website`           | `string`  | URL to the validator website                                                            |
+| `logo`              | `string`  | URL to .SVG image (256kB max) representing validator entity                             |
+| `social`            | `string`  | Any social profiles such as Twitter, Telegram, etc…                                     |
+| `contact`           | `string`  | Email address, url, or another emergency contact                                        |
+| `validator_node_id` | `string`  | Node ID of the validator node. Required to identify the node in the network visualizer. |
+
+
+#### Users Records Examples {#cef2ddb6fb744ca5a8f7312f2246bc20}
+
+
+Users can create one or several of the following keys in the Identity Registrar in order to make their account easier to identify and recognize by other users.
+
+
+| **NAME**   | **TYPE** | **DESCRIPTION**                                                                                                                                                      |
+| ---------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `username` | `string` | Identifies your name as seen on the network explorer. The value can be used for the purpose of sending transactions similarly to [ENS domain](https://ens.domains/). |
+| `avatar`   | `string` | URL to .SVG image or gif (256kB max)                                                                                                                                 |
+
+
+## Parameters {#026f178a01804399a7ebb999934c01ad}
+
+
+| NAME        | TYPE                        | EXAMPLE                                       | DESCRIPTION                                                                                                                                              |
+| ----------- | --------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`        | `uint64`                    | `153789`                                      | A unique identifier for the Identity Record.                                                                                                             |
+| `address`   | `string`                    | `kira1vgy0v6l593lxghv9v8a98nl87x4y2uvfn0yn7r` | The address of the user associated with the Identity Record.                                                                                             |
+| `key`       | `string`                    | `website`                                     | The key representing the type of identity information, e.g., "website" for website ownership. Can be custom or reserved such as `username` or `moniker`. |
+| `value`     | `string`                    | `example.com`                                 | The value associated with the key, serving as proof of ownership or association, e.g., a website URL for a `website` key.                                |
+| `date`      | `google.protobuf.Timestamp` | `2023-09-28T12:34:56Z`                        | The timestamp indicating when the Identity Record was created.                                                                                           |
+| `verifiers` | `[]string`                  | `[kira1vgy0v6l59…, kira1gurt0g67y9…"]`        | A list of addresses of users who have verified the validity of the Identity Record.                                                                      |
+
+
+## CLI Syntax & Examples {#f1fb0aad90ad4d53978864b33ac263c9}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#335766cd9511406e99cbaeea5b6428cc}
+
+
+| `register-identity-records`              | Add or edit identity records.                               |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| `delete-identity-records`                | Delete one or several identity records.                     |
+| `request-identity-record-verify`         | Request verification for an identity record.                |
+| `handle-identity-records-verify-request` | Verify or reject requests for identity record verification. |
+
+
+#### Adding & Editing Records {#62956e6786bf4d3a96b5cd70654c92a9}
+
+
+To add or edit identity records, use the `register-identity-records` CLI command. Provide the desired key-value pairs either in a JSON file by specifying its path with the `--infos-file` flag, or directly in the command as a JSON string using the `--infos-json` flag. Note that certain key names are reserved and may be required to be unique within the Identity Registrar.
+
+
+**Flags**
+
+- `$INFOSFILE`: The path to the file containing information for the identity request.
+- `$INFOSJSON`: The JSON string containing information for the identity request.
+
+```bash
+sekaid tx customgov register-identity-records \
+--from=$SIGNER $FLAGS_TX \
+[ --infos-file=$INFOSFILE || --infos-json=$INFOSJSON ]
+```
+
+
+```bash
+# Example
+# from an id.json file with below content : 
+#  {
+#      "key1": "value1",
+#      "key2": "value2"
+#  }
+sekaid tx customgov register-identity-records \
+--from=$SIGNER $FLAGS_TX \
+--infos-file="path-to-id.json" 
+
+# providing json format manually 
+sekaid tx customgov register-identity-records \
+--from=$SIGNER $FLAGS_TX \ 
+--infos-json="{\"$KEY1\":\"$VAL1\",\"$KEY2\":\"$VAL2\"}"
+```
+
+
+#### Deleting Records {#af09186bc0ce40109ee7c1ac05b80266}
+
+
+To delete one or several identity records, use the `delete-identity-records` CLI command and provide the keys to be deleted as a comma-separated list using the `--keys` flag. Note that the keys `moniker` and `username` cannot be deleted.
+
+
+**Flags**
+
+- `$KEYS`: Comma-separated list of keys.
+
+```bash
+sekaid tx customgov delete-identity-records \
+--from=$SIGNER $FLAGS_TX \
+--keys=$KEYS
+```
+
+
+#### Requesting Record Verification {#bb0d96fae6004b9e8492e36357643c77}
+
+
+To verify an identity record, use the `request-identity-record-verify` CLI command. Provide the address of the verifier using the `--verifier` flag, and the desired key(s) or record ID(s) using the `--record-ids` flag. Users can also provide a tip using the `--tip` flag to incentivize the verifier to review the request. Note that the tip value must be greater than twice the transaction fee value.
+
+
+**Flags**
+
+- `$VERIFIER`: The verifier’s address.
+- `$RECORDIDS`: Comma-separated list of identity record ids.
+- `$TIP`: The tip to be given to the verifier.
+
+```bash
+sekaid tx customgov request-identity-record-verify \
+--from=$SIGNER $FLAGS_TX \
+--verifier=$VERIFIER --record-ids=$RECORDIDS --tip=$TIP
+```
+
+
+#### Verifying or Rejecting Records Verification Requests {#9da55fa53fea4987bed3cbc06d80d56d}
+
+
+To verify or reject a request for identity record verification, use the `handle-identity-records-verify-request` CLI command. To approve the request, include the `--approve` flag and set its value to `true`. To reject the request, set the value of `--approve` to `false`. The ID of the request must also be provided. Only the verifier specified in the original request can approve or reject it.
+
+
+**Args**
+
+- `$ID`: Id of the key to be approved/rejected.
+
+**Flags**
+
+- `$APPROVE`: The flag to approve or reject the verification request. Defaults to `true`.
+
+```bash
+sekaid tx customgov handle-identity-records-verify-request \
+--from=$SIGNER $FLAGS_TX \
+$ID --approve=$APPROVE
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#d13c14d8a80f46f4a2ad26e3cbe8b859}
+
+
+| `all-identity-records`                         | Query all identity records.                                |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| `identity-record`                              | Query identity record by id.                               |
+| `identity-records-by-addr`                     | Query identity records by owner.                           |
+| `identity-record-verify-request`               | Query identity record verify request by id.                |
+| `identity-record-verify-requests-by-requester` | Query identity records verify requests by requester.       |
+| `identity-record-verify-requests-by-approver`  | Query identity record verify request by verifier/approver. |
+
+
+#### Query Identity Record by Id {#6776be81baeb48ba8b1e36ff2925d5ff}
+
+
+Retrieve a specific identity record using the `identity-record` subcommand followed by the record’s identifier.
+
+
+**Args**
+
+- `$ID`: ID of the record.
+
+```bash
+sekaid query customgov identity-record $ID $FLAGS_QR | jq
+```
+
+
+#### Query Identity Records by Address {#865325fc4b494eec95bcd7d9a9743a6f}
+
+
+Fetch all identity records associated with a specific account using the `identity-records-by-addr` subcommand followed by the account’s address.
+
+
+**Args**
+
+- `$ACCOUNT`: The account’s address.
+
+```bash
+sekaid query customgov identity-records-by-addr $ACCOUNT $FLAGS_QR | jq
+```
+
+
+#### Query Specific Record Id of a Specific Account {#6c3f59a1538f4b6c82b64b5789c3b2a8}
+
+
+To query a specific record ID of a specific account, utilize the `identity-records-by-addr` subcommand in conjunction with `jq` filtering using the specific record ID.
+
+
+**Args**
+
+- `$ACCOUNT`: The address of the account.
+- `$ID`: ID of the record.
+
+```bash
+sekaid query customgov identity-records-by-addr $ACCOUNT $FLAGS_QR | jq ".records | .[] | select(.id==\\"$ID\\")"
+```
+
+
+#### Query Specific Record Key of a Specific Account {#56dc6e36f358439c9a4cebcebea4995e}
+
+
+Retrieve a specific record key of a specific account using the `identity-records-by-addr` subcommand and `jq` filtering.
+
+
+**Args**
+
+- `$ACCOUNT`: The address of the account.
+- `$KEY`: The key of the record.
+
+```bash
+sekaid query customgov identity-records-by-addr $ACCOUNT $FLAGS_QR | jq ".records | .[] | select(.key==\\"$KEY\\")"
+```
+
+
+#### Query All Pending Requests of a Specific Record Id {#a14eba53930948d0ab0aff5289e8084f}
+
+
+Fetch all pending requests of a specific record ID using the `identity-record-verify-requests` subcommand followed by the record ID.
+
+
+**Args**
+
+- `$ID`: ID of the record.
+
+```bash
+sekaid query customgov identity-record-verify-requests-by-requester $ID $FLAGS_QR | jq
+```
+
+
+#### Query All Pending Record Requests as Requester {#2b3f53912b494d66a3c351452df7d8d8}
+
+
+Retrieve all pending verification requests of a requester account using the `identity-record-verify-requests-by-approver` subcommand. For a more specific query, an optional `$VERIFIER` argument may be provided to filter the results to only display pending requests sent to a specific verifier/approver account.
+
+
+**Args**
+
+- `$ACCOUNT`: Account’s address.
+- `$VERIFIER`: (Optional) The specific verifier’s address.
+
+```bash
+# For all pending requests of a requester account
+sekaid query customgov identity-record-verify-requests-by-requester $ACCOUNT $FLAGS_QR | jq
+
+# For all pending requests of a requester account sent to a specific verifier
+sekaid query customgov identity-record-verify-requests-by-requester $ACCOUNT $FLAGS_QR | jq ".verify_records | .[] | select(.verifier==\\"$VERIFIER\\")"
+```
+
+
+#### Query All Pending Record Requests as Verifier/approver  {#89c15277298943eea39981e1bbe61449}
+
+
+Retrieve all pending verification requests for a verifier using the `identity-record-verify-requests-by-approver` subcommand. For a more specific query, an optional `$ACCOUNT` argument may be provided to filter the results to only display requests from a specific requester account.
+
+
+**Args**
+
+- `$VERIFIER`: The verifier’s address.
+- `$ACCOUNT`: (Optional) The specific requester’s address.
+
+```bash
+# For all requests of a verifier
+sekaid query customgov identity-record-verify-requests-by-approver $VERIFIER $FLAGS_QR | jq
+
+# For all requests of a verifier of a specific requester account
+sekaid query customgov identity-record-verify-requests-by-approver $VERIFIER $FLAGS_QR | jq ".verify_records | .[] | select(.address==\\"$ACCOUNT\\")"
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#f1324a890dd64b178343e16d2b8e8127}
+
+
+There is no governance proposal for this sub-module.
+
+
+
+</TabItem></Tabs>
+

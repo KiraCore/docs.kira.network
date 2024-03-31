@@ -164,6 +164,12 @@ const config = {
             activeBaseRegex: '^/testnet/',
           },
           {
+            label: 'Ecosystem',
+            to: '/ecosystem/',
+            position: 'left',
+            activeBaseRegex: '^/ecosystem/',
+          },
+          {
             label: 'Links',
             to: '/links/',
             position: 'right',   

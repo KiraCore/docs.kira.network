@@ -1,0 +1,284 @@
+---
+title: Polls
+sidebar_position: 4
+slug: /f5e18e49-927a-4a4f-ae70-bb9fc5606243
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Concept {#4a059df6e57742028ba3441c9e5b0abd}
+
+
+Signaling proposals are a typical practice in blockchain governance activities. They provide a means for the community to gauge sentiment or reach consensus on a particular issue or suggestion without necessitating changes to the blockchain's state. However, these proposals simplify multifaceted issues into binary 'yes/no' votes, potentially distorting the accurate representation of varied community perspectives on complex issues. Additionally, they may slow down decision-making and introduce inefficiency to the overall governance process. Such potential drawbacks have led some projects, such as Ethereum and Celestia, to favor off-chain governance, a shift that arguably contradicts the decentralization principle.
+
+
+Because of KIRA network's [unique governance ranking system](/docs/d6f8543a-3b76-44a8-8fab-eeafcef56c8e), the inclusion of signaling proposals adds another layer of complexity, potentially skewing the decision-making process as votes could be influenced more by score preservation than by authentic opinions. To circumvent these challenges, KIRA network introduces the Poll module, which offers a more inclusive and flexible mechanism for consensus. Unlike traditional signaling proposals, a Poll Proposal allows a select group of individuals to either present their own voting options or vote on pre-existing ones. This approach caters to a wide array of use cases and fosters a more accurate reflection of the diverse interests across various scenarios, such as agreeing on upgrade timeframes, selecting group administrators, or deciding on future changes to the network properties registrar.
+
+
+### Proposing & Voting Rights {#5cba6ad7964f4ecca8e5dcf67be3762b}
+
+
+For any users to initiate a Poll, the necessary permission, represented by the 66[broken link], must be directly assigned to their account or embedded within a Role associated with their account. This permission is automatically granted to [Councilors](/docs/d6f8543a-3b76-44a8-8fab-eeafcef56c8e) upon claiming their Councillor Seat. Contrary to KIRA [Proposals](/docs/25d26925-50ce-4a4f-836b-fc8486ef8b05), Polls do not have a corresponding voting permission. Rather, the user submitting the proposal determines which [roles](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) can vote on the particular Poll by setting up a whitelist.
+
+
+### Decision-making Process {#25e477b20c7d417eb03cec979abace5d}
+
+
+The decision-making process for the Poll module operates in line with the principles established by the [Proposals logic](/docs/25d26925-50ce-4a4f-836b-fc8486ef8b05), while accommodating the unique requirements of this module. This process is guided by the following key points:
+
+- **Voting Eligibility:** All whitelisted roles can cast a vote per poll. This vote can be changed later on by sending another voting transaction.
+- **Vote Options:** A single vote can correspond to one or many voting options, as outlined by the `options.choices` variable.
+- **Custom Choices:** Voters are permitted to cast custom choices if the `options.count` exceeds the `options.values.length`. Such custom choices are subsequently added to `options.values`, enabling other users to vote on them. However, each voter can only cast a vote for a specific option once.
+- **Abstain and Veto:** Regardless of the defined `options.values`, voters are allowed to vote `abstain` or `veto`. These are reserved values and don't have to match the `options.type`.
+- **Proposal Timeline:** Poll proposals do not have an enactment time. A proposal can neither pass, be rejected, nor vetoed before its `voting_end_time` time has elapsed, unless all eligible voters have cast their votes and the result is decisive.
+- **Quorum Requirement:** A poll necessitates a minimum number of votes, or a quorum, to be considered valid. The quorum is essential for ensuring adequate participation and representation in the decision-making process.
+
+:::note
+
+The poll minimum quorum percentage is the same as the proposal quorum, 33% by default and is configurable by governance via the `vote_quorum` [network property](/docs/b9b95792-b936-4603-8a46-15566f24e3c0).
+
+:::
+
+
+
+
+The outcome of a Poll proposal is determined based on the following rules:
+
+
+| **Outcome**        | **Condition**                                                                                                                                                                                                                                 |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Passed`           | If quorum is reached and more than $1\over 2$ (>50%) of all votes are for any `Custom` options or `Abstain`.                                                                                                                                  |
+| `Rejected`         | If quorum is reached and there is a tie for the highest vote count between two or more options (indicating an indecisive result), or if the sum of `Abstain` and `NoWithVeto` votes is more than or equal to $1\over 2$ (>=50%) of all votes. |
+| `RejectedWithVeto` | More than or equal to `veto_threshold` percentage of votes are veto.                                                                                                                                                                          |
+| `QuorumNotReached` | `vote_quorum` was not reached before the end of the poll.                                                                                                                                                                                     |
+
+
+### Other Relevant Network Properties {#d0c478a7d18c4ce690d835ed6fba620c}
+
+
+The following [network properties](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) establish limits over some of the Poll parameters:
+
+- The `max_proposal_poll_option_size` denotes the maximum character size of an individual Poll option and is set at `64` by default.
+- The `max_proposal_poll_option_count` sets the maximum number of custom options a Poll can have and is set at `128` by default.
+- The `max_proposal_reference_size` is used to indicate the maximum reference size in the poll and has a default value set at `512`.
+- The `max_proposal_checksum_size` represents the maximum checksum size in the poll and is set to default at `128`.
+
+## Parameters {#2ae4e0f3094f431793822d60f251dae8}
+
+
+#### Polls Parameters {#b19d8cba68b0462d8abb0101f2a4e6c1}
+
+
+| **NAME**          | **TYPE**                      | **EXAMPLE**                                                        | **DESCRIPTION**                                                                                                                                                           |
+| ----------------- | ----------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `poll_id`         | `uint64`                      | `1`                                                                | The unique identifier of the poll.                                                                                                                                        |
+| `creator`         | `cosmos-sdk/types.AccAddress` | `kira1d52r...`                                                     | The account address of the poll's creator.                                                                                                                                |
+| `title`           | `string`                      | `some title`                                                       | The title of the poll, limited to 128 characters by default as defined by the `max_proposal_title_size` network property.                                                 |
+| `description`     | `string`                      | `Are you the boss of me now?`                                      | The description of the poll, limited to 1024 characters by default as defined by the `max_proposal_description_size` network property.                                    |
+| `reference`       | `string`                      | `bafybeifiixdxq4cli6qxib5zfiky7rilb6k66f336nymj4jty6tdsiixre`      | Reference to the subject matter of the poll, potentially an IPFS CID or URL. Limited to 512 characters by default, by the `max_proposal_reference_size` network property. |
+| `checksum`        | `string`                      | `f5aca3b1fafffdcf22a30aafd3392e473592944da28515ae0a06afbc71c27b09` | Checksum for the poll, ensuring data integrity. Limited to 128 characters by default, by the `max_proposal_checksum_size` network property.                               |
+| `roles`           | `[]uint64`                    | `[1,2,...]`                                                        | The roles that are eligible to participate in the poll.                                                                                                                   |
+| `options`         | `PollOptions`                 |                                                                    | The list of available voting options in the poll.                                                                                                                         |
+| `voting_end_time` | `google.protobuf.Timestamp`   | `1678386530`                                                       | The timestamp indicating the end of the voting period for the poll.                                                                                                       |
+| `result`          | `string`                      | `POLL_RESULT_PASSED (1)`                                           | The result of the poll, updated after the voting period ends.                                                                                                             |
+
+
+**PollOptions type**
+
+
+| **NAME**  | **TYPE**   | **EXAMPLE**                                                          | **DESCRIPTION**                                                                                                                                          |
+| --------- | ---------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `values`  | `[]string` | `["yes","no","maybe","I dont know", "can you repeat the question?"]` | The list of available voting options in the poll, each item limited to 64 characters as defined by the `max_proposal_poll_option_size` network property. |
+| `count`   | `int`      | `5`                                                                  | The maximum number of voting options that a poll can have, as defined by the `max_proposal_poll_option_count` network property.                          |
+| `type`    | `string`   | `string`                                                             | The type of the options, all user supplied or predefined options must match this type. Possible types: `string`, `uint`, `int`, `float`, `bool`.         |
+| `choices` | `int`      | `1`                                                                  | The maximum number of choices that a voter can select, default is 1.                                                                                     |
+
+
+#### Vote Options Id  {#b71c02cda9824b75b833f01a0c7a9fae}
+
+
+| **VOTE OPTION**                    | **DESCRIPTION**                                                                                                                                                                                       |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POLL_VOTE_OPTION_UNSPECIFIED (0)` | No-op vote option.                                                                                                                                                                                    |
+| `POLL_OPTION_ABSTAIN (1)`          | Councilor has no strong opinion on the proposal, but wants to signify that they took note of it.                                                                                                      |
+| `POLL_OPTION_CUSTOM (2)`           | Councilor has voted one or several custom option provided by the proposal.                                                                                                                            |
+| `POLL_OPTION_NO_WITH_VETO (3)`     | Councilor strongly disagrees with the poll and wants to prevent it from passing successfully, bypassing the majority vote requirements due to concerns highly impacting network operations or safety. |
+
+
+#### Polls Status {#c197e6b006d4495ab3c54944f65fc395}
+
+
+| **STATUS**                           | **DESCRIPTION**                                                                                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POLL_RESULT_UNKNOWN (0)`            | Result of the proposal is not yet known/defined.                                                                                                           |
+| `POLL_RESULT_PASSED (1)`             | Poll reached quorum with one of the options having majority votes and passed successfully.                                                                 |
+| `POLL_RESULT_REJECTED (2)`           | Proposal was rejected because abstain votes have majority or more than one `options.values` have the highest and same number of votes (indecisive result). |
+| `POLL_RESULT_REJECTED_WITH_VETO (3)` | Poll reached quorum but did not pass due to `veto_threshold` being reached.                                                                                |
+| `POLL_PENDING (4)`                   | Poll is not finalized yet and is still awaiting votes.                                                                                                     |
+| `POLL_RESULT_QUORUM_NOT_REACHED (5)` | Poll was rejected because it failed to reach `vote_quorum`.                                                                                                |
+
+
+## CLI Syntax & Examples {#ee6d816aadcd4d328734d41b24214a77}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#53e6aec0ccce4df5b49416ddff3cbf1b}
+
+
+| `poll create` | Initiates the creation of a new poll. |
+| ------------- | ------------------------------------- |
+| `poll vote`   | Cast a vote on an existing poll.      |
+
+
+#### Create Poll {#0f28f81a42fa40e6b898566730538466}
+
+
+Create a new poll using the `create` command.
+
+
+**Flags**
+
+
+	`$TITLE`: The title of the poll.
+
+
+	`$DESCRIPTION`: The description of the poll, it can be a URL, text, etc.
+
+
+	`$REFERENCE`: IPFS CID or URL reference to file describing the poll and voting options in depth.
+
+
+	`$CHECKSUM`: Reference checksum.
+
+
+	`$OPTIONS`: The options for the poll in the format variant1, variant2, ...
+
+
+	`$ROLES`: List of roles allowed to take part in the poll vote in the format role1, role2, ...
+
+
+	`$COUNT`: Maximum number of voting options that a poll can have.
+
+
+	`$TYPE`: Type of the options, all user supplied or predefined options must match its type.
+
+
+	`$CHOICES`: Define the maximum number of choices a voter can select.
+
+
+	`$DURATION`: The duration of the poll.
+
+
+```bash
+sekaid tx customgov poll create \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION --reference=$REFERENCE --checksum=$CHECKSUM \
+--options=$OPTIONS --roles=$ROLES --count=$COUNT --type=$TYPE \
+--choices=$CHOICES --duration=$DURATION
+```
+
+
+#### Vote on a Poll {#72a9d254517a43acb3d4d27d8f743430}
+
+
+Cast a vote on an existing poll using the `vote` command.
+
+
+**Args**
+
+
+	`$POLL_ID`: The ID of the poll you wish to vote on.
+
+
+	`$POLL_OPTION`: The option ID you are voting for.
+
+
+**Flags**
+
+
+	`$CUSTOM_VALUE`: The custom poll value.
+
+
+```bash
+sekaid tx customgov poll vote $POLL_ID $POLL_OPTION \
+--from=$SIGNER $FLAGS_TX \
+--custom-value=$CUSTOM_VALUE
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#0d0d943855964c4ea064602fe4917551}
+
+
+| `query polls`      | Lists polls created by a specific address.       |
+| ------------------ | ------------------------------------------------ |
+| `query poll-votes` | Lists all votes of a specific poll using its ID. |
+
+
+#### Query Polls by Address {#2226e5df59e041e5aee56dd9a328cdb0}
+
+
+Retrieve polls created by a specific address.
+
+
+**Args**
+
+
+	`$ADDRESS`: The account address.
+
+
+```bash
+sekaid query polls $ADDRESS $FLAGS_QR | jq
+```
+
+
+#### Query Poll Votes by Id {#000ea9f1328542fb90c9c18599dfe9c8}
+
+
+Lists all votes for a specific poll using the poll’s ID.
+
+
+**Args**
+
+
+	`$POLL_ID`: The unique identifier of the poll.
+
+
+```bash
+sekaid query poll-votes $POLL_ID $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#83525905e45340f3b595111c93181b71}
+
+
+The duration of polls, which is determined by the `voting_end_time` parameter, is shared with proposals. As a result, it can be adjusted using the `set-proposal-durations-proposal` CLI found the [proposal sub-module](/docs/25d26925-50ce-4a4f-836b-fc8486ef8b05).
+
+
+
+</TabItem></Tabs>
+

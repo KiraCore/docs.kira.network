@@ -1,0 +1,283 @@
+---
+title: Upgrade Module
+sidebar_position: 1
+slug: /b87fd14e-b3d8-4a25-b0d2-0cda6bdc6478
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+Upgrades can occur as either Hard Forks or Soft Forks. Hard Forks are executed when the new blockchain application is incompatible with the current chain state storage, requiring launching from a new genesis with a new chain ID to prevent double signing. On the other hand, Soft Forks are executed when no impact on the chain-state is expected, allowing the network to continue with the same chain ID without exporting and generating a new genesis file.
+
+
+:::note
+
+If a consensus node casts a negative vote on an upgrade proposal that is later approved, it will automatically be [`paused`](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f) at the beginning of the upgrade.
+
+:::
+
+
+
+
+### Parameters {#3e04b070eb15440fb32be7705a85fbdc}
+
+
+| **Parameter**            | **Type**  | **Example**                                                                      | **Description**                                                                                                                                                                                                                                                                         |
+| ------------------------ | --------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                   | `string`  | `upgrade-118`                                                                    | Name of the plan                                                                                                                                                                                                                                                                        |
+| `max_enrolment_duration` | `integer` | `90`                                                                             | Expected duration of upgrade in seconds                                                                                                                                                                                                                                                 |
+| `new_chain_id`           | `string`  | `testnet-9`                                                                      | Identifier of the new chain                                                                                                                                                                                                                                                             |
+| `old_chain_id`           | `string`  | `testnet-8`                                                                      | Identifier of the current chain                                                                                                                                                                                                                                                         |
+| `proposalID`             | `string`  | `668`                                                                            | ID of the update proposal. It is set automatically.                                                                                                                                                                                                                                     |
+| `reboot_required`        | `boolean` | `true`                                                                           | Defines if nodes require OS reboot                                                                                                                                                                                                                                                      |
+| `resources`              | `array`   | `{"version": "testnet-9","url":https://github.com/KiraCore/kira","id": "kira"},` | A list of resources to be used in the pipeline, such as images or external dependencies. Includes: `url`, `checksum`, `version`, `id`.                                                                                                                                                  |
+| `rollback_checksum`      | `string`  | `upgrade-118-roll`                                                               | Checksum to use when rolling back the chain                                                                                                                                                                                                                                             |
+| `skip_handler`           | `boolean` | `true`                                                                           | Defines if `sekaid` on-chain handlers of the upgrade process should be skipped. If `true`, `sekaid` version changes will be omitted and the network will continue running. If `false`, the network will halt at the `upgrade_time` and remain stopped until `sekaid` binary is upgraded |
+| `instate_upgrade`        | `boolean` | `true`                                                                           | Defines if database state should be deleted or persisted. If set to `true` then a Hard Fork will be executed and the `new_chain_id` and `old_chain_id` must be different. If set to `false` , a Soft Fork will be executed and the database does not have to be erased.                 |
+| `upgrade_time`           | `integer` | `1641573000`                                                                     | Unix timestamp of the exact time the update should be executed                                                                                                                                                                                                                          |
+
+
+#### Upgrade Configuration Examples {#26a1fdae5da44a1087d2e19c99f98566}
+
+- Hard Fork with no change made in `sekaid` binary - used to upgrade other binaries such as INTERX or infrastructure manager, and wiping old database state (e.g. to save disk space)
+	- `instate_upgrade` - `false`
+	- `skip_handler` - `true`
+	- `new_chain_id` - MUST be different then `old_chain_id`
+- Hard Fork with changes in `sekaid` binary - used to upgrade network in the case where old database state is incompatible with new release
+	- `instate_upgrade` - `false`
+	- `skip_handler` - `false`
+	- `new_chain_id` - MUST be different then `old_chain_id`
+- Soft Fork without changes in `sekaid` binary  - used to upgrade other binaries, but preserve old database state
+	- `instate_upgrade` - TBD
+	- `skip_handler` - TBD
+	- `new_chain_id` - MUST be the same as `old_chain_id`
+
+#### Upgrade Plan Example {#0cff5a2dae1b4f039c904237df25449e}
+
+
+```json
+{
+	"plan": {
+		"max_enrolment_duration": "90",
+		"name": "upgrade-118",
+		"new_chain_id": "testnet-9",
+		"old_chain_id": "testnet-8",
+		"proposalID": "668",
+		"reboot_required": true,
+		"resources": [
+			{
+			"checkout": "testnet-9",
+			"git": "https://github.com/KiraCore/kira",
+			"id": "kira"
+			},
+			{
+			"checkout": "testnet-9",
+			"git": "https://github.com/KiraCore/sekai",
+			"id": "sekai"
+			},
+			{
+			"checkout": "testnet-9",
+			"git": "https://github.com/KiraCore/sekai",
+			"id": "interx"
+			}
+		],
+		"rollback_checksum": "upgrade-118-roll",
+		"skip_handler": true,
+		"upgrade_time": "1641573000"
+		}
+}
+```
+
+
+### Upgrade Process {#8576cd2745b74f64bd2df866b9ebc5cf}
+
+
+The KIRA network can be upgraded through an off-chain mechanism executed by the daemon service of the KIRA Manager (KM). However, it is not mandatory to use KM to upgrade the network, and node operators can set up their own dedicated CD/CI pipeline tools, such as Jenkins or Teamcity.
+
+
+To keep up-to-date with upcoming upgrades, operators can obtain information from two INTERX endpoints:
+
+- [**`/<ip>:11000/api/kira/upgrade/current_plan`**](https://testnet-rpc.kira.network/api/kira/upgrade/current_plan): The “current” plan contains information and resources regarding the current release.
+- [**`/<ip>:11000/api/kira/upgrade/next_plan`**](https://testnet-rpc.kira.network/api/kira/upgrade/next_plan): The “next” plan contains information and resources regarding the upcoming release. Nodes can also obtain resource references, such as GitHub links and branches, specified in the “current” plan endpoint of a trusted node while joining the network for the very first time.
+
+#### Manual Hard Fork {#e101effdd1aa446eac7633d2a4475c77}
+
+
+If a new genesis file is required for a hard fork, and KM is not used, node operators must create it by first exporting genesis at the block height where the network stopped (node daemon should be shut down), and then passing it through a dedicated `new-genesis-from-exported` command. It should be noted that the `sekaid` application must be upgraded prior to executing the `new-genesis-from-exported` command. Otherwise, it might not be able to interpret and convert the old genesis to the new.
+
+
+Node operators can execute the following steps to manually hard fork the network:
+
+
+```bash
+SEKAI="/home/go/src/github.com/kiracore/sekai"
+EXPORTED_GENESIS="/tmp/exported-genesis.json"
+NEW_GENESIS="/tmp/new-genesis.json"
+
+# Cleanup old files
+rm -fv $EXPORTED_GENESIS $NEW_GENESIS
+
+# Ensure sekaid process is killed gracefully
+pkill -15 sekaid || echoWarn "WARNING: Failed to kill sekaid, process might already be dead"
+
+# Export current genesis
+sekaid export --home=$SEKAID_HOME > $EXPORTED_GENESIS
+
+# Update repository
+cd $SEKAI
+git fetch --all
+git checkout $BRANCH_TO_CHECKOUT
+make install
+
+# Convert exported genesis to a new compatible version
+sekaid new-genesis-from-exported $EXPORTED_GENESIS $NEW_GENESIS
+
+```
+
+
+## CLI Syntax & Examples {#e33d542c95414e01b67b21abf61aa961}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/980ceb2f-9bc1-4133-aad0-bfb8a5c55536) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#d5522dd8578142d582074acef31f2b66}
+
+
+There is no transactions other than the governance proposals for this sub-module.
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#4e0e5ff7b7394ac5ba2ce2b33bd0550c}
+
+
+| `current-plan` | Query the current network upgrade plan. |
+| -------------- | --------------------------------------- |
+| `next-plan`    | Query the next network upgrade plan.    |
+
+
+#### Display the Current Plan {#75bbe2df40cf4062b80245ade1980630}
+
+
+Use the `current-plan` command to retrieve the current network upgrade plan.
+
+
+```shell
+sekaid query upgrade current-plan $FLAGS_QR | jq
+```
+
+
+#### Display the Next Plan {#d84065dd1cd5451f84968808880db451}
+
+
+To query the next network upgrade plan, use the `next-plan` command.
+
+
+```shell
+sekaid query upgrade next-plan $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#a2174efb55d24eb48f3b046437db2148}
+
+
+| `proposal-set-plan`    | Create a proposal to set a network upgrade plan.      |
+| ---------------------- | ----------------------------------------------------- |
+| `proposal-cancel-plan` | Create a proposal to cancel an existing upgrade plan. |
+
+
+#### Set Network Upgrade Plan Proposal {#776b14b4fa314e0ca4387826d49a9346}
+
+
+:::note
+
+If a consensus node casts a negative vote on an upgrade proposal that is later approved, it will automatically be [`paused`](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f) at the beginning of the upgrade.
+
+:::
+
+
+
+
+The CLI command, `proposal-set-plan`, is used to create a proposal to set an upgrade plan for the network. If voted, the upgrade plan is saved and will be overwritten by any subsequent proposals voted before the `$MIN_UPGRADE_TIME`. The command accepts the following flags:
+
+
+**Flags**
+
+- `$TITLE`: Title of the proposal.
+- `$DESCRIPTION`: Description of the proposal.
+- `$UPGRADEMEMO`: Upgrade proposal memo.
+- `$NAME`: Upgrade name.
+- `$INSTATEUPGRADE`: Boolean indicating instate upgrade (true for hard fork with new genesis file/soft fork).
+- `$SKIPHANDLER`: Boolean indicating if handler should be skipped (true if change in sekaid version).
+- `$OLDCHAINID`: Old chain id.
+- `$NEWCHAINID`: New chain id.
+- `$MINUPGRADETIME`: Unix timestamp of the exact time the update should be executed.
+- `$RESOURCES`: List of resources to be used in the pipeline.
+- `$ROLLBACKMEMO`: Checksum to use when rolling back the chain.
+- `$MAXENROLLMENTDURATION`: Expected duration of upgrade in seconds.
+- `$REBOOTREQUIRED`: Node reboot requirement (true if required).
+
+```shell
+sekaid tx customgov proposal-set-plan \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--name=$NAME --resources=$RESOURCES \
+--min-upgrade-time=$MIN_UPGRADE_TIME \
+--old-chain-id=$OLD_CHAIN_ID \
+--new-chain-id=$NEW_CHAIN_ID \
+--rollback-memo=$ROLLBACK_MEMO \
+--max-enrollment-duration=$MAX_ENROLLMENT_DURATION \
+--upgrade-memo=$UPGRADE_MEMO \
+--instate-upgrade=$INSTATE_UPGRADE \
+--reboot-required=$REBOOT_REQUIRED \
+--skip-handler=$SKIP_HANDLER
+```
+
+
+#### Cancel Network Upgrade Plan Proposal {#6afe9d8499b640ad960d44e4e210bebd}
+
+
+The CLI command, `proposal-cancel-plan`, is used to create a proposal to cancel an existing upgrade plan for the network. This proposal is not necessary if the goal is the replace an upgrade plan as the `proposal-set-plan` command overwrite any existing upgrade plan. The command accepts the following flags:
+
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The description of the proposal.
+- `$NAME`: The name of the upgrade plan to be cancelled.
+
+```shell
+sekaid tx customgov proposal-cancel-plan \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--name=$NAME
+```
+
+
+
+</TabItem></Tabs>
+
+
+---
+

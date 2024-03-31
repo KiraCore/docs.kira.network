@@ -1,0 +1,19 @@
+---
+title: Overview
+sidebar_position: 0
+slug: /e26c8757-2bfc-4ec1-add5-4dc82d170e50
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+Slashing is a mechanism traditionally used in permissionless Proof-of-Stake networks to address Sybil vulnerabilities and align operator incentives with the network (for more details, see the [Consensus](https://claude.ai/chat/link-to-consensus-page) page). However, coupling the weighted voting mechanism with strong slashing requirements still does not guarantee that the intentions of these entities align with the long-term best interests of the network. This issue stems from [the fundamental limitations of permissionless systems](https://bford.info/2019/09/23/rational/) that rely on assumptions about the rationality of participants, which is inherently insecure. The core idea is that rationality-based security models are insufficient in open, permissionless systems because they do not account for the possibility of rational actors exploiting the system for external gains, making the system vulnerable to a broader range of attacks beyond what is considered within the rationality framework. This concern becomes even more pressing as we shift towards a multi-chain "Internet of Blockchains" paradigm.
+
+
+Moreover, slashing mechanisms not only heighten the risk for smaller, home-based node operators, who may worry about incurring severe financial penalties for honest mistakes or system failures, but they also amplify risk for delegators. This dual effect fosters centralizing tendencies: it compels node operators to gravitate towards more centralized, potentially safer cloud services like AWS, and simultaneously, it nudges delegators towards these seemingly more secure nodes for their asset protection. Such shifts inadvertently challenge the decentralized ethos at the heart of blockchain networks, creating a counterproductive dynamic in the ecosystem.
+
+
+KIRA takes a unique stance on slashing. In KIRA's governance-permissioned validator set, the discretionary power of identified governance members to remove malicious nodes enables the detection and mitigation of irrational, malicious behavior that might elude purely economic models. This allows for a more targeted approach to slashing, where only instances of double-signing are subject to potential penalties. These penalties are triggered automatically only when a certain number of validators are caught double-signing within a short time frame, serving as a deterrent against coordinated attacks. In all other cases, slashing is subject to governance approval. This approach minimizes the risk of severe consequences for minor or unintentional errors, reducing the fear of harsh penalties and encouraging a more diverse set of individuals to run validator nodes, including those operating from home environments. Furthermore, it alleviates the pressure on Delegators to prioritize security over decentralization when choosing nodes to stake with, as the network itself is designed to be resilient to a wider range of failures. The combination of automatic slashing under specific conditions, governance-supported slashing for individual cases, and the absence of downtime slashing makes it extremely unlikely for Consensus nodes and Delegators to face unwarranted penalties. This approach aligns more closely with Byzantine principles, as it takes into account the inevitability of human error and system failures, thus promoting a strong, diverse validator community and a more decentralized network overall.
+
