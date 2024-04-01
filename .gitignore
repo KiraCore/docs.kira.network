@@ -1,0 +1,13 @@
+# Ignore build artifacts and node_modules
+build/
+node_modules/
+
+# Ignore temporary files or directories
+temp/
+
+# Ignore Docusaurus generated files
+.docusaurus/
+
+# Ignore static and tabs directory
+tabs/
+static/
