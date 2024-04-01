@@ -4,8 +4,9 @@
 # Temporary pull (rsync is used to selectively update the tabs folder)
 /temp
 
-# Custom srcpages tabs
+# Custom tabs
 tabs/srcpages/
+tabs/ecosystem/
 
 # Production (ignoring build folder will disable showLastUpdateTime feature)
 /build
