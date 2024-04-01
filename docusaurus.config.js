@@ -182,6 +182,12 @@ const config = {
             "aria-label": "GitHub repository",
           },
           {
+            href: "https://discord.kira.network",
+            position: "right",
+            className: "header-discord-link",
+            "aria-label": "Official Discord Channel",
+          },
+          {
             href: "https://tg.kira.network",
             position: "right",
             className: "header-tg-link",
