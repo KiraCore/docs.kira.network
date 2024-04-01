@@ -27,7 +27,7 @@ export function CardSmall({ icon: Icon, title, body, link }) {
       <div className={styles.cardSmall}>
         <div className={styles.header}>
           <div className={styles.titleSmall}>{title}</div>
-          {Icon && <img src={Icon} alt="Icon" className={styles.icon} />}
+          {Icon && <img src={Icon} alt="Icon" className={styles.iconSmall} />}
         </div>
         <div className={styles.bodySmall}>{body}</div>
       </div>

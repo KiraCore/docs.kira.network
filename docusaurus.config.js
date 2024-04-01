@@ -86,6 +86,21 @@ const config = {
         },
       },
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'ecosystem',
+        path: 'tabs/ecosystem',
+        routeBasePath: '/ecosystem/',
+        sidebarPath: undefined,
+        showLastUpdateTime: true,
+        editUrl: ({docPath, permalink}) => {
+          docPath = docPath.toLowerCase();
+          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
+          return repoUrl;
+        },
+      },
+    ],
   ],
   stylesheets: [
     {
@@ -176,7 +191,7 @@ const config = {
             activeBaseRegex: '^/links/',         
           },
           {
-            href: "https://github.com/KiraCore",
+            href: "https://github.kira.network",
             position: "right",
             className: "header-github-link",
             "aria-label": "GitHub repository",
