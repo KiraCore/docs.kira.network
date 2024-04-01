@@ -10,7 +10,7 @@
     "pull": "yarn run clear-docs && npx nocusaurus -n $DOCU_NOTION_INTEGRATION_TOKEN -r $DOCU_NOTION_SAMPLE_ROOT_PAGE_DOC -m ./temp -i ./static/notion_imgs -p /notion_imgs/ --yes --log-level verbose",
     "start": "docusaurus start",
     "srcpages": "mv ./temp/srcpages/*.mdx ./src/pages/",
-    "update": "rsync -av --checksum --delete temp/ tabs/",
+    "update": "rsync -av --checksum --delete --exclude='tabs/Ecosystem/' temp/ tabs/",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
     "swizzle": "docusaurus swizzle",
@@ -19,7 +19,7 @@
     "serve": "docusaurus serve"
   },
   "dependencies": {
-    "nocusaurus": "1.5.1",
+    "nocusaurus": "1.5.2",
     "@docusaurus/core": "3.0.1",
     "@docusaurus/preset-classic": "3.0.1",
     "@easyops-cn/docusaurus-search-local": "0.40.1",
