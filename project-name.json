@@ -1,6 +1,6 @@
 {
     "name": "Name of your project, e.g. SEKAI",
-    "logo": "url of self-hosted logo",
+    "logo": "(Optional) Url of self-hosted logo",
     "title": "Title of your project, e.g. KIRA's Blockchain Application",
     "description": "Description of your project",
     "website": "Website url",
