@@ -6,7 +6,8 @@ Static site deployment branch: [docs.kira.network](https://github.com/KiraCore/d
 
 ## Ecosystem 
 
-Build with us! Submit your idea [here](https://github.com/KiraCore/docs.kira.network/tree/ecosystem).
+Build with us! 
+Submit your project idea [here](https://github.com/KiraCore/docs.kira.network/tree/ecosystem), and get promoted.
 
 ## Installation
 
