@@ -1,12 +1,14 @@
-# KIRA Network Documentation Repository
+# KIRA's Documentation
 
 This repository holds KIRA's documentation. It leverages Nocusaurus to extract content from KIRA's Notion workspace using the Notion API and transform it into sructured Markdown files. These files are then processed with Docusaurus v3 to generate static HTML files deployed via gutHub page.
 
-Deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.network/tree/docs.kira.network)
+Static site deployment branch: [docs.kira.network](https://github.com/KiraCore/docs.kira.network/tree/docs.kira.network)
 
-# How to Use
+## Ecosystem 
 
-## Installation:
+Build with us! Submit your idea [here](https://github.com/KiraCore/docs.kira.network/tree/ecosystem).
+
+## Installation
 
 1. **Clone Repository**: Clone the repository to your local machine.
 3. **Install dependencies**:
