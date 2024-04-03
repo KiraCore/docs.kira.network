@@ -1,6 +1,8 @@
-# Ecosystem
+# KIRA's Ecosystem
 
-Welcome to KIRA's Ecosystem Submission page. If you wish to express your interest in building with us, you are at the right place. We will make a special ecosystem project card for you in our documentation where you are promoted with references to all your media. All you have to do is create a website or at least a Twitter account to give your submission credibility, and push a PR to this repo to present your idea by following these simple steps:
+Welcome to the KIRA Ecosystem repository! This is the place to showcase your innovative ideas built on the KIRA network. By submitting your project, we'll create a dedicated card in our documentation, complete with links to your online presence and other media.
+
+To get started, establish an online presence for your project, whether it's a website or a Twitter account. This will lend credibility to your submission. Then, follow these simple steps to present your idea:
 
 1. Clone this branch:
 
