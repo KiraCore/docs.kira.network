@@ -64,7 +64,6 @@ jobs:
 
       - name: Create folder and move ${{ env.FILE }}
         run: |
-          mkdir -p ${{ env.SUBMISSIONS_PATH }}/${{ env.PROJECT_NAME }}
 
       - name: Download archived file
         uses: actions/download-artifact@v4
@@ -79,6 +78,11 @@ jobs:
           git add .
           git commit -m "Create a folder" -m "* Project '$PROJECT_NAME'"
           git push origin ${{ env.SUBMISSIONS_BRANCH }}/${{ env.PROJECT_NAME }}
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "Create a folder" -m "* Project ${{ env.PROJECT_NAME }}"
 
       - name: Create pull request
         env:
