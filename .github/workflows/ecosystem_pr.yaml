@@ -13,7 +13,6 @@ env:
 
 jobs:
   PR_check:
-    name: Checks PR, upload project config
     runs-on: ubuntu-latest
     outputs:
       project_name: ${{ steps.extract-project-name.outputs.project_name }}
