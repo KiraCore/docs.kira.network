@@ -11,3 +11,126 @@ import TabItem from '@theme/TabItem';
 
 KIRA's Layer 2, termed Pessimistic Rolldowns, optimizes computational efficiency and transaction bundling. Our unique Virtual Finality Gadget expedites the verification of computation results, fostering a versatile platform that caters to both 'code is law' and judgment-based applications. This is more than a platform—it's a launchpad for developers to define their own rules and easily iterate on diverse applications.
 
+
+### Overview {#839416fc493f442281675d79dc421b74}
+
+
+The base layer of any blockchain application should only contain the most basic state machine code essential to securing the network, coordinating governance, and persisting users' balances. Any execution of an arbitrary code MUST take place on the dedicated execution layer independent from the core blockchain application (off-chain). In short, the base layer (on-chain) should be responsible for settlement, and the execution layer (off-chain) for computation / arbitrary code execution. 
+
+
+In our implementation of Layer 2 (responsible for arbitrary code execution), we will utilize a mechanism similar to [ethereum optimistic rollups](https://ethereum.org/en/developers/docs/scaling/optimistic-rollups/) where transactions and final results of the computation are bundled and settled on the base layer. In the case of optimistic rollups on ethereum, the final state of execution (bundle) is “optimistically” assumed to be correct and can be challenged within a “challenge period”. In our case, we will be “pessimistically” assuming the final result of the computation to be NOT correct and only settle it if either a sufficient number of verifications was performed within the “challenge period” or if any node who was “observing” the computation arrived to different results and wants to stop the settlement from happening until 2/3+ of validators verify the correctness. We will call our mechanism **pessimistic rolldowns** since we do not assume correctness and we will be rolling the state of computation down into our settlement layer in a bundled form.
+
+
+#### Deterministic Code {#9ca9c3e8b9a3403ea5161b404484b7ba}
+
+
+Whenever referring to “arbitrary code” execution we have to make clear what type of code and programming languages we can support. In the case of our pessimistic rolldowns, we will treat “code” as a black box behaving as follows `blackBoxFunc(s(t-1),x) => s(t)` where `s(t-1)` is a previous state of execution at time `t-1` and where `x` is a list of user inputs such that the new state `s(t)` will always be the same given the same inputs to our `blackBoxFunc`. In simple terms, we can say that the code within our “black box” must be [deterministic](https://en.wikipedia.org/wiki/Deterministic_system#:~:text=In%20mathematics%2C%20computer%20science%20and,starting%20condition%20or%20initial%20state.), and “whenever the same input enters the black box, its corresponding output must be exactly the same value or blob of data every single time”. As long as this single rule is preserved and our output is predictable and ordered the code can be written in any programming language and the results of computation can be verified regardless of time, or any other external conditions. 
+
+
+![](/notion_imgs/1387519270.png)
+
+
+Suppose given the previous state of execution, input from the settlement layer, and an ordered list of user input anyone can recompute the new state and output that should be settled on the base layer. In that case, execution of any deterministic code is possible with security guarantees equal to those of the base layer. Any party with a vested interest in the correct execution of the code can operate a dedicated “**fisherman**” / verifier node that can observe the execution of the deterministic code and report on-chain any doubts in regard to the final results.
+
+
+#### Virtual Finality Gadget {#ba2d35e3552244488d5aba94767a1b96}
+
+
+Since our time-invariant deterministic computational black box can be executing possibly ANY code within limitations defined before, we must provide a way for the fisherman to efficiently verify the correctness of the results. Since the problem we are trying to solve is generalized computing it is realistic to assume that there will never be a single perfect way to speed up the verification of the computation and in some cases, verification might not even adhere to the logic that can be put in the code! An example here is gaming where the judgment of a human or AI might take priority over exploitable game rules. Whenever the “code is law” principle is insufficient or not realistic to be adhered to in order to provide the expected user experience we need to provide a fast and efficient way for verification. The virtual finality gadget is a simplified deterministic machine resembling our “dApp black box” that, given the input `s(t-1)`, and output `s(t)` produces a simple “yes” or “no” answer to whether the output `s(t)` was computed correctly. The verification process can be simply re-running the application code with an input of `s(t-1)` or employing much more clever techniques, such as probabilistic checks of the transaction included in the Merkle-root bundling checkpoint used in rollups. KIRA L2 is simply a protocol and NOT an “out of the box” solution for every possible problem, the default verification means are a dumb recomputation, meanwhile, the developer gains the ability to define his own “my code is law” rules.
+
+
+#### Architecture {#d9cd842ec8294d6aa8153fc558ebfa2e}
+
+
+The current stack of the network consists of the static page frontend application (MIRO), middleware (INTERX) that acts like a decentralized API, and a backend application in the form of a blockchain (SEKAI). In the L2 implementation, we will have to focus on both SEKAI and INTERX to achieve scaling since the blockchain application (SEKAI) alone can’t execute anything that is not part of a state machine code. Let’s have a look at the high-level roles that each part of the infrastructure will have:
+
+
+![](/notion_imgs/644648612.png)
+
+
+**SEKAI**
+
+- Allow anyone (users) to submit executable code (deterministic code) as SHA256 hash and URL/CID to its source
+- Allow validators to submit their candidacy to run the executable (dApp)
+- Allow validators to register in IR[broken link] their INTERX nodes that will be executing particular dApps
+- Allow users to deposit and withdraw tokens to/from the dApp (lock/unlock assets)
+- Allow the validator who runs the dApp session to propose a token balance change and the latest dApp state as SHA256 hash
+- Allow other validators who participate in state verification to accept/reject dApp state hash and changes to account balances
+- Allow anyone (users) to register a fisherman node (interx), that will be verifying the correctness of the dApp execution
+- If the dApp state hash is challenged (rejected) then halt the dApp and allow validators to vote on un-halting the dApp or accepting/rejecting the state hash
+- Allow dApps to mint & burn tokens (essential for bridges) as well as publish key-value pair data on-chain to enable compossibility between dApps
+
+**INTERX**
+
+- Determine if the INTERX node belongs to the validator and should participate in assisting execution
+- Download the application docker image and verify SHA256
+- Expose application images on demand to application launcher
+- Allow the application container to communicate with INTERX API (be able to observe blockchain state and state of other apps)
+- Provide persistent storage for the application state and user input
+- Provide proxy service for the application container on the dedicated port range
+- Publish the application state to sekai or accept/reject state in the verification/fisherman mode
+
+**KM**
+
+- deploy application image sourced from INTERX
+- deploy app verification image sourced from INTERX
+- expose dedicated ports range to INTERX
+
+**FRONTEND**
+
+
+For each application, the frontend should be a static page (e.g. hosted on IPFS) that will communicate with selected INTERX nodes exposing the API interface. This application has to be developed independently for each app.
+
+- discover session leader IP through data stored on L1
+- interact with a docker container through the INTERX proxy
+
+#### Sessions {#0a92a379be114fa7b5a91bc4a1c699b0}
+
+
+Since the L2 code that is executed must be at some point verified and changes to the blockchain state settled on L1, we need to define a point in time after which the execution must stop and the verification process begins. The period of time and the process during which the execution is occurring we will call “**dApp Session**”. Every dApp Session is going to be executed by only a single validator (dApp leader) while verification will be done by the remaining validators and fisherman (dApp verifiers). After dApp Session ends the dApp leader is going to submit on-chain a result of his computation (changes to the blockchain, e.g. changes in token balances) and a new hash of a dApp state (changes to its internal database, e.g. position of players in a video game or changes to account balances after swapping tokens). Proposed hashes and changes are then voted on by dApp executors who collect necessary input from the dApp leader to re-execute or otherwise verify computations using the Virtual Finality Gadget. As long as more than 2/3 of dApp Executors take part in voting and ALL of them agree on the session results including ALL dApp Verifiers, the changes will be accepted. While the approval of Executors is essential, the approval of Verifiers is optional, meaning that even if the majority of fisherman agrees with the new session changes they do not have the right to finalize the state transition. The only universal right of a fisherman is to halt the application if they arrive at the conclusion that the state transitions of the dApp are incorrect.
+
+
+_NOTE: The number of dApp Verifiers (fishermen) can be much greater than the number of dApp Executors (possible dApp Leaders). At any point in time, there will only be a single dApp leader._ 
+
+
+![](/notion_imgs/506458943.png)
+
+
+Since verification of the correct execution might take quite a while we will appoint a new leader after the first one finishes execution and allow him to continue dApp execution immediately, without having to wait for the verification process to be completed. The dApp leader must be an active (online) validator and will be chosen in a [Round-robin](https://en.wikipedia.org/wiki/Round-robin_scheduling) manner, that is simply as next in line by the iterative validator ID. The difference between Validators and Fishermen/Verifiers is that validators can be leaders while fishermen can never be leaders and propose changes to the blockchain. 
+
+
+#### Multi-party Computation {#4bc51322d5994539b60a004f23ddd0c7}
+
+
+It might happen that your dApp might require [Multi-Party Computation](https://en.wikipedia.org/wiki/Secure_multi-party_computation) (MPC) to operate, one example of that might be the MPC random number generation necessary in many types of games utilizing a simple [Commitment Scheme](https://en.wikipedia.org/wiki/Commitment_scheme), another example can be a [Threshold Signature Scheme ](https://everipedia.org/wiki/lang_en/threshold-signature-scheme-tss)(TSS) useful in securing and creating pegged bridges between cryptocurrencies such as BTC or ETH. The obvious problem here is that it’s not just one dApp Leader that will be tasked with computation but multiple validators must cooperate at the same time and perform certain types of parallel computations.  
+
+
+To resolve the problem of the leader-verifiers having to cooperate in calculations we can treat the “verifiers” the exact same way we would treat “users” - by awaiting their input to the dedicated INTERX endpoint`/dapp/<dapp-id>/txs` of the dApp leader, that is the exact same endpoint that users would forward their internal dApp txs’ to. Whenever MPC is needed your dApp docker container can [run multiple services](https://docs.docker.com/config/containers/multi-service_container/) using a short init script. The init script can then parallelize the operation of the “verification” and communication/cooperation with a leader the same way the client application would at the same time. 
+
+
+![](/notion_imgs/1202357394.png)
+
+
+#### Replication {#9f96ce9b732249e0a77b1fcb0f5c2d86}
+
+
+Once execution of the Session ends the dApp Leader must be able to share the results of his computation which includes dApp database changes, on-chain changes (e.g changes in balances), and an ordered list of the user input so that anyone can verify the Session Results. If the Session Results were not shared in a timely manner then dApp Verifies will not be able to approve them and all changes will be completely discarded. There might be many reasons why the session results might be lost, this includes hardware faults, networking faults, software implementation faults, intentional or unintentional DOS/DDOS, and even natural disasters. To ensure the highest chances of success during the state replication process we will first have to make all data available to be downloaded from the dApp Leader INTERX node by utilizing our custom `<interx-addr>:11000/download` endpoint. Next, we will have to define connection limits but at the same time ensure that downloading priority is guaranteed for all dApp Verifiers and in the case where dApp Leader becomes unavailable all verifies can try to fetch the data from each other (e.g. Leader is down, but one of the verifiers managed to download the state in time).
+
+
+The main disadvantage of the session-based replication is that our dApp might become unresponsive until the next leader can fetch the final Session Results or perform a verification before continuing the execution. To mitigate that issue the next leader can entirely ignore the verification process completely and “on the go” fetch the latest user inputs directly from the current leader. We can optimistically assume that the computation is correct and in the case where it is not we can simply discard both previous and the current session data (which should be a rare and unlikely scenario). A dedicated stream communication channel could be established between the current and next leader to on-the-go fetch all incoming data. If it happened that the current or the next leader suddenly becomes unresponsive before the new session starts then we can have any consecutive leader pick up the changes by fetching them from one of the available `<interx-addr>:11000/download` endpoints (assuming new state was shared in time).
+
+
+![](/notion_imgs/737920724.png)
+
+
+_NOTE: It doesn’t really matter who proposes changes to the blockchain and propagates hashes of the session result as long as the bundle of the user inputs was signed by the leader executing it. This means that the current dApp leader can go offline even before finalizing his session and in the case of failure offload responsibility to the next leader who was live-fetching all the user input stream data. In the MVP implementation, we will only focus on the simplest cases and discard any improvements that can be done at a later stage._
+
+
+#### Incentives {#eb3f3ea623d34d0da14b60e8f6c6c5ea}
+
+
+Every dApp should have the ability to sustain its operations and long-term development. One of the simplest ways to achieve that is by allowing each dApp to issue its own tokens with the approval of the governance. Profits from the dApp operations (such as fees) can then be split between dApp Executors, dApp Verifiers & the dApp Token Holders. Token issuance module can at the same time be used to enable bridging of tokens from other networks without the need to use cross-chain protocols such as XCMP & IBC. However, those very XCM-protocols can be supported as “plugins” - meaning a dedicated dApp can be handling communication with Polkadot and another one with Cosmos, Ethereum, or other networks.
+
+
+To prevent spam each dApp should have a quota on the number of tokens it can issue and their max supply. By default, each dApp will have just one native (default) token. Once the default token is created by the dApp it will not be possible to remove or change its denomination or name. The purpose of the default token will be the rewards distributions and governance functions.
+
