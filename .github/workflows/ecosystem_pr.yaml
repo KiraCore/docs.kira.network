@@ -35,14 +35,14 @@ jobs:
 
       - name: Create new branch from master
         run: |
-          git checkout -b ecosystem/$project_name origin/master
+          git checkout -b submission/$project_name origin/master
         shell: bash
 
       - name: Create folder and move details.json
         run: |
           project_name=$(echo "${{ steps.extract_project_name.outputs.project_name }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
           mkdir -p static/ecosystem/$project_name
-          git show ecosystem:details.json > static/ecosystem/$project_name/details.json
+          git show ${{ github.event.pull_request.head.ref }}:details.json > static/ecosystem/$project_name/details.json
 
       - name: Commit and push changes
         run: |
