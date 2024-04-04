@@ -8,12 +8,16 @@ on:
 
 env:
   FILE: details.json
+  SUBMISSIONS_PATH: ./ecosystem/submissions
+  SUBMISSIONS_BRANCH: submissions
 
 jobs:
-  Check_PR_and_collect_the_file:
+  PR_check:
+    name: Checks PR, upload project config
     runs-on: ubuntu-latest
     outputs:
-      PROJECT_NAME: ${{ steps.extract_project_name.outputs.project_name }}
+      project_name: ${{ steps.extract-project-name.outputs.project_name }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,52 +25,70 @@ jobs:
           sparse-checkout: |
             ${{ env.FILE }}
       - name: Extract project name from ${{ env.FILE }}
-        id: extract_project_name
+        id: extract-project-name
         run: |
           project_name=$(jq -r '.name' ${{ env.FILE }} | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
-          echo "::set-output name=project_name::$project_name"
+          echo $project_name
+          echo "project_name=${project_name}" >> "$GITHUB_OUTPUT"
       - name: DEBUG Info
         run: |
           pwd
           ls -lah
-
-      - name: Archive ${{ env.FILE }}
+      - name: Upload artifact ${{ env.FILE }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.FILE }}
           path: ${{ env.FILE }}
-          if-no-file-found: error
+          compression-level: 0
+          if-no-files-found: error
 
-  Create_PR_to_master:
+  PR_create:
+    needs: PR_check
     runs-on: ubuntu-latest
+    env:
+      PROJECT_NAME: ${{ needs.PR_check.outputs.project_name }}
     steps:
+
+      - name: Check the project name
+        run: |
+          echo "$PROJECT_NAME"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: master
 
+      - name: Create and checkout a new branch
+        run: |
+          git checkout -b ${{ env.SUBMISSIONS_BRANCH }}/${{ env.PROJECT_NAME }}
+
       - name: Create folder and move ${{ env.FILE }}
         run: |
-          mkdir -p ./ecosystem/submissions/${{ env.PROJECT_NAME }}
-      - name: Downlowad archived file
+          mkdir -p ${{ env.SUBMISSIONS_PATH }}/${{ env.PROJECT_NAME }}
+
+      - name: Download archived file
         uses: actions/download-artifact@v4
         with:
+          path: ${{ env.SUBMISSIONS_PATH }}/${{ env.PROJECT_NAME }}
           name: ${{ env.FILE }}
-      - name: DEBUG Info
+
+      - name: Configure git user, commit changes, push
         run: |
-          pwd
-          ls -lah
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Create a folder" -m "* Project '$PROJECT_NAME'"
+          git push origin ${{ env.SUBMISSIONS_BRANCH }}/${{ env.PROJECT_NAME }}
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: |
-            "Add ${{ env.PROJECT_NAME }} into ecosystem"
-          commit-message: |
-            "Add ${{ env.FILE }} for ${{ env.PROJECT_NAME }} into ecosystem"
-          branch: master
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --base master --title "Add new submission for $PROJECT_NAME" --body "Description"
 
       - name: Close initial PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr close ${{ github.event.number }}
 
       - name: Delete inital branch
