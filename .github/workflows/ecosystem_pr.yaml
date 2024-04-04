@@ -45,17 +45,28 @@ jobs:
         with:
           ref: master
 
+      - name: Create and checkout a new branch
+        run: |
+          git checkout -b submissions/${{ env.PROJECT_NAME }}
+
       - name: Create folder and move ${{ env.FILE }}
         run: |
           mkdir -p ./ecosystem/submissions/${{ env.PROJECT_NAME }}
-      - name: Downlowad archived file
+
+      - name: Download archived file
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.FILE }}
+
       - name: DEBUG Info
         run: |
           pwd
           ls -lah
+
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "Create a folder" -m "* Project ${{ env.PROJECT_NAME }}"
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
