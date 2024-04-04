@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Check for details.json
         run: |
@@ -26,17 +26,17 @@ jobs:
     needs: check_PR
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Extract project name from details.json
         run: |
           project_name=$(jq -r '.name' details.json)
           echo "::set-output name=project_name::$project_name"
 
-      - name: Create new branch from master
-        run: |
-          git checkout -b submission/$project_name origin/master
-        shell: bash
+      - name: Checkout repository to master
+        uses: actions/checkout@v4
+        with:
+          ref: master
 
       - name: Create folder and move details.json
         run: |
@@ -44,21 +44,12 @@ jobs:
           mkdir -p static/ecosystem/$project_name
           git show ${{ github.event.pull_request.head.ref }}:details.json > static/ecosystem/$project_name/details.json
 
-      - name: Commit and push changes
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add static/ecosystem/$project_name/details.json
-          git commit -m "Ecosystem: add details.json for $project_name"
-          git push
-
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v6
         with:
           title: "Add $project_name into ecosystem"
           commit-message: "Add details.json for $project_name into ecosystem"
-          branch: ecosystem/$project_name
-          base: master
+          branch: master
 
       - name: Close initial PR
         run: gh pr close ${{ github.event.number }}
