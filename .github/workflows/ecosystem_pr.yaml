@@ -1,3 +1,4 @@
+---
 name: Ecosystem PR Workflow
 
 on:
@@ -5,50 +6,64 @@ on:
     branches:
       - ecosystem
 
+env:
+  FILE: details.json
+
 jobs:
-  check_PR: 
+  Check_PR_and_collect_the_file:
     runs-on: ubuntu-latest
+    outputs:
+      PROJECT_NAME: ${{ steps.extract_project_name.outputs.project_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Check for details.json
+        with:
+          sparse-checkout: |
+            ${{ env.FILE }}
+      - name: Extract project name from ${{ env.FILE }}
+        id: extract_project_name
         run: |
-          if [ -f "details.json" ]; then
-            echo "File 'details.json' found."
-          else
-            echo "Error: 'details.json' not found. Please include this file in your pull request."
-            exit 1
-          fi
+          project_name=$(jq -r '.name' ${{ env.FILE }} | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
+          echo "::set-output name=project_name::$project_name"
+      - name: DEBUG Info
+        run: |
+          pwd
+          ls -lah
 
-  process_PR:  
+      - name: Archive ${{ env.FILE }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILE }}
+          path: ${{ env.FILE }}
+          if-no-file-found: error
+
+  Create_PR_to_master:
     runs-on: ubuntu-latest
-    needs: check_PR
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Extract project name from details.json
-        run: |
-          project_name=$(jq -r '.name' details.json)
-          echo "::set-output name=project_name::$project_name"
-
-      - name: Checkout repository to master
         uses: actions/checkout@v4
         with:
           ref: master
 
-      - name: Create folder and move details.json
+      - name: Create folder and move ${{ env.FILE }}
         run: |
-          project_name=$(echo "${{ steps.extract_project_name.outputs.project_name }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-          mkdir -p static/ecosystem/$project_name
-          git show ${{ github.event.pull_request.head.ref }}:details.json > static/ecosystem/$project_name/details.json
+          mkdir -p ./ecosystem/submissions/${{ env.PROJECT_NAME }}
+      - name: Downlowad archived file
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.FILE }}
+      - name: DEBUG Info
+        run: |
+          pwd
+          ls -lah
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
         with:
-          title: "Add $project_name into ecosystem"
-          commit-message: "Add details.json for $project_name into ecosystem"
+          title: |
+            "Add ${{ env.PROJECT_NAME }} into ecosystem"
+          commit-message: |
+            "Add ${{ env.FILE }} for ${{ env.PROJECT_NAME }} into ecosystem"
           branch: master
 
       - name: Close initial PR
