@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Extract project name from details.json
+        id: extract_project_name  
         run: |
           project_name=$(jq -r '.name' details.json)
           echo "::set-output name=project_name::$project_name"
