@@ -1,11 +1,11 @@
 {
     "name": "Name of your project, e.g. SEKAI",
-    "logo": "(Optional) Url of self-hosted logo",
+    "logo": "(Optional) Url of self-hosted logo (svg or png prefered)",
     "title": "Title of your project, e.g. KIRA's Blockchain Application",
     "description": "Description of your project",
-    "website": "Website url",
-    "github": "Github url",
-    "twitter": "Twitter url",
-    "telegram": "Telegram channel url",
-    "discord": "Discord channel url"
+    "website": "",
+    "github": "",
+    "twitter": "",
+    "telegram": "",
+    "discord": ""
 }
