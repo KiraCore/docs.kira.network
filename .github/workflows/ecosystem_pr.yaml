@@ -35,8 +35,8 @@ jobs:
 
       - name: Create new branch from master
         run: |
-          git checkout -b submission/$project_name origin/master
-        shell: bash
+          git checkout master
+          git checkout -b submission/$project_name
 
       - name: Create folder and move details.json
         run: |
@@ -65,3 +65,4 @@ jobs:
 
       - name: Delete inital branch
         run: git push origin --delete ${{ github.event.pull_request.head.ref }}
+
