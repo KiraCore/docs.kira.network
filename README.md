@@ -24,18 +24,32 @@ git add .
 git commit -m "commit message"
 ```
 
-3. Install GitHub CLI if you don't have it yet (https://github.com/cli/cli#installation), and authenticate yourself:
-
-```bash
-gh auth login 
-```
-
-4. Submit a PR to the `ecosystem` branch: 
+3. Push changes and submit PR to the `ecosystem` branch (or submit PR directly using `gh`):
 
 > [!WARNING]  
 > Make sure all information is correct before creating the PR.
 
+You can submit the PR using one of the following methods:
+
+*Method 1: Using a remote repository and the GitHub website*
+
+```bash
+git remote set-url origin <your_remote_repository_url>
+git push origin <branch_name>
+```
+Then, open a PR manually via the GitHub frontend.
+
+*Method 2: Using the GitHub CLI (`gh`)*
+
+  1. Install the GitHub CLI if you haven't already by following the instructions at https://github.com/cli/cli#installation.
+  2. Authenticate yourself:
+
+```bash
+gh auth login
+```
+3. Create the PR:
+
 ```bash
 git checkout project-name
-gh pr create --base ecosystem  --title "project name"
+gh pr create --base ecosystem --title "project name"
 ```
