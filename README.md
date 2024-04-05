@@ -31,7 +31,7 @@ git commit -m "commit message"
 
 You can submit the PR using one of the following methods:
 
-*Method 1: Using a remote repository and the GitHub website*
+**Method 1: Using a remote repository and the GitHub website**
 
 ```bash
 git remote set-url origin <your_remote_repository_url>
@@ -39,7 +39,7 @@ git push origin <branch_name>
 ```
 Then, open a PR manually via the GitHub frontend.
 
-*Method 2: Using the GitHub CLI (`gh`)*
+**Method 2: Using the GitHub CLI (`gh`)**
 
   1. Install the GitHub CLI if you haven't already by following the instructions at https://github.com/cli/cli#installation.
   2. Authenticate yourself:
