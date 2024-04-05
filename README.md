@@ -4,13 +4,13 @@ Welcome to the KIRA Ecosystem repository! This is the place to showcase your inn
 
 To get started, establish an online presence for your project, whether it's a website or a Twitter account. This will lend credibility to your submission. Then, follow these simple steps to present your idea:
 
-## Clone this branch:
+## 1. Clone this branch:
 
 ```bash
 git clone --single-branch --branch ecosystem https://github.com/KiraCore/docs.kira.network.git
 ```
 
-## Create a new branch and edit the JSON file:
+## 2. Create a new branch and edit the JSON file:
 
 ```bash
 git checkout -b project-name
@@ -24,7 +24,7 @@ git add .
 git commit -m "commit message"
 ```
 
-## Push changes and submit PR to the `ecosystem` branch (or submit PR directly using `gh`):
+## 3. Push changes and submit PR to the `ecosystem` branch (or submit PR directly using `gh`):
 
 > [!WARNING]  
 > Make sure all information is correct before creating the PR.
