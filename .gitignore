@@ -6,7 +6,6 @@
 
 # Custom tabs
 tabs/srcpages/
-tabs/ecosystem/
 
 # Production (ignoring build folder will disable showLastUpdateTime feature)
 /build
