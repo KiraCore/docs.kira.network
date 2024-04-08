@@ -12,34 +12,10 @@ import TabItem from '@theme/TabItem';
 KIRA's Layer 2, termed Pessimistic Rolldowns, optimizes computational efficiency and transaction bundling. Our unique Virtual Finality Gadget expedites the verification of computation results, fostering a versatile platform that caters to both 'code is law' and judgment-based applications. This is more than a platform—it's a launchpad for developers to define their own rules and easily iterate on diverse applications.
 
 
-### Overview {#839416fc493f442281675d79dc421b74}
-
-
-The base layer of any blockchain application should only contain the most basic state machine code essential to securing the network, coordinating governance, and persisting users' balances. Any execution of an arbitrary code MUST take place on the dedicated execution layer independent from the core blockchain application (off-chain). In short, the base layer (on-chain) should be responsible for settlement, and the execution layer (off-chain) for computation / arbitrary code execution. 
-
-
-In our implementation of Layer 2 (responsible for arbitrary code execution), we will utilize a mechanism similar to [ethereum optimistic rollups](https://ethereum.org/en/developers/docs/scaling/optimistic-rollups/) where transactions and final results of the computation are bundled and settled on the base layer. In the case of optimistic rollups on ethereum, the final state of execution (bundle) is “optimistically” assumed to be correct and can be challenged within a “challenge period”. In our case, we will be “pessimistically” assuming the final result of the computation to be NOT correct and only settle it if either a sufficient number of verifications was performed within the “challenge period” or if any node who was “observing” the computation arrived to different results and wants to stop the settlement from happening until 2/3+ of validators verify the correctness. We will call our mechanism **pessimistic rolldowns** since we do not assume correctness and we will be rolling the state of computation down into our settlement layer in a bundled form.
-
-
-#### Deterministic Code {#9ca9c3e8b9a3403ea5161b404484b7ba}
-
-
-Whenever referring to “arbitrary code” execution we have to make clear what type of code and programming languages we can support. In the case of our pessimistic rolldowns, we will treat “code” as a black box behaving as follows `blackBoxFunc(s(t-1),x) => s(t)` where `s(t-1)` is a previous state of execution at time `t-1` and where `x` is a list of user inputs such that the new state `s(t)` will always be the same given the same inputs to our `blackBoxFunc`. In simple terms, we can say that the code within our “black box” must be [deterministic](https://en.wikipedia.org/wiki/Deterministic_system#:~:text=In%20mathematics%2C%20computer%20science%20and,starting%20condition%20or%20initial%20state.), and “whenever the same input enters the black box, its corresponding output must be exactly the same value or blob of data every single time”. As long as this single rule is preserved and our output is predictable and ordered the code can be written in any programming language and the results of computation can be verified regardless of time, or any other external conditions. 
-
-
-![](/notion_imgs/1387519270.png)
-
-
-Suppose given the previous state of execution, input from the settlement layer, and an ordered list of user input anyone can recompute the new state and output that should be settled on the base layer. In that case, execution of any deterministic code is possible with security guarantees equal to those of the base layer. Any party with a vested interest in the correct execution of the code can operate a dedicated “**fisherman**” / verifier node that can observe the execution of the deterministic code and report on-chain any doubts in regard to the final results.
-
-
-#### Virtual Finality Gadget {#ba2d35e3552244488d5aba94767a1b96}
-
-
-Since our time-invariant deterministic computational black box can be executing possibly ANY code within limitations defined before, we must provide a way for the fisherman to efficiently verify the correctness of the results. Since the problem we are trying to solve is generalized computing it is realistic to assume that there will never be a single perfect way to speed up the verification of the computation and in some cases, verification might not even adhere to the logic that can be put in the code! An example here is gaming where the judgment of a human or AI might take priority over exploitable game rules. Whenever the “code is law” principle is insufficient or not realistic to be adhered to in order to provide the expected user experience we need to provide a fast and efficient way for verification. The virtual finality gadget is a simplified deterministic machine resembling our “dApp black box” that, given the input `s(t-1)`, and output `s(t)` produces a simple “yes” or “no” answer to whether the output `s(t)` was computed correctly. The verification process can be simply re-running the application code with an input of `s(t-1)` or employing much more clever techniques, such as probabilistic checks of the transaction included in the Merkle-root bundling checkpoint used in rollups. KIRA L2 is simply a protocol and NOT an “out of the box” solution for every possible problem, the default verification means are a dumb recomputation, meanwhile, the developer gains the ability to define his own “my code is law” rules.
-
-
 #### Architecture {#d9cd842ec8294d6aa8153fc558ebfa2e}
+
+
+KIRA’s main thesis regarding decentralized applications is that the base layer (backend a.k.a blockchain) of any application should only contain the most basic state machine code essential to securing the network, coordinating governance, and persisting users' balances. Any execution of an arbitrary code MUST take place on the dedicated execution layer independent from the core blockchain application (off-chain). In short, the base layer (on-chain) should be responsible for settlement, and the execution layer (off-chain) for computation / arbitrary code execution. 
 
 
 The current stack of the network consists of the static page frontend application (MIRO), middleware (INTERX) that acts like a decentralized API, and a backend application in the form of a blockchain (SEKAI). In the L2 implementation, we will have to focus on both SEKAI and INTERX to achieve scaling since the blockchain application (SEKAI) alone can’t execute anything that is not part of a state machine code. Let’s have a look at the high-level roles that each part of the infrastructure will have:
@@ -84,6 +60,27 @@ For each application, the frontend should be a static page (e.g. hosted on IPFS)
 - discover session leader IP through data stored on L1
 - interact with a docker container through the INTERX proxy
 
+### Virtual Finality Gadget {#ba2d35e3552244488d5aba94767a1b96}
+
+
+In our implementation of Layer 2 (responsible for arbitrary code execution), we will utilize a mechanism similar to [ethereum optimistic rollups](https://ethereum.org/en/developers/docs/scaling/optimistic-rollups/) where transactions and final results of the computation are bundled and settled on the base layer. In the case of optimistic rollups on ethereum, the final state of execution (bundle) is “optimistically” assumed to be correct and can be challenged within a “challenge period”. In our case, we will be “pessimistically” assuming the final result of the computation to be NOT correct and only settle it if either a sufficient number of verifications was performed within the “challenge period” or if any node who was “observing” the computation arrived to different results and wants to stop the settlement from happening until 2/3+ of validators verify the correctness. We will call our mechanism **pessimistic rolldowns** since we do not assume correctness and we will be rolling the state of computation down into our settlement layer in a bundled form.
+
+
+Since our time-invariant deterministic computational black box can be executing possibly ANY code within limitations defined before, we must provide a way for the fisherman to efficiently verify the correctness of the results. Since the problem we are trying to solve is generalized computing it is realistic to assume that there will never be a single perfect way to speed up the verification of the computation and in some cases, verification might not even adhere to the logic that can be put in the code! An example here is gaming where the judgment of a human or AI might take priority over exploitable game rules. Whenever the “code is law” principle is insufficient or not realistic to be adhered to in order to provide the expected user experience we need to provide a fast and efficient way for verification. The virtual finality gadget is a simplified deterministic machine resembling our “dApp black box” that, given the input `s(t-1)`, and output `s(t)` produces a simple “yes” or “no” answer to whether the output `s(t)` was computed correctly. The verification process can be simply re-running the application code with an input of `s(t-1)` or employing much more clever techniques, such as probabilistic checks of the transaction included in the Merkle-root bundling checkpoint used in rollups. KIRA L2 is simply a protocol and NOT an “out of the box” solution for every possible problem, the default verification means are a dumb recomputation, meanwhile, the developer gains the ability to define his own “my code is law” rules.
+
+
+#### Non-deterministic Code {#9ca9c3e8b9a3403ea5161b404484b7ba}
+
+
+Whenever referring to “arbitrary code” execution we have to make clear what type of code and programming languages we can support. In the case of our pessimistic rolldowns, we will treat “code” as a black box behaving as follows `blackBoxFunc(s(t-1),x) => s(t)` where `s(t-1)` is a previous state of execution at time `t-1` and where `x` is a list of user inputs such that the new state `s(t)` will always be the same given the same inputs to our `blackBoxFunc`. In simple terms, we can say that the code within our “black box” must be [deterministic](https://en.wikipedia.org/wiki/Deterministic_system#:~:text=In%20mathematics%2C%20computer%20science%20and,starting%20condition%20or%20initial%20state.), and “whenever the same input enters the black box, its corresponding output must be exactly the same value or blob of data every single time”. As long as this single rule is preserved and our output is predictable and ordered the code can be written in any programming language and the results of computation can be verified regardless of time, or any other external conditions. 
+
+
+![](/notion_imgs/1387519270.png)
+
+
+Suppose given the previous state of execution, input from the settlement layer, and an ordered list of user input anyone can recompute the new state and output that should be settled on the base layer. In that case, execution of any deterministic code is possible with security guarantees equal to those of the base layer. Any party with a vested interest in the correct execution of the code can operate a dedicated “**fisherman**” / verifier node that can observe the execution of the deterministic code and report on-chain any doubts in regard to the final results.
+
+
 #### Sessions {#0a92a379be114fa7b5a91bc4a1c699b0}
 
 
@@ -126,11 +123,125 @@ The main disadvantage of the session-based replication is that our dApp might be
 _NOTE: It doesn’t really matter who proposes changes to the blockchain and propagates hashes of the session result as long as the bundle of the user inputs was signed by the leader executing it. This means that the current dApp leader can go offline even before finalizing his session and in the case of failure offload responsibility to the next leader who was live-fetching all the user input stream data. In the MVP implementation, we will only focus on the simplest cases and discard any improvements that can be done at a later stage._
 
 
-#### Incentives {#eb3f3ea623d34d0da14b60e8f6c6c5ea}
+#### Ilo / Incentives {#eb3f3ea623d34d0da14b60e8f6c6c5ea}
 
 
 Every dApp should have the ability to sustain its operations and long-term development. One of the simplest ways to achieve that is by allowing each dApp to issue its own tokens with the approval of the governance. Profits from the dApp operations (such as fees) can then be split between dApp Executors, dApp Verifiers & the dApp Token Holders. Token issuance module can at the same time be used to enable bridging of tokens from other networks without the need to use cross-chain protocols such as XCMP & IBC. However, those very XCM-protocols can be supported as “plugins” - meaning a dedicated dApp can be handling communication with Polkadot and another one with Cosmos, Ethereum, or other networks.
 
 
 To prevent spam each dApp should have a quota on the number of tokens it can issue and their max supply. By default, each dApp will have just one native (default) token. Once the default token is created by the dApp it will not be possible to remove or change its denomination or name. The purpose of the default token will be the rewards distributions and governance functions.
+
+
+---
+
+
+---
+
+
+## KIRA Layer 2: Pessimistic Rolldowns Overview {#6cb24db5a1144a2d9c0fcb4ba819eb2d}
+
+
+The core architectural principle of KIRA is the total separation of the execution and settlement. The base layer (SEKAI) handles critical functions like governance, token transfers, persistence of balances, staking, and all security-critical state machine logic. However, it does not execute arbitrary code for decentralized applications (it is not possible to deploy smart contracts on SEKAI). Instead, the execution of dApps takes place off-chain on dedicated execution layers. We refer to these off-chain applications as RollApps.
+
+
+This separation of execution and settlement is an increasingly adopted scaling approach, as increasing the throughput of a monolithic base layer beyond the constraints of the slowest nodes is fundamentally limited by physical networking factors. In a base layer blockchain requiring total ordering of transactions, data propagation delays present a significant bottleneck. As the amount of data to be shared increases, the time required to disseminate it to all nodes grows, limited by the transmission speeds between nodes. This propagation delay restricts the maximum throughput achievable, as the system must stay synchronized with even the slowest nodes required for making the consensus progress.
+
+
+An emerging solution is the concept of Data Availability Sampling (DAS), which advocates an architectural shift towards modularity. In DAS systems like Celestia, the base layer solely ensures data availability, while intensive computation occurs off-chain by separate executors. The premise is that by making data available, even lightweight verifying nodes can gain confidence in computation integrity without linearly scaling bandwidth. This allows pushing intensive workloads to more capable executors, avoiding prohibitive hardware demands on all verifiers.
+
+
+However, KIRA's thesis is that while dispersing data across nodes enables decentralized storage, it does not necessarily provide the highly available real-time access with unlimited bandwidth required for persistently storing state in high-value applications. Additionally, because DAS architectures lack economic integration between the data availability nodes and the off-chain execution environments, there is no aligned security model or notion of shared economic incentives across these separate system components.
+
+
+Beyond the fixed data replication factors which present limitations, as applications have diverse needs for availability, persistence, and access speeds, DAS's one-size-fits-all approach cannot optimally handle these varying requirements across different use cases. KIRA's design philosophy is that truly modular blockchain architecture requires flexibility to adjust the scalability-decentralization tradeoffs dynamically based on each application's specific trust assumptions and performance needs.
+
+
+This separation allows parallel scaling of computational resources, storage, and networking capabilities for each dApp, and avoid the pitfalls of executing everything on the base layer and/or by nodes that are unrelated to the application itself. Unlike optimistic rollup systems that assume computation correctness unless challenged, KIRA's Pessimistic Rolldowns operate under the assumption that all off-chain computations are potentially incorrect. Computation results from dApps must be verified through consensus among a permissionless set of Verifier nodes before being settled to the SEKAI base layer as the canonical state.
+
+
+By separating execution from settlement, scalability can be achieved by parallelizing the off-chain computations across many execution layers, while relying on the high-security decentralized consensus of the base layer for periodically settling state transitions.
+
+
+Many blockchain projects have embraced or pivoted towards similar rollup and Layer 2 scaling roadmaps to circumvent these fundamental limitations while preserving robust decentralization and security inherited from their base settlement layers.
+
+
+The core architectural principle of KIRA is the separation of the execution and settlement layers: The base layer (SEKAI) handles critical functions like governance, token transfers, staking, and all security-critical state machine logic but does not execute arbitrary code for decentralized applications (dApps). Instead, the execution of dApps takes place off-chain on dedicated execution layers. This scaling practice is widely adopted or part of part of roadmap of most chain have pivoted to a rollup-centric roadmap , this is because increasing the bandwidth of the system beyond the speed of the slowest node in the supermajority is impossible, that’s basically CAP, it comes from impossibility of propagating message over a cable among soo many nodes, its a physical constraint, the more data you have the longer it takes to share with other nodes in the network, which is pretty obvious conclusion.
+
+
+
+
+### Rollapp Architecture {#78cd352955c044d3a813e1c8298b0284}
+
+
+A RollApp consists of two key components:
+
+1. **Execution Container**: This defines the core application logic as deterministic code that can be written in any programming language. There is no requirement is that the code must be deterministic, producing the same output for a given set of inputs and previous state.
+2. **Verification Container**: This component specifies the rules and methods for efficiently verifying the correctness of the state transitions produced by the Execution Container's computations.
+
+Before a RollApp can be launched on KIRA, its code, resource requirements, and other metadata must be submitted on-chain by "Controllers" (similar to Ethereum contract deployers). A minimum bond of KEX tokens is required to prevent spam. If the bond target is crowdsourced, RollApp ownership tokens are minted and provided to liquidity providers.
+
+
+### Pessimistic Assumption and Verification {#2b94d06861bb4fdcae2f3e8e22772051}
+
+
+In contrast to optimistic rollup systems which assume computations are valid unless challenged, KIRA's Pessimistic Rolldowns pessimistically assume that all RollApp computations are potentially incorrect. The results of each computation must be verified through a decentralized consensus process before being accepted and settled on the canonical SEKAI base layer.
+
+
+To enable this verification, RollApp execution is divided into discrete sessions. In each session:
+
+1. A single Executor node, selected from the active validator set, acts as the leader. It executes the RollApp code and proposes a new state root along with any changes to account balances on SEKAI.
+2. Other Executors, as well as permissionless external "Fishermen" nodes, re-execute the RollApp using the same data streams to validate the leader's results.
+3. If at least 2/3 of the Verifiers (including all Executors) unanimously agree on the results, the state transition is finalized on SEKAI. Even a single dissenting Verifier can halt the transition.
+
+This process runs in a pipelined manner - as soon as one leader finishes their session, the next leader can immediately begin executing the subsequent session, enabling continuous uninterrupted computation.
+
+
+To optimize verification, RollApps can define their own lightweight "Virtual Finality Gadgets" as alternatives to full re-execution for efficiently validating results.
+
+
+### Continuous Computation and State Replication {#938610ac812847a5bc60ba50ea97dae2}
+
+
+One key advantages of the pessimistic session-based model is that it avoids the "halting problem" faced by monolithic smart contracts. By having multiple overlapping sessions, even if one session's results are rejected, the RollApp can continue executing with the next leader rather than fully halting.
+
+
+To maintain liveness, RollApp state must be continuously replicated from the current leader to the next in line. This is achieved through direct peer-to-peer connections where the new leader can fetch the latest state on-the-fly as the prior leader is executing. Replicated state is authenticated by the leader's signature.
+
+
+In cases where the current or next leader goes offline, any following leader can fetch replicated state from the available pool of Verifiers who have already downloaded it, ensuring continuous operation.
+
+
+### Economic Security Via Roles and Incentives {#f4ac16aa68e64a5db2e15a27653a57c8}
+
+
+There are two primary roles involved in the RollApp verification process:
+
+1. **Executors**: These are the existing KIRA validator nodes that optionally choose to run the RollApp Execution Container. One Executor is elected as the leader for each session and proposes state changes to SEKAI. Executors are held accountable by being subject to removal from their privilieged validator role and slashing of their staked income if caught misbehaving.
+2. **Fishermen**: These are permissionless verifier nodes external to the validator set. To participate as a Fishermen, they must stake a bond (default 0.1%) of the RollApp's liquidity pool tokens. This bond is slashable if they unjustifiably censor or reject a valid state transition that achieves consensus from other verifiers.
+
+This combination of accountable Executors bound to their privilieged roles, along with permissionless external Verifiers staking economic bonds, upholds KIRA's security standards and robust crypto-economic incentives even for the off-chain Layer 2 computations.
+
+
+### Enabling Features {#4fdd27bada1342509f1976c7e4ccef66}
+
+
+To support building a rich ecosystem of RollApps, KIRA provides several enabling features:
+
+
+**Multi-Party Computation (MPC)**: For RollApps requiring cooperative multi-party computations (like random number generation or threshold signatures), Verifiers can participate by sending inputs alongside users to the Execution Container.
+
+
+**Token Issuance**: Each RollApp can issue its own token (with supply caps set by governance) to fund operations and pay rewards to Executors, Verifiers, and investors/developers.
+
+
+**Interoperability**: RollApps can potentially enable trustless cross-chain interoperability by issuing tokens representing assets on other chains and using MPC for threshold signature schemes.
+
+
+**Composability**: The secure SEKAI settlement layer can act as a trusted source of canonical state to enable composing multiple RollApps while avoiding complexities like re-entrancy issues.
+
+
+Overall, KIRA's Layer 2 Pessimistic Rolldowns provide a flexible framework for building scalable yet secure decentralized applications, leveraging the benefits of Layer 1 settlement guarantees combined with scalable off-chain parallel execution validatedby decentralized economic incentives.
+
+
+Let me know if this updated overview comprehensively covers all the key points from the specifications or if you need any clarifications or additions.
 

@@ -1,5 +1,5 @@
 ---
-title: Slashing
+title: Jailing and Slashing Procedures
 sidebar_position: 1
 slug: /d6fee8b3-1948-493e-bbdd-796bcc996c2b
 ---
@@ -9,10 +9,19 @@ import TabItem from '@theme/TabItem';
 
 
 
-### Automatic Jailing & Threshold Slashing {#e8ce22a553f74f06b7645d8999be4ff4}
+### Automatic Jailing and Threshold Slashing {#e8ce22a553f74f06b7645d8999be4ff4}
 
 
-In KIRA, double-signing is the only penalized fault for consensus nodes. Consensus nodes going offline will not be punished and/or slashed as explained in the [Consensus ranks & statuses](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f). Double-signing occurs when a consensus node proposes or participates in the production of two different blocks at the same block height, creating or attempting to create a fork in the blockchain. A fork is when there are two or more valid chain histories that could be followed, and it's not immediately clear which one should be considered the "correct" chain, a.k.a canonical chain. Forks can disrupt network observers, such as light nodes, who do not have the resources to fully validate transactions and therefore rely on a single chain for their own operations. If a light node is unable to determine which fork is the canonical chain, it may be vulnerable to attacks where the same funds are spent multiple times, once on each fork. 
+:::note
+
+Consensus nodes going offline are not punished as explained in the [Consensus ranks & statuses](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f). 
+
+:::
+
+
+
+
+In KIRA, there are two potential punishments for consensus nodes - slashing of stakes and jailing. Slashing is never an automatic consequence, while jailing is an automatic punishment that only triggers for the fault of double-signing. Double-signing occurs when a consensus node proposes or participates in the production of two different blocks at the same block height, creating or attempting to create a fork in the blockchain. A fork is when there are two or more valid chain histories that could be followed, and it's not immediately clear which one should be considered the "correct" chain, a.k.a canonical chain. Forks can disrupt network observers, such as light nodes, who do not have the resources to fully validate transactions and therefore rely on a single chain for their own operations. If a light node is unable to determine which fork is the canonical chain, it may be vulnerable to attacks where the same funds are spent multiple times, once on each fork. 
 
 
 However, double-signing does not necessarily mean that a consensus node is acting maliciously and in this case slashing doesn’t actually add any security to the network. There can be various reasons for unintentional misbehavior, such as:
@@ -22,7 +31,7 @@ However, double-signing does not necessarily mean that a consensus node is actin
 - Misconfiguration
 - Accidentally deploying two nodes with the same key
 
-For this reason, KIRA does not automatically punish nodes for double-signing. Instead, they are **automatically jailed** and their fate is decided by governance later on, which may choose to unjail them, permanently remove them from the consensus node set, and/or slash them in cases of coordinated attacks. This protects delegators' staked funds and minimizes the risk of accidental loss, which is important when staking valuable assets such as Bitcoin, digital fiat, or commodities. This is possible because the consensus node set is governance-permissioned and voting power is not based on the stake backing them. This means that malicious consensus nodes can be permanently removed by other consensus nodes without being able to influence governance decisions.
+For this reason, KIRA does not automatically slash nodes for double-signing. Instead, they are **automatically jailed** and their fate is decided by governance later on, which may choose to permanently remove them from the consensus node set and slash them in cases of coordinated attacks. This process protects delegators' staked funds and minimizes the risk of accidental loss, which is important when staking valuable assets such as Bitcoin, digital fiat, or commodities. This is facilitated by KIRA's [Multistaking module](/docs/f7a0a518-e818-481c-aa8c-7c63ee1cf2ab), which decouples voting power from staked amounts, preventing any single consensus node from having outsized influence on governance decisions.
 
 
 To detect coordinated attacks, KIRA utilizes the concept of **threshold slashing**. An automatic slashing proposal only occurs if a certain number of consensus nodes double-sign within a specific time frame, with the threshold being less than 1/3 of all consensus nodes. The threshold slashing parameters, `slashing_period` (3600 seconds by default) and `max_jailed_percentage` (25 by default, i.e 25% of all active consensus nodes), are [network properties](/docs/b9b95792-b936-4603-8a46-15566f24e3c0) that can be adjusted by governance. 
@@ -33,17 +42,17 @@ To detect coordinated attacks, KIRA utilizes the concept of **threshold slashing
 
 :::note
 
-Slashing a staking pool is a permanent operation. Once a pool has been slashed, it is no longer possible to add deposits to it, and there is no way to return it to its original state.
+Slashing a staking pool is a permanent operation. Once a slashing proposal, it is no longer possible to add deposits to it, and the node is permanently excluded from the consensus set.
 
 :::
 
 
 
 
-In KIRA, slashing is governed, meaning that the decision to slash and the amount to be slashed is determined by the governance and evaluated on a case-by-case basis to prevent cases where software bugs could result in the loss of delegator assets. KIRA's governance-permissioned nature reduces the difficulty and risk of running a node, making it accessible to anyone, even those with little experience, rather than requiring expensive cloud provider setups.
+In KIRA, slashing is governed, meaning that the decision to slash is never automatic and the amount to be slashed is determined by the governance and evaluated on a case-by-case basis to prevent cases where software bugs could result in the loss of delegator assets. KIRA's governance-permissioned nature reduces the difficulty and risk of running a node, making it accessible to anyone, even those with little experience, rather than requiring expensive cloud provider setups.
 
 
-#### Jailing & Unjailing {#02d326b0daf940608fa5f61c6935e19c}
+#### Unjailing Process {#02d326b0daf940608fa5f61c6935e19c}
 
 
 If a consensus node is caught double-signing, it will be automatically jailed by the network and its status will be changed to `jailed`. This does not necessarily mean that the node will be slashed, as double-signing is not automatically considered malicious. While a node is `jailed`, it (or any governance member with proposal creation permission 20) can request to be unjailed through a governance proposal using `sekaid tx customstaking proposal unjail-validator`. This request must be made within a certain time frame, defined by the `unjail_max_time` network property (600 seconds by default). If the request is not made or accepted within this time frame, the node will become permanently jailed. The process of unjailing a node is a judgment proposal, meaning that all governance members voting permissions 21 and consensus nodes with `active` status, can vote on whether or not the node should be unjailed.
@@ -52,23 +61,29 @@ If a consensus node is caught double-signing, it will be automatically jailed by
 While it is `jailed`, a node cannot propose blocks, doesn’t accumulate rewards, cannot receive any new delegations and cannot vote on any proposals. Meanwhile other nodes can wait to see if there is evidence of double-signing collusion with other potential malicious nodes or other suspicious activity during that time window.
 
 
-#### Slashing {#76d940b87b0848bf821f753a5877002f}
+#### Slashing Proposals and Outcomes {#76d940b87b0848bf821f753a5877002f}
 
 
-If a slashing decision is being considered, all governance members with proposal creation permission 57 can rise a slashing proposal using `proposal-slash-validator` to slash and permanently remove the node from the active consensus node set. However, if `max_jailed_percentage` is reached, a slashing proposal for each incriminated consensus node is automatically rised by the network. 
+Governance members with the appropriate permissions (57) can raise a slashing proposal (`proposal-slash-validator`) to permanently remove a consensus node from the active set, either due to malicious behavior, lack of resources causing consensus issues, or any other reason deemed valid by governance. However, if a coordinated attack is detected, (i.e. `max_jailed_percentage` is reached within `slashing_period`), the network will automatically raise slashing proposals for each incriminated node.
 
 
-While a slashing proposal is ongoing, the consensus node under investigation can submit counter-evidence, or "refutation," using the `refute-slashing-proposal` method by providing an URL or CID to an IPFS resource. Once the counter-evidence is submitted, it cannot be updated again. If a governance proposal results in a slashing event, the consensus node can no longer be unjailed and its staking pool is slashed and becomes inoperative. Users can only undelegate their existing stake in this case.
+While a slashing proposal is ongoing, the consensus node under investigation can submit counter-evidence, or "refutation," using the `refute-slashing-proposal` method by providing an URL or CID to an IPFS resource. Once the counter-evidence is submitted, <u>it cannot be updated again</u>. If a governance proposal results in a slashing event, the consensus node can no longer be unjailed and its staking pool is slashed and becomes inoperative. Users can only undelegate their existing stake in this case.
 
 
 A slashing proposal can have one of the following outcome:
 
-- If the slashing proposal ends without reaching the required quorum, the consensus node is not slashed and can request to be unjailed by rising an unjailing proposal.
-- If it ends by reaching the required quorum :
-	- If the governance decided not to slash, the node is not slashed and can request to be unjailed.
-	- If the governance decided to slash, the node is slashed by the percentage determined in the proposal and cannot be unjailed.
+1. If a consensus node is not currently jailed when a slashing proposal is raised against it, the proposal outcomes are:
+	- If the proposal does not reach quorum, no further action is taken.
+	- If the proposal reaches quorum and slashing is approved, the node is permanently evicted from the consensus set and its staking pool is slashed.
+	- If the proposal reaches quorum but slashing is not approved, the node is permanently evicted but not slashed.
+2. If a consensus node is already jailed when a slashing proposal is raised, it can only request to be unjailed by raising an unjailing proposal if:
+	- The slashing proposal does not reach quorum, or
+	- The slashing proposal reaches quorum but the governance votes not to slash
 
-#### Governance Proposals Hierarchy  {#f9febb32be5f41198c8b7756fe14513c}
+In cases where the slashing proposal reaches quorum and slashing is approved, the jailed node cannot request unjailing and its staking pool will be slashed.
+
+
+#### Governance Proposal Hierarchy  {#f9febb32be5f41198c8b7756fe14513c}
 
 
 Slashing proposals take precedence over unjailing proposals. If a slashing proposal is raised for a given consensus node, any active unjailing proposals related to this node are cancelled, and no new unjailing proposals can be raised until the slashing proposal is finalized. This hierarchical relationship ensures that no unjailing action can be finalized before a slashing action, which prevents malicious consensus nodes from starting to produce blocks and receive new delegations before a potential slashing event. This helps to prevent difficult-to-handle situations where malicious nodes are able to gain an advantage before being punished for their actions or having to slash new, innocent delegators.
@@ -86,7 +101,7 @@ Jailed nodes being slashed as well as any of the others colluders listed in the 
 
 
 
-If a slashing proposal is rised, all governance members with voting permission 58 and consensus nodes with the active [status](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f), can vote by providing a slashing percentage as an input. This input is limited by the maximum slashing percentage `max_slashing_percentage`, which is a configurable parameter in the network properties. This percentage can range from 0% to 100%, with a default value of 0.5%. This limit is meant to provide delegators to have a quantifiable manner of measuring their potential risks when staking. The exact percentage of slashing for a given proposal is determined by taking the median of all votes inputs. For the slashing to occur, more than 50% of all governance members participating in the proposal process must vote with a non-zero slash.
+If a slashing proposal is raised, all governance members with voting permission 58 and consensus nodes with the active [status](/docs/9f763be9-fbd3-452f-8c6e-6e418f34856f), can vote by providing a slashing percentage as an input. This input is limited by the maximum slashing percentage `max_slashing_percentage`, which is a configurable parameter in the network properties. This percentage can range from 0% to 100%, with a default value of 0.5%. This limit is meant to provide delegators to have a quantifiable manner of measuring their potential risks when staking. The exact percentage of slashing for a given proposal is determined by taking the median of all votes inputs. For the slashing to occur, more than 50% of all governance members participating in the proposal process must vote with a non-zero slash.
 
 
 **Examples:** 
@@ -94,33 +109,6 @@ If a slashing proposal is rised, all governance members with voting permission 5
 - If the `max_slashing_percentage` is set to `0.1` and the slashing votes are: `0, 0, 0, 0, 0, 0.5, 1, 0.5, 0.25, 0.25, 0.25, 0.75, 0.01, 0, 0.25`  then the [median ](https://www.calculator.net/mean-median-mode-range-calculator.html)is `0.25` but the final slashing `10%`.
 - If the `max_slashing_percentage` is set to `0.5` and the slashing votes are: `0, 0, 0, 0.01, 0.01, 0.03, 0.03, 1, 0.04, 0.05, 0.07, 0.08, 1, 0.1` then the [median ](https://www.calculator.net/mean-median-mode-range-calculator.html)is `0.35` and the final slashing is `3.5%`.
 - If the `max_slashing_percentage` is set to `0.25` and the slashing votes are: `0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.01, 0, 0, 1`, then the [median ](https://www.calculator.net/mean-median-mode-range-calculator.html)is `0` and no slashing takes place.
-
-**Slashing proposal structure**
-
-
-```json
-{
-	"offender": "kiraXXX...XXX",           // validator address that commited a fault
-	"staking_pool_id": <integer>,
-  "misbehaviour_time": <timestamp>,      // time at which misbehaviour occured
-  "misbehaviour_type": "double-signing", //string type of evidence (in the future there can be different types)
-  "jailed_percentage": <decimal>,        // percentage of validators that was jailed (colluded)
-  "colluders": [                         // list of validator who colluded with a misbehaving validator
-		"kiraXXX...XXX",
-		"kiraXXX...XXX",
-		...,
-		"kiraXXX...XXX"
-	],
-  "refutation": "<string/url/CID>"       // validator supplied counter-evidence proving that his behaviour was not intentionally malicious,
-  "votes": [
-    { "voter": "kiraXXX...XXX", "slash": <decimal> },
-		{ "voter": "kiraXXX...XXX", "slash": 0.5 },
-		...
-		{ "voter": "kiraXXX...XXX", "slash": 0 }
-	]
-}
-```
-
 
 ### Slashing Mechanism {#579d6eefbae4479b92e5b3b202268667}
 
