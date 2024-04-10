@@ -19,19 +19,20 @@
     "serve": "docusaurus serve"
   },
   "dependencies": {
-    "nocusaurus": "1.5.3",
+    "@cookbookdev/docsbot": "^4.8.8",
     "@docusaurus/core": "3.0.1",
     "@docusaurus/preset-classic": "3.0.1",
     "@easyops-cn/docusaurus-search-local": "0.40.1",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^1.2.1",
+    "nocusaurus": "1.5.3",
     "prism-react-renderer": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-player": "^2.10.1",
-    "rimraf": "^4.1.2",
     "rehype-katex": "7.0.0",
-    "remark-math": "6.0.0"
+    "remark-math": "6.0.0",
+    "rimraf": "^4.1.2"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.0.1",
