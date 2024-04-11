@@ -66,3 +66,9 @@ yarn build      # Build Docusaurus static site
 yarn serve      # (Optional) Serve the build for additional testing before production deployment
 yarn deploy     # Deploy to GitHub Pages (needs $GIT_PASS and $GIT_USER)
 ```
+
+## Contributors
+
+<a align="center" href="https://github.com/KiraCore/docs.kira.network/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=KiraCore/docs.kira.network" />
+</a>
