@@ -38,7 +38,7 @@ const config = {
       '@docusaurus/plugin-content-docs',
       {
         id: 'docs',
-        path: 'tabs/Docs',
+        path: 'tabs/docs',
         routeBasePath: '/docs/',
         sidebarPath: undefined,
         showLastUpdateTime: true,
@@ -56,7 +56,7 @@ const config = {
       '@docusaurus/plugin-content-docs',
       {
         // id: 'learn', // omitted => default instance
-        path: 'tabs/Learn',
+        path: 'tabs/learn',
         routeBasePath: '/learn/',
         sidebarPath: undefined,
         showLastUpdateTime: true,
@@ -73,7 +73,7 @@ const config = {
       '@docusaurus/plugin-content-docs',
       {
         id: 'testnet',
-        path: 'tabs/Testnet',
+        path: 'tabs/testnet',
         routeBasePath: '/testnet/',
         sidebarPath: undefined,
         showLastUpdateTime: true,
