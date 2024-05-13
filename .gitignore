@@ -8,7 +8,8 @@
 tabs/srcpages/
 
 # Production (ignoring build folder will disable showLastUpdateTime feature)
-/build
+# /build
+/tabs
 
 # Generated files
 .docusaurus
