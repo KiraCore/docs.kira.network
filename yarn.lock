@@ -7586,10 +7586,10 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-nocusaurus@1.5.3:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/nocusaurus/-/nocusaurus-1.5.3.tgz#a238514c5f9713df78b84731bcad9b105f14163c"
-  integrity sha512-rfOVlYAxBnAgUOcMb35Mj0jb6VUdWSTIEIakTjjYJ8aKtm+iOpCR4f20FnkszjRZjsfxNw1eCQ6hKdFZ6eDAAQ==
+nocusaurus@1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/nocusaurus/-/nocusaurus-1.6.0.tgz#698d57e5f150812d9714a800628686c0a4fde9fc"
+  integrity sha512-BJWd02iqqt8hlrLtrwR1Oc9qZO4KQMxkpCNMpxqnqG+Xkfq75lhVhr/8hDlp67nK61zBzgFf04a2ZLaxU/1NIQ==
   dependencies:
     "@notionhq/client" "2.2.3"
     chalk "^4.1.2"

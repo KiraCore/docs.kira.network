@@ -6,9 +6,9 @@ export default function SearchBarWrapper(props) {
   return (
     <>
       <SearchBar {...props} />
-      <AskCookbook
+      {/* <AskCookbook
         apiKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NWVmNmUzMGIyMjE3MGZkZGNlNmZmMDciLCJpYXQiOjE3MTAxOTAxMjgsImV4cCI6MjAyNTc2NjEyOH0.8nv0LsYIESu0kFUabpQ-dGUGpJIHKjd8x_FjZy5LCB4"
-      />
+      /> */}
     </>
   );
 }
