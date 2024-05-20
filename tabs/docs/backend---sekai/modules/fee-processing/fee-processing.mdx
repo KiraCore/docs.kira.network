@@ -1,0 +1,145 @@
+---
+title: Fee processing
+sidebar_position: 1
+slug: fee-processing
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Concept {#a64d114cc8344c4894aa2a47f4cd729c}
+
+
+### Bounded Fee Range {#e2acfd45404a4165b09003c079c4c2d2}
+
+
+While KIRA does have a fee market, it operates within a bounded range set by the `min_tx_fee` and `max_tx_fee` parameters. This approach serves two purposes:
+
+- **Spam Prevention**: The `min_tx_fee` sets a lower boundary, acting as a deterrent against spam transactions, thus maintaining the network's integrity by preventing it from being overloaded with low-value or malicious transactions.
+- **User Protection**: The `max_tx_fee` acts as an upper limit, safeguarding users from inadvertently incurring excessive fees. This is particularly important in preventing significant fund losses that might occur due to mistakenly high fee inputs during transaction submission.
+
+## Parameters {#fd6b338759ce4efc92746dd86f6ddb8c}
+
+
+| **NAME**             | **TYPE** | **EXAMPLE**       | **DESCRIPTION**                                                                                                                                                             |
+| -------------------- | -------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `transaction_type`   | `string` | `submit-proposal` | The specific transaction type the following parameters apply to. All existing types can be found [**here**](https://github.com/KiraCore/sekai/blob/master/types/Msg.go#L9). |
+| `execution_fee`      | `uint64` | `100`             | The required fee for users to successfully execute this particular transaction type.                                                                                        |
+| `failure_fee`        | `uint64` | `50`              | The fee users must pay in case the transaction execution is unsuccessful.                                                                                                   |
+| `timeout`            | `uint64` | `300`             | The time duration (in seconds) after which the transaction execution will be considered as failed if not completed.                                                         |
+| `default_parameters` | `uint64` | `42`              | The default input values that the corresponding transaction function will utilize before execution.                                                                         |
+
+
+## CLI Syntax & Examples {#724094a9815c4ad3ade4bbe55757b84b}
+
+
+:::note
+
+_Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the_ [_Roles & Permissions_](/docs/backend---sekai/modules/governance/roles--permissions) _documentation for more details._ _`$SIGNER`_ _represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as_ _`$FLAGS_TX`_ _and_ _`$FLAGS_QR`__, see the_  _section_
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#94b4014034de4cf2b6a908adec732def}
+
+
+| `set-execution-fee` | Update execution fee parameters for different transaction types. |
+| ------------------- | ---------------------------------------------------------------- |
+
+
+#### Updating Execution Fees With Sudo Permission {#7f04fc7ef9574a42822d4a1ff95796b0}
+
+
+The `set-execution-fee` CLI command allows accounts with sudo permission 7 to modify execution fee parameters for different transaction types.
+
+
+**Flags**
+
+- `$TX_TYPE`: The type of transaction for which the fees are being updated.
+- **`$`**`EXECUTION_FEE`: The fee for successful execution of the transaction.
+- `$FAILURE_FEE`: The fee for failed execution of the transaction.
+- `$TX_TIMEOUT`: The timeout duration for the transaction.
+
+```shell
+sekaid tx customgov set-execution-fee \
+--from=$SIGNER $FLAGS_TX \
+--transaction_type=$TX_TYPE \
+--execution_fee=$EXECUTION_FEE \
+--failure_fee=$FAILURE_FEE \
+--timeout=$TX_TIMEOUT
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#111168574d0749cf9e568b9864bbf5cb}
+
+
+| `execution-fee` | Retrieve execution fee parameters for a specified transaction type. |
+| --------------- | ------------------------------------------------------------------- |
+
+
+#### Query Execution Fees {#826587771d4d41ee8cb94b8f55770fe0}
+
+
+The `execution-fee` CLI command is used to retrieve the execution fee parameters for a specified transaction type.
+
+
+**Args**
+
+- `$TRANSACTION_TYPE`: The type of transaction for which to query the execution fees.
+
+```shell
+sekaid query customgov execution-fee $TRANSACTION_TYPE $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#4a1056edcb7643c1bfc80fa905a8fee1}
+
+
+| `set-execution-fee` | Update execution fee parameters for different transaction types. |
+| ------------------- | ---------------------------------------------------------------- |
+
+
+#### Updating Execution Fees {#1ad7e28b92154c648d688f9baf12b4b4}
+
+
+The `set-execution-fee` CLI command allows accounts with permission XXX to modify execution fee parameters for different transaction types.
+
+
+**Flags**
+
+- `$TX_TYPE`: The type of transaction for which the fees are being updated.
+- **`$`**`EXECUTION_FEE`: The fee for successful execution of the transaction.
+- `$FAILURE_FEE`: The fee for failed execution of the transaction.
+- `$TX_TIMEOUT`: The timeout duration for the transaction.
+
+```shell
+sekaid tx gov set-execution-fee \
+--from=$SIGNER $FLAGS_TX \
+--transaction_type=$TX_TYPE \
+--execution_fee=$EXECUTION_FEE \
+--failure_fee=$FAILURE_FEE \
+--timeout=$TX_TIMEOUT
+```
+
+
+
+</TabItem></Tabs>
+

@@ -1,0 +1,109 @@
+---
+title: Bash-utils
+sidebar_position: 1
+slug: bash-utils
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+[https://github.com/KiraCore/tools/releases](https://github.com/KiraCore/tools/releases)
+
+
+Bash-utils is a collection of utility functions and aliases for Bash shell scripts developed specifically for KIRA to streamline and simplify the process of executing tasks within the network. It provides various functions for managing environment variables, displaying information, and handling errors.
+
+
+:::caution
+
+The prerequisite to securely install BU is [COSIGN tool](/docs/tools/cosign) that will guarantee the integrity of the files. It MUST be installed and KIRA’s public key added before proceeding.
+
+:::
+
+
+
+
+:::note
+
+Always source /etc/profile with `. /etc/profile` when starting a new terminal to use BU. 
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="linux" label="Linux">
+
+
+## Linux {#437350f2feaf480b8319b68a2666e5dc}
+
+
+```bash
+# assume root permissions
+sudo -s && . /etc/profile
+
+# Install essential dependencies
+apt-get install -y wget
+
+# Define version of BU you want to install
+TOOLS_VERSION="v0.3.46"
+
+# Download BU script
+if [ -z "$KIRA_COSIGN_PUB" ] ; then
+  echo "ERROR: KIRA_COSIGN_PUB variable is not set. Please refer to cosign installation to add KIRA's public key path as variable."
+  exit
+fi && \
+cd /tmp && FILE_NAME="bash-utils.sh" && rm -rfv ./$FILE_NAME ./${FILE_NAME}.sig && \
+ UBUNTU_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36" && \
+ wget --user-agent="$UBUNTU_AGENT" "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}" -O ./$FILE_NAME && \
+ wget --user-agent="$UBUNTU_AGENT" "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}.sig" -O ./${FILE_NAME}.sig
+
+# Verify cosign release
+cosign verify-blob --key "$KIRA_COSIGN_PUB" --signature "/tmp/${FILE_NAME}.sig" "/tmp/$FILE_NAME" --insecure-ignore-tlog --insecure-ignore-sct
+
+# Install BU
+chmod +x ./$FILE_NAME && ./$FILE_NAME bashUtilsSetup && ./etc/profile
+
+# Verify version of BU 
+bu bashUtilsVersion
+```
+
+
+
+</TabItem>
+<TabItem value="macos" label="MacOS">
+
+
+## Macos {#fd030ddb84a245fda72e29dc7ddec525}
+
+
+:::note
+
+Unfortunately, certain commands within the bash-utils tool may not behave properly on macOS due to slight variations in command behavior, such as the 'sed' command, which exhibit differences between Mac and Linux platforms. If you wish to contribute in addressing these compatibility issues, contact us !
+
+:::
+
+
+
+
+```bash
+sudo -s && . /etc/profile
+
+TOOLS_VERSION="v0.3.46" && FILE_NAME="bash-utils.sh" && \
+if [ -z "$KIRA_COSIGN_PUB" ] ; then
+  echo "ERROR: KIRA_COSIGN_PUB variable is not set. Please refer to cosign installation to add KIRA's public key path as variable."
+  exit
+fi && \
+wget "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}" -O ./$FILE_NAME && \
+wget "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}.sig" -O ./${FILE_NAME}.sig && \
+cosign verify-blob --key="$KIRA_COSIGN_PUB" --signature=./${FILE_NAME}.sig ./$FILE_NAME && \
+chmod -v 555 ./$FILE_NAME && ./$FILE_NAME bashUtilsSetup "/var/kiraglob" && . /etc/profile && \
+echo "Installed bash-utils $(bash-utils bashUtilsVersion)"
+```
+
+
+
+</TabItem></Tabs>
+

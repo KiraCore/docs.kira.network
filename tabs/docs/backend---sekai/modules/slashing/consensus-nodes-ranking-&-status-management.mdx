@@ -1,0 +1,243 @@
+---
+title: Consensus Nodes Ranking & Status Management
+sidebar_position: 2
+slug: consensus-nodes-ranking--status-management
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+### Ranking System {#729611044b78402fbb895dd8d0689f8a}
+
+
+:::note
+
+The rank value is a measure of a node's performance and is used to inform the governance system about the node's activity. It does not affect the operation or future revenue of the node, but it may impact the visibility of the node in the public ranking system on the frontend application.
+
+:::
+
+
+
+
+KIRA’s Consensus nodes ranking system and associated node statuses operate on block production and missed blocks counter, and are measured through two performance indicators, `streak` and `rank`.
+
+- The `streak` functions like a short-term performance indicator, showing the sequential number of successful block proposals by a consensus node in real time. This is akin to kill-streaks in video games. A failure to propose a single block resets the `streak` to zero and increases the node's `mischance_confidence` counter.
+- In contrast, the `rank` acts as a long-term performance indicator, reflecting the maximum `streak` a validator has ever achieved. It is the main performance indicator.
+
+While a node's `rank` may decrease due to missed blocks, the ranking system accommodates for the unpredictability of block production chances and waits until a node misses a `mischance_confidence` number of blocks before considering the node `offline`. When a node's status becomes `offline`, each subsequent missed block, or `mischance` counter, decreases the node's `rank` by a constant amount, `mischance_rank_decrease_amount` (set to 10 by default). However, if a node's status remains `offline` and their `mischance` score surpasses the `max_mischance` value, defined in the network properties, the system will categorize the node as `inactive`. An `inactive` status triggers a decrease in the node's `rank` by a percentage amount, defined by `inactive_rank_decrease_percent` (set to 50% by default).
+
+
+Consequently, `inactive` consensus nodes are removed from the consensus node set and are barred from producing blocks. They can return to active status only after a configurable period called `downtime_inactive_duration`, which is defined in the network properties. This time delay prevents inactive nodes from immediately regaining access to block rewards, serving as a penalty for extended downtime without the need for slashing. Once the `downtime_inactive_duration` has passed, node operators can signal readiness to produce blocks again, having resolved their internal issues, by using the `activate` CLI.
+
+
+The governance can adjust all these network properties to ensure a probabilistically fair decrease in a node's rank and to promote high uptime through gamification.
+
+
+#### Ranking Reset {#859920756f1c4be2a75ab4cdbb9e07b4}
+
+
+It may be useful for the governance to reset all ranks simultaneously (e.g., incentivized games, etc.). For this purpose, the governance module has a dedicated proposal and corresponding voting permission.
+
+
+### Node Statuses {#d8558d49b23249b192b6fa0e826d0b63}
+
+
+Depending on it’s performance and activity, a consensus node can have one of the following statuses:
+
+
+| STATUS     | DESCRIPTION                                                                                                                                                                        |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `active`   | Validator is actively participating in consensus, proposing and signing blocks. Every produced block increases validator rank by `1`                                               |
+| `inactive` | Validator stopped producing blocks and didn't signal to the network any planned maintenance. As the result his rank got slashed.                                                   |
+| `paused`   | Validator node entered maintenance node and is not producing blocks. The rank is not impacted.                                                                                     |
+| `jailed`   | Validator is jailed (permanently) due to double signing fault. Governance must investigate reason for the fault and unjail node via [proposal](/docs/backend---sekai/modules/slashing/jailing--slashing-procedures). |
+
+
+#### Pausing Node {#7c60dcc14b8b4b8cbfdfaae7337efff6}
+
+
+For planned maintenance where a consensus node must be offline, it can use the `pause` CLI to remove itself from the consensus node set. This will prevent the its rank from being impacted and the node will not be inactivated. When it is back online, the consensus node can use the `unpause` CLI to signal to the network that it is ready to rejoin the consensus node set.
+
+
+### Initial Framework for Determining Optimal Ranking System Values {#97a5346b720741029b9847fab7461550}
+
+
+Determining the optimal values for `max_mischance` and `inactive_rank_decrease_percent` depends on various factors, including the specific network conditions, the desired level of decentralization, average time for automatic recovery and the overall network performance. Based on the average block production rate, expected node uptime, and network latency of existing Cosmos ecosystem chains, the following initial values are proposed.
+
+- `mischance_confidence`: In the Cosmos ecosystem, the average block time is around 5-7 seconds. To give a node a reasonable amount of time to recover from temporary issues, `mischance_confidence` could be set to a value equivalent to 10 minutes, such as 120 blocks (assuming a 5-second block time). This would allow nodes to recover from short-term issues without being unfairly penalized.
+- `max_mischance`: Assuming an expected node uptime of 99% per day (i.e 14.4min of allowed downtime per day) and considering network latency, we can initially set `max_mischance` to 60 blocks (5min) . This means that, after missing 120 blocks, if a node misses another 60 consecutive blocks, its status will change to being `inactive` and its rank will be slashed.
+- `inactive_rank_decrease_percent`: To create a competitive environment that encourages node operators to maintain high performance, we can set the `inactive_rank_decrease_percent` to 20%. This value is significant enough to incentivize operators to address any issues leading to downtime quickly, without being overly punitive for temporary issues.
+
+## Parameters {#ec9a31c9c0864679b173c41bd2f6e9b8}
+
+
+#### Validator Signing Info {#036395957b234988b35849522764489c}
+
+
+| **NAME**                  | **TYPE**                    | **EXAMPLE**            | **DESCRIPTION**                                                                                           |
+| ------------------------- | --------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| `address`                 | `string`                    | `kira1yq8l`...         | The address of the consensus node.                                                                        |
+| `start_height`            | `int64`                     | `1500`                 | The height at which the consensus node was first a candidate OR was activated.                            |
+| `inactive_until`          | `google.protobuf.Timestamp` | `2023-05-09T00:00:00Z` | The timestamp consensus node has to wait to re-activate.                                                  |
+| `missed_blocks_counter`   | `int64`                     | `0`                    | Total missed blocks counter.                                                                              |
+| `produced_blocks_counter` | `int64`                     | `4500`                 | Total produced blocks counter.                                                                            |
+| `mischance_confidence`    | `int64`                     | `0`                    | Mischance confidence counter - counts when node is in `active` status.                                    |
+| `mischance`               | `int64`                     | `0`                    | Missed blocks counter - counts after `mischance_confidence` is reached and if node is in `active` status. |
+| `last_present_block`      | `int64`                     | `1575648`              | The last block height signed by the consensus node.                                                       |
+
+
+#### Consensus Nodes Rank {#dc9234b0f7b04e8fac5bf3b6ec2e909b}
+
+
+Nodes rank and statuses are stored in the `x/staking` module and can be queried using [Consensus nodes](/docs/backend---sekai/modules/multistaking/consensus-nodes) CLI. 
+
+
+| **NAME**  | **TYPE**         | **EXAMPLE**                   | **DESCRIPTION**                                                                                                                                                                                                                                  |
+| --------- | ---------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `val_key` | `sdk.ValAddress` | `kiravaloper1yq8lg...`        | The validator key, casted to a Cosmos SDK `ValAddress` type.                                                                                                                                                                                     |
+| `pub_key` | `sdk.PubKey`     | `kiravalconspub1zcjduepqw...` | The public key of the validator, accepted as a `cosmos.crypto.PubKey` interface.                                                                                                                                                                 |
+| `status`  | `string`         | `active`                      | The current status of the validator.                                                                                                                                                                                                             |
+| `rank`    | `int64`          | `112`                         | A long-term statistic implying the longest streak that a validator ever achieved. This helps to judge real-life performance and reliability of validators.                                                                                       |
+| `streak`  | `int64`          | `10`                          | The consecutive number of times that a given validator successfully proposed a block (since the last time they failed) that was accepted into the blockchain state. Similar to kill-streaks in video games, this implies short-term performance. |
+
+
+## CLI Syntax & Examples {#f6aa9bcf8b9548e08851342e55526bfa}
+
+
+:::note
+
+Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the [Roles & Permissions](/docs/backend---sekai/modules/governance/roles--permissions) documentation for more details. 
+
+:::
+
+
+
+
+:::note
+
+`$SIGNER` represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as `$FLAGS_TX` and `$FLAGS_QR`, see the [CLI Guide](/docs/backend---sekai/cli-guide) page.
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#45932a0c158245b491ff1bfa70861f3a}
+
+
+| `pause`    | Pause a consensus node.                                       |
+| ---------- | ------------------------------------------------------------- |
+| `unpause`  | Unpause a consensus node.                                     |
+| `activate` | Activate a consensus node previously inactivated for downtime |
+
+
+#### Pause Validator {#93a2e9f8d825484bb2cd185bc9fdd4cf}
+
+
+```bash
+sekaid tx customslashing pause \
+--from=$SIGNER $FLAGS_TX
+```
+
+
+#### Unpause Validator {#bb6f0ac5e8b84c06b9254a10d7b17cda}
+
+
+```bash
+sekaid tx customslashing unpause \
+--from=$SIGNER $FLAGS_TX
+```
+
+
+#### Activating an Inactive Node  {#48d5192f5c3142b399d5396a637e7304}
+
+
+```bash
+sekaid tx customslashing activate \
+--from=$SIGNER $FLAGS_TX
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#c752b88fcac34284994386908ab948c0}
+
+
+| `active-staking-pools`   | Query active staking pools.   |
+| ------------------------ | ----------------------------- |
+| `inactive-staking-pools` | Query inactive staking pools. |
+
+
+:::note
+
+Nodes rank and statuses can be queried using the [Consensus node’s dedicated queries](/docs/backend---sekai/modules/multistaking/consensus-nodes). 
+
+:::
+
+
+
+
+#### Active Staking Pools {#690a7c0801d741fe998d1384a038f922}
+
+
+List all staking pools currently active and accepting delegations.
+
+
+```bash
+sekaid query customslashing active-staking-pools $FLAGS_QR | jq
+```
+
+
+#### Inactive Staking Pools {#3458f5bf4ec9483888609b767a139118}
+
+
+List staking pools that are inactive and cannot accept delegations.
+
+
+```bash
+sekaid query customslashing inactive-staking-pools $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#9304f58d70a74166a823067103118abe}
+
+
+| `proposal-reset-whole-validator-rank` | Proposes to reset the ranking of all validators |
+| ------------------------------------- | ----------------------------------------------- |
+
+
+#### Reset All Validators Ranks {#8dfa1ec3611d407a8074848dba5f9cd3}
+
+
+The CLI command, `proposal-reset-whole-validator-rank`, is utilized to raise a governance proposal for resetting the whole validator rank.
+
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The description of the proposal.
+
+```bash
+sekaid tx custom proposal-reset-whole-validator-rank \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION
+```
+
+
+
+</TabItem></Tabs>
+

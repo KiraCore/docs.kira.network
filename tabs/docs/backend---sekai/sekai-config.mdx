@@ -1,0 +1,94 @@
+---
+title: Configuration
+sidebar_position: 3
+slug: sekai-config
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+SEKAI is a blockchain network that allows users to query its state via RPC (Remote Procedure Call) and GRPC (gRPC Remote Procedure Call) protocols, as well as propagate blocks through the P2P (Peer-to-Peer) protocol. It is also possible to monitor SEKAI through a dedicated Prometheus port.
+
+
+### Repository {#fbd1c90fa73e4371a1acd39772b84100}
+
+
+The Github repository for SEKAI can be found [**here**](https://github.com/kiracore/sekai).
+
+
+### Default Ports {#0418932ac4a142c684e702ced8579f8d}
+
+
+SEKAI exposes a metadata endpoint to help communicate with the blockchain application via RPC. This endpoint provides information on the types of transactions that can be sent on-chain.
+
+- Transaction types metadata RPC endpoint:
+	- `<IP>:26657/metadata`
+- Tendermint RPC native endpoints:
+	- [**Documentation Reference**](https://docs.tendermint.com/v0.34/rpc/)
+
+In addition to the RPC and P2P ports, SEKAI also has a dedicated Prometheus port for monitoring purposes. 
+The specific port number for this port is not provided in the given information.
+
+
+### Node Configuration Files and Directory {#87c245337c464ea183434303aebfe46b}
+
+
+By default, config and data files are stored in the folder located at the `~/.sekaid` directory which can be changed by using the `--home` flag. It is possible to have multiple home directories that each represent a different blockchain.
+
+
+```text
+.# ~/.sekaid
+  ├── data/# Contains the databases used by the node.
+  └── config/
+      ├── app.toml# Application-related configuration file.
+      ├── config.toml# Tendermint-related configuration file.
+	    ├── client.toml# Client-related configuration file.
+      ├── genesis.json# The genesis file.
+      ├── node_key.json# Private key to use for node authentication in the p2p protocol.
+      └── priv_validator_key.json# Private key to use as a validator in the consensus protocol.
+```
+
+
+The Cosmos SDK automatically generates two configuration files inside `~/.sekaid/config`
+
+- **config.toml**: This file contains the configuration for the Tendermint consensus engine, including the node's validator address, the minimum gas prices, and the node's peers. In addition, the config.toml file also specifies the location of the data and log directories, as well as the p2p and rpc listen addresses. It may also contain configuration options for the Tendermint WebSocket (WS) server and the ABCI application.
+- **app.toml**: This file contains the configuration for the SEKAI blockchain application such as state pruning strategies, telemetry, gRPC and REST servers configuration, state sync...
+
+### Client Configuration {#3d228313019c4d5e86a4d08816eeaeca}
+
+
+We can view the default client config setting by using the `sekaid config` command:
+
+
+```bash
+sekaid config
+{
+	"chain-id": "",
+	"keyring-backend": "os",
+	"output": "text",
+	"node": "tcp://localhost:26657",
+	"broadcast-mode": "sync"
+}
+```
+
+
+Changes to the default settings can be made according to users preferences. For example, the chain identifier can be changed from a blank name by using:
+
+
+```bash
+sekaid config "chain-id" sekai_1
+sekaid config
+{
+	"chain-id": "sekai_1",
+	"keyring-backend": "os",
+	"output": "text",
+	"node": "tcp://localhost:26657",
+	"broadcast-mode": "sync"
+}
+```
+
+
+Other values can be changed in the same manner. Alternatively, modification can be made directly in the `client.toml` file.
+

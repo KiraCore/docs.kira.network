@@ -1,0 +1,248 @@
+---
+title: Key Management
+sidebar_position: 4
+slug: key-management
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+If it ever happened to you that you forgot to save your validator signing key and/or wanted to recover your node together with its original Node Id but the CLI does not support that? fear not. In this document, we provide a reliable secret derivation method that will allow you to always recover all your secrets using just a single mnemonic and stay compatible with the KIRA Manager (KM) tool.
+
+
+:::note
+
+_Key management with the testnet tool KIRA Manager (KM) should NOT be considered safe nor used on the mainnet as all mnemonics remain unencrypted on your device and can easily be compromised due to human fault or any malicious process that is already running on your device. Despite the significant vulnerability present in the KM we want to allow everyone to accustom themselves with the KIRA stack seamlessly before designing and building their own infrastructure. If you choose to run KM on the mainnet you are doing so at your own responsibility and in such case we highly encourage self-hosting in your own home environment using open-source hardware such as Raspberry Pi._
+
+:::
+
+
+
+
+## Key Types {#9ec6a525a6204eb1a75f22b7d000f052}
+
+
+On the testnet, you will find yourself in possession of at least 4 types of cryptographic secrets:
+
+- **Validator Address Key** - In order to participate as a new testnet validator, you must generate and safeguard the initial secret key, which is used to derive your public KIRA address.
+	- type: `secp256k1`
+- **Validator Signing Key** - When your node is started for the first time `sekai` automatically generates a so-called validator signing key. When you claim a validator seat the public key derived from this secret becomes associated with your validator. This key is used to sign blocks that your validator node will be proposing or agreeing on with other nodes in the consensus.
+	- type: `ed25519`
+	- location: `$SEKAID_HOME/config/priv_validator_key.json`
+- **Node Key** - When your `sekai` node communicates with other nodes via P2P it authenticates using a node key and a corresponding node id derived from this secret.
+	- type: `ed25519`
+	- location: `$SEKAID_HOME/config/node_key.json`
+- **INTERX Signing Key** - This key is used by the interx nodes to prove that messages sent to the client originate from the trusted node operator without the need for HTTPS, its native form is a mnemonic supplied in the configuration file.
+	- type: `secp256k1`
+
+## Mnemonic Derivation {#8f8624aa1ae34cb5a4c84b9f55fbcb68}
+
+
+For the sake of convenience, each type of KIRA node deployed through KM derives a specific set of mnemonics from a `MASTER_MNEMONIC` in a deterministic manner, utilizing our proprietary seed words generation tool known as bip39gen. This tool is readily available in the [tools repository on GitHub](https://github.com/KiraCore/tools/releases), with pre-compiled binaries for `Linux`, `Mac`, and `Windows` available on the release page. Rather than requiring installation, these binaries can simply be downloaded and executed on any operating system. To ensure the authenticity of the file, we strongly suggest verifying the `sha256` hash and/or `cosign` signature that is provided alongside the official release.
+
+
+:::📌
+
+_The prerequisite to install bip39gen is Bash Utils (BU) tool, please refer to_ [_BU Setup page_](/testnet/bu-setup) _before proceeding._
+
+:::
+
+
+
+
+**Secure** **`bip39gen`** **Setup**
+
+
+```bash
+# assume root permissions
+sudo -s
+
+# Download and install bip39gen
+TOOLS_VERSION="v0.3.42" && TOOL_NAME="bip39gen" && cd /tmp && \
+ safeWget ./${TOOL_NAME}.deb "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${TOOL_NAME}-$(getPlatform)-$(getArch).deb" \
+ "QmeqFDLGfwoWgCy2ZEFXerVC5XW8c5xgRyhK5bLArBr2ue" && rm -rfv ./$TOOL_NAME && dpkg-deb -x ./${TOOL_NAME}.deb ./$TOOL_NAME && \
+ cp -fv ./$TOOL_NAME/bin/$TOOL_NAME /usr/local/bin/$TOOL_NAME && chmod +x "/usr/local/bin/$TOOL_NAME" && \
+ rm -rfv ./$TOOL_NAME ./${TOOL_NAME}.deb
+
+# Check bip39gen version
+bip39gen version
+```
+
+
+The `MASTER_MNEMONIC` is the only secret you will ever need to remember. All other secrets are derived from it such as your whitelisted validator KIRA address, validator signing key, node keys, faucet address, interx signing key, and so on. Our derivation method simply takes a `sha256` hash of your `MASTER_MNEMONIC` string combined with a human-readable suffix and supplies the `sha256` to the `bip39gen` tool as raw entropy. Please see the table below to determine how to recreate your desired mnemonic entropy:
+
+- Validator controller, original KIRA address:
+	- `echo -n "$MASTER_MNEMONIC ; validator addr"`
+- Validator signing key mnemonic:
+	- `echo -n "$MASTER_MNEMONIC ; validator val"`
+- Validator node key:
+	- `echo -n "$MASTER_MNEMONIC ; validator node"`
+- Sentry node key:
+	- `echo -n "$MASTER_MNEMONIC ; sentry node"`
+- Seed node key:
+	- `echo -n "$MASTER_MNEMONIC ; seed node"`
+- INTERX message signing key & default faucet KIRA address:
+	- `echo -n "$MASTER_MNEMONIC ; signer addr"`
+- Default test KIRA address:
+	- `echo -n "$MASTER_MNEMONIC ; test addr"`
+
+:::📌
+
+_WARNING!!! Before the hash function is applied all strings MUST be lowercase and all white spaces MUST be removed, in bash this can be ensured by using_ _`tr '[:upper:]' '[:lower:]' | tr -d '[:space:]'`_ _command._
+
+:::
+
+
+
+
+**Example of INTERX faucet mnemonic & message signing key recovery**
+
+
+```bash
+# Your validator address mnemonic 
+MASTER_MNEMONIC="eagle gap major artwork napkin hover gate illness ball distance awful mountain salute guard scare edit scorpion praise trust potato cotton crazy unique result"
+
+# Entropy derived from the validator address mnemonic 
+ENTROPY_HEX=$(echo -n "$MASTER_MNEMONIC ; signer addr" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]' | sha256sum | awk '{ print $1 }' | xargs)
+
+# Default INTERX mnemonic derivation
+bip39gen mnemonic --length=24 --raw-entropy="0x${ENTROPY_HEX}" --verbose=false --hex=true
+# > dry dilemma fat polar surround monkey tragic record cement mechanic picture receive theory yard jar entry frost already tool fabric belt afraid inhale wasp
+```
+
+
+## Signing & Node Key Derivation {#c2e623903b9d4b329dc8060d1e24a4df}
+
+
+Validator signing keys and node ID keys as opposed to mnemonics corresponding to your public KIRA addresses have a binary format and must be generated from mnemonics that are `MASTER_MNEMONIC` derived using a dedicated tool [validator-key-gen available in the tools repository on GitHub](https://github.com/KiraCore/tools/releases). The `validator-key-gen` can generate a validator signing key if `--valkey=<file>` flag is provided, node key if `--nodekey=<file>` is provided, and calculate node ID if `--keyid=<file>` flag is set. 
+
+
+**Secure** **`validator-key-gen`** **Setup**
+
+
+```bash
+# Download and install validator-key-gen
+TOOLS_VERSION="v0.3.42" && TOOL_NAME="validator-key-gen" && cd /tmp && \
+ safeWget ./${TOOL_NAME}.deb "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${TOOL_NAME}-$(getPlatform)-$(getArch).deb" \
+ "QmeqFDLGfwoWgCy2ZEFXerVC5XW8c5xgRyhK5bLArBr2ue" && rm -rfv ./$TOOL_NAME && dpkg-deb -x ./${TOOL_NAME}.deb ./$TOOL_NAME && \
+ cp -fv ./$TOOL_NAME/bin/$TOOL_NAME /usr/local/bin/$TOOL_NAME && chmod +x "/usr/local/bin/$TOOL_NAME" && \
+ rm -rfv ./$TOOL_NAME ./${TOOL_NAME}.deb
+
+# Check validator-key-gen version
+validator-key-gen --version
+```
+
+
+**Example Validator Signing Key Recovery**
+
+
+```bash
+# Your example master mnemonic 
+MASTER_MNEMONIC="eagle gap major artwork napkin hover gate illness ball distance awful mountain salute guard scare edit scorpion praise trust potato cotton crazy unique result"
+
+# Entropy derived from the master mnemonic
+ENTROPY_HEX=$(echo -n "${MASTER_MNEMONIC} ; validator val" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]' | sha256sum | awk '{ print $1 }' | xargs)
+
+# Derivation of the validator signing key mnemonic
+VALIDATOR_VAL_MNEMONIC=$(bip39gen mnemonic --length=24 --raw-entropy="0x${ENTROPY_HEX}" --verbose=false --hex=true)
+# > grain patch soccer child duty excite road soup quality cherry close record corn analyst ready hundred quote uphold oxygen eagle drive album practice brain
+
+# Generating validator signing key
+validator-key-gen --mnemonic="$VALIDATOR_VAL_MNEMONIC" --valkey="/tmp/priv_validator_key.json"
+
+# Preview example signing key
+cat "/tmp/priv_validator_key.json" 
+# Signing key file example >
+{
+  "address": "22E9E935ED027D3A7B3B2B6C8344F9E97C56995F",
+  "pub_key": {
+    "type": "tendermint/PubKeyEd25519",
+    "value": "xNca/lGP3wFjlylTInAW8pEuIVwcab9gjrhpuE+k0Jk="
+  },
+  "priv_key": {
+    "type": "tendermint/PrivKeyEd25519",
+    "value": "mv7s3XNOcYAkymyfAt0ODTGdH3pXOyfEZV5QTyG1pXnE1xr+UY/fAWOXKVMicBbykS4hXBxpv2COuGm4T6TQmQ=="
+  }
+}
+```
+
+
+**Example Sentry Node Key Recovery**
+
+
+```bash
+# Your validator address mnemonic 
+MASTER_MNEMONIC="eagle gap major artwork napkin hover gate illness ball distance awful mountain salute guard scare edit scorpion praise trust potato cotton crazy unique result"
+
+# Entropy derived from the master mnemonic
+ENTROPY_HEX=$(echo -n "$MASTER_MNEMONIC ; sentry node" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]' | sha256sum | awk '{ print $1 }' | xargs)
+
+# Derivation of the validator signing key mnemonic
+SENTRY_NODE_MNEMONIC=$(bip39gen mnemonic --length=24 --raw-entropy="0x${ENTROPY_HEX}" --verbose=false --hex=true)
+# > test vibrant interest grape digital moment deposit trophy major priority foam assault quote deer basket awake blanket feature outer dress receive polar oxygen search
+
+# Generate sentry node key
+validator-key-gen --mnemonic="$SENTRY_NODE_MNEMONIC" --nodekey="/tmp/node_key.json"
+
+# Preview example node key
+cat "/tmp/node_key.json" 
+# Node key file example >
+{
+  "priv_key": {
+    "type": "tendermint/PrivKeyEd25519",
+    "value": "fmuBCSfOls4anYGHl8bAwPsJ3buTaejIX4um5ZgFH9tUEoET7LwoAHxh2/xkv/a37oqPouHCEeV2f4+VvCEESA=="
+  }
+}
+```
+
+
+## Public Address Derivation {#e1756f56cea54395b43a445b1a189159}
+
+
+If you want to verify that your master mnemonic or a mnemonic derived from the master mnemonic will correspond to the correct public KIRA address or Node Id, you can do so utilizing a `validator-key-gen`. 
+
+
+**Example KIRA Address Derivation**
+
+
+```bash
+# Your example master mnemonic 
+MASTER_MNEMONIC="eagle gap major artwork napkin hover gate illness ball distance awful mountain salute guard scare edit scorpion praise trust potato cotton crazy unique result"
+
+# Entropy derived from the master mnemonic
+ENTROPY_HEX=$(echo -n "${MASTER_MNEMONIC} ; validator addr" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]' | sha256sum | awk '{ print $1 }' | xargs)
+
+# Derivation of the validator address mnemonic
+VALIDATOR_ADDR_MNEMONIC=$(bip39gen mnemonic --length=24 --raw-entropy="0x${ENTROPY_HEX}" --verbose=false --hex=true)
+# > moment autumn couple digital century before consider left cargo quick execute canoe author chronic hurt blast quantum blind slim throw prefer range differ squirrel
+
+# Validator KIRA address public key
+validator-key-gen --mnemonic="$VALIDATOR_ADDR_MNEMONIC" --accadr=true --prefix=kira --path="44'/118'/0'/0/0"
+# > kira1yrhm3aap6wpq2dtysquy5tau8aqpenfzjcuuqp
+```
+
+
+**Example Node Id Derivation**
+
+
+```bash
+# Your example master mnemonic 
+MASTER_MNEMONIC="eagle gap major artwork napkin hover gate illness ball distance awful mountain salute guard scare edit scorpion praise trust potato cotton crazy unique result"
+
+# Entropy derived from the master mnemonic
+ENTROPY_HEX=$(echo -n "${MASTER_MNEMONIC} ; seed node" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]' | sha256sum | awk '{ print $1 }' | xargs)
+
+# Derivation of the seed node mnemonic
+SEED_NODE_MNEMONIC=$(bip39gen mnemonic --length=24 --raw-entropy="0x${ENTROPY_HEX}" --verbose=false --hex=true)
+# > moment autumn couple digital century before consider left cargo quick execute canoe author chronic hurt blast quantum blind slim throw prefer range differ squirrel
+
+# Generate sentry node key id
+validator-key-gen --mnemonic="$SEED_NODE_MNEMONIC" --keyid="/tmp/node_key_id.txt"
+
+# Preview example node key
+cat "/tmp/node_key_id.txt" 
+# > d8fd8fb9b63bbbdde8493a18ad7b5d276a299151
+```
+

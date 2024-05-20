@@ -1,0 +1,13 @@
+---
+title: Overview
+sidebar_position: 0
+slug: overview
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+The Evidence module, extended from the Cosmos SDK's, enhances existing evidence handling that relies on the underlying consensus engine to automatically submit evidence upon discovery. It achieves this by implementing abstractions and interfaces that enable developers to define custom evidence messages and methods for penalizing misbehaving consensus nodes. Tendermint detects double-signing by consensus nodes and reports this to the Evidence module, which then manages the verification process and determines the appropriate penalty for the offending consensus nodes. Penalties may include slashing a portion of their stake and removing them from the active consensus node set.
+

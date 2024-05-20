@@ -1,0 +1,273 @@
+---
+title: Token Rates Registrar
+sidebar_position: 1
+slug: token-rates-registrar
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Overview {#27568532b5af487fb7aee6974fab52e4}
+
+
+The Token Rate Registrar in Kira Network allows governance to whitelist foreign tokens, set exchange rates, and define limits on staking rewards distribution in order to maintain the relevance and value of KEX. This enables users to pay execution fees with any whitelisted token, providing easy onboarding for new users directly from foreign networks without requiring them to use centralized exchanges to acquire KEX or deanonymize themselves. The Token Rate Registrar also allows governance to define the distribution of incentives to maintain the relevance and value of KEX, ensuring that the native token remains attractive and desirable for users and stakeholders to hold and use. By incentivizing participation and holding, the network is able to maintain a high level of security and value.
+
+
+### Token Management and Staking Policies {#b532e79ee90941d0a948afcfe85cc21f}
+
+
+#### Staking Capability {#9da78ef9591b4f7eac68e846a77fb81f}
+
+
+The `stake_token` property determines whether or not a specific token can be used as collateral by delegators. If the `stake_token` property for a token is set to `true`, then users will be able to stake that token and earn rewards. If it is set to `false`, then it will not be possible to stake the token and no rewards will be distributed.
+
+
+:::📌
+
+The `stake_token` property of a specific token can only be set to `true` if the given token is present in the Token Aliases[broken link], which sets the decimals in the lowest denomination. Removal of a token from the token aliases registry will automatically disable it by setting `stake_token` and `fee_token` properties to `false`. 
+
+:::
+
+
+
+
+#### Fee Payment Capability {#797471526a38443dae4ec626770301dc}
+
+
+The `fee_payment` property determines if a given token can be used to pay transaction fees on the Kira Network, provided the `enable_foreign_fee_payments` [network property](/docs/backend---sekai/modules/governance/network-properties) is enabled. If the `fee_payment` property is set to `true`, then users will be able to use that token to pay transaction fees based on its `fee_rate` parameter, which sets the exchange rate for the token. By allowing users to pay transaction fees with a variety of different tokens, the network can be more accessible and user-friendly, providing an easy onboarding process for new users and allowing them to pay fees without having to acquire the native KEX token.
+
+
+#### Fee Exchange Rate {#f011644ddd1c459ca667d0ec6eaef9fb}
+
+
+`fee_rate` sets the exchange rates for whitelisted tokens in terms of KEX. [Token Rates Registrar](/docs/backend---sekai/modules/tokens-module/token-rates-registrar) is not meant to track the market price of assets accurately as this would be too much of an overhead, but rather provides an easy way to convert between tokens and KEX as a way to protect against transaction spam. For example, if the `fee_rate` for token `u<denom>` is 2, it means that 2 `ukex` is equal to 1 `u<denom>`. If the minimum fee payment, as defined by the `min_tx_fee` [network property](/docs/backend---sekai/modules/governance/network-properties), is 100 `ukex`, then to make a transfer, the transaction fee should be set to at least 50 `u<denom>` tokens. Rates can also be expressed as decimals. For example, a rate of 0.1 would mean that 0.1 `ukex` is equal to 1 `u<denom>`. In this case, the minimum transaction fee payment in our example would be 1000 `u<denom>` tokens.
+
+
+:::📌
+
+The `fee_rate` for transactions using tokens other than KEX is expected to be higher in order to ensure the security of the blockchain and prevent transaction spam. This is because KIRA must maintain the security of the chain regardless of the market price of other tokens at any given time. The governance system is responsible for adjusting the exchange rates to account for possible black swan events. KIRA does not and will not use any third-party oracles, and instead relies solely on the capabilities of its own governance system. This is to mitigate any potential risks associated with the use of oracles and third parties.
+
+:::
+
+
+
+
+#### Staking Reward Cap {#d205c9a9cd8c4311a19782ca1206f9ac}
+
+
+Any token eligible for staking has a corresponding `stake_cap` parameter which sets the maximum percentage of staking rewards that it is entitled to receive from a staking pool. For example, if the `stake_cap` for BTC is set to `0.1` (10%), then no matter how much BTC is staked in the pool, only 10% of incoming rewards will be allocated and shared among BTC delegators. This is to prevent a malicious user from diluting the pool with a large amount of a particular token in order to claim all the rewards for themselves. By setting specific shares for each token, the reward distribution process is made simpler and more efficient, as it eliminates the need to track the market value of the staking tokens in terms of a fiat currency such as USD or KEX. 
+
+
+The cumulative `stake_cap` for all whitelisted tokens in [Token Rates Registrar](/docs/backend---sekai/modules/tokens-module/token-rates-registrar) cannot exceed `1.0` (100%). Any additions or updates to a token's `stake_cap` must adhere to this limit. If the combined reward caps surpasses `1.0`, the `stake_token` property of any new token cannot be set to `true`. For tokens where `stake_token` is set to `false`, staking is not permitted—only unstaking. Such tokens also don't receive any rewards (equivalent to `fee_rate` of 0).
+
+
+:::note
+
+KEX `stake_cap` cannot be set under 50%.
+
+:::
+
+
+
+
+#### Dust Spam Prevention {#3731dcd8a65641519adf0409f88261a1}
+
+
+The `stake_min` property sets the minimum amount of token a user can delegate or undelegate per transaction to prevent a _dust spam attack_ where a malicious user would try to massively delay the block production by adding/withdrawing small amounts of staking tokens with many different accounts (c.f [Fees and staking rewards distribution](/docs/backend---sekai/modules/distributor/fees-and-staking-rewards-distribution)). 
+
+
+:::note
+
+`stake_min` cannot be set to 0. 
+
+:::
+
+
+
+
+#### Token Rate Deletion {#01dc6c9c4dc74ec198c49856d5435201}
+
+
+Tokens, once registered in the Token Registrar, cannot be removed because of potential complexities when they're involved in other modules, like [Consensus nodes](/docs/backend---sekai/modules/multistaking/consensus-nodes). To address this, an `invalidated` flag is available for each token entry. When this flag is set to `true`, it serves as a metadata signal indicating that the token is no longer active within the network, even though it doesn't impose any operational restrictions on the token itself. Conversely, when the flag is set to `false`, it suggests that the token remains active and can be used according to the other parameters' values.
+
+
+## Parameters {#9a67ee6002de4f9cbdeaa4e581a13596}
+
+
+:::note
+
+For the native KEX token, only the `stake_cap` and `stake_min` parameters can be modified. 
+
+:::
+
+
+
+
+| **NAME**      | **TYPE** | **EXAMPLE** | **DESCRIPTION**                                                                                                |
+| ------------- | -------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `stake_token` | `bool`   | `true`      | Determines whether or not a specific token can be used as collateral by delegators on the KIRA Network.        |
+| `fee_payment` | `bool`   | `true`      | Determines if a given token can be used to pay transaction fees on the KIRA Network.                           |
+| `fee_rate`    | `float`  | `0.1`       | Sets the exchange rates for whitelisted tokens in terms of KEX.                                                |
+| `stake_cap`   | `float`  | `0.1`       | Sets the maximum percentage of staking rewards that a given token is entitled to receive from a staking pool.  |
+| `stake_min`   | `int`    | `10`        | Sets the minimum amount per delegations and undelegations for a given token to prevent a _dust spam attack_.   |
+| `invalidated` | `bool`   | `false`     | Indicates the inactive status of a token. If `true`, the token is marked as inactive for network interactions. |
+
+
+## CLI Syntax & Examples {#b9982ccb172d481c9392049afc924fe8}
+
+
+:::note
+
+Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the [Roles & Permissions](/docs/backend---sekai/modules/governance/roles--permissions) documentation for more details. 
+
+:::
+
+
+
+
+:::note
+
+`$SIGNER` represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as `$FLAGS_TX` and `$FLAGS_QR`, see the [CLI Guide](/docs/backend---sekai/cli-guide) page.
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#01d5529dd36e4bb8b1194b5834aa5d86}
+
+
+| `proposal-upsert-rate` | Create or update a token rate through a proposal. |
+| ---------------------- | ------------------------------------------------- |
+
+
+#### Upsert Token Rate With Sudo Permission {#d44f6bfbf118402292bc11b648093700}
+
+
+The `upsert-rate` CLI command allows accounts with sudo permission to create or modify a token rate without a proposal.
+
+
+**Flags**
+
+- `$DENOM`: Denomination of the token.
+- `$FEE_PAYMENT`: Boolean indicating if the token can be used for fee payment.
+- `$RATE`: Token’s exchange rate compared to KEX.
+- `$STAKE_TOKEN`: Boolean indicating if the token can be used for staking.
+- `$STAKE_CAP`: Staking rewards shares allocated for the token per staking pool.
+- `$STAKE_MIN`: Minimum amount of token required to stake per transaction.
+
+```shell
+sekaid tx tokens upsert-rate \
+--from=$SIGNER $FLAGS_TX \
+--denom=$DENOM --rate=$RATE \
+--fee_payments=$FEE_PAYMENT --stake_token=$STAKE_TOKEN \
+--stake_cap=$STAKE_CAP --stake_min=$STAKE_MIN
+```
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#41ce65d28ef24009b2241d98839343da}
+
+
+| `all-rates`      | Get all token rates in the system.                  |
+| ---------------- | --------------------------------------------------- |
+| `rate`           | Get a specific token rate by denomination.          |
+| `rates-by-denom` | Get token rates of multiple tokens by denomination. |
+
+
+#### List All Existing Token Rates {#ec7c6fb56a254751b76e874c976677a4}
+
+
+Use the `all-rates` command to retrieve all token rates.
+
+
+```shell
+sekaid query tokens all-rates $FLAGS_QR | jq
+```
+
+
+#### Query a Specific Token Rate {#bfecbe47c7584fc1b8364dd96a58febb}
+
+
+To query the rate of a specific token, use the `rate` command.
+
+
+**Args**
+
+- `$DENOM`: Denomination of the token whose rate is to be queried.
+
+```shell
+sekaid query tokens rate $DENOM $FLAGS_QR | jq
+```
+
+
+#### Query Multiple Token Rates {#4469a355daec4eaa94330a03f9551724}
+
+
+The `rates-by-denom` command allows querying rates of multiple tokens.
+
+
+**Args**
+
+- `$DENOM_LIST`: A comma-separated list of token denominations to query.
+
+```shell
+sekaid query tokens rates-by-denom $DENOM_LIST $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#2e821403aca7404cbbe24ce849ff77a7}
+
+
+In order to create a proposal to add or modify entries in the Token Registrar, an account must possess permission 18 or 8. Similarly, for voting on any of the Token Registrar proposals, an account must have permission 19.
+
+
+| `proposal-upsert-rate` | Create or update a token rate through a proposal. |
+| ---------------------- | ------------------------------------------------- |
+
+
+#### Proposal to Upsert Token Rate {#66cb1d8f16254f498ca6f97660eddb5e}
+
+
+The `proposal-upsert-rate` CLI command is used to create or update a token rate registry through a proposal process.
+
+
+**Flags**
+
+- `$TITLE`: The title of the proposal.
+- `$DESCRIPTION`: The description of the proposal, which can be a URL, text, etc.
+- `$DENOM`: Denomination of the token (e.g., `tbtc`).
+- `$FEE_PAYMENT`: Boolean indicating if the token can be used for fee payment.
+- `$RATE`: Token’s exchange rate compared to KEX.
+- `$STAKE_TOKEN`: Boolean indicating if the token can be used for staking.
+- `$STAKE_CAP`: Staking rewards shares allocated for the token per staking pool.
+- `$STAKE_MIN`: Minimum amount of token required to stake per transaction.
+
+```shell
+sekaid tx tokens proposal-upsert-rate \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+--denom=$DENOM --rate=$RATE \
+--fee_payments=$FEE_PAYMENT --stake_token=$STAKE_TOKEN \
+--stake_cap=$STAKE_CAP --stake_min=$STAKE_MIN
+```
+
+
+
+</TabItem></Tabs>
+

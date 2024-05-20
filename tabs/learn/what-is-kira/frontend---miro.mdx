@@ -1,0 +1,28 @@
+---
+title: Frontend - MIRO
+sidebar_position: 3
+slug: frontend---miro
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+MIRO 看 (見る) is KIRA’s frontend application and web wallet. It provides a straightforward interface for users to interact with the KIRA blockchain via the decentralized API, INTERX. This allows for efficient management of KIRA accounts and assets. 
+
+
+The defining feature of MIRO is its self-contained design. Once the MIRO page is loaded into a user's browser, it operates entirely locally on the user's computer. This means all actions taken within MIRO, from transactions to account management, happen within the user's device without the need reliance on external hosting servers. The only requirement is a connection to at least one local or public INTERX node. 
+
+
+Notably, MIRO does not rely on light clients and leverages the security of INTERX for blockchain communication. This is possible thanks to INTERX’s swarm request feature, which is designed to work optimally when MIRO interfaces with multiple INTERX nodes, ideally operated by different entities. While it's possible to connect MIRO to a single node, the real strength of swarm requests lies in their ability to cross check signed responses from multiple nodes to identify any inconsistencies and allow the creation of fraud proofs against false data. Such a strategy achieves a level of security comparable to that of light clients, with the safeguard that even one honest node among several can uphold the integrity of the system.
+
+
+:::note
+
+For a comprehensive explanation of how INTERX's swarm requests leverage signed responses to bolster security, refer to the [INTERX](/learn/what-is-kira/middleware---interx/overview) page.
+
+:::
+
+
+

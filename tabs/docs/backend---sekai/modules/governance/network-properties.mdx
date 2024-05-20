@@ -1,0 +1,189 @@
+---
+title: Network Properties
+sidebar_position: 5
+slug: network-properties
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Overview {#ebfaaf65269241b9a32a9bfeea35b3c8}
+
+
+KIRA Network utilizes a unique set of on-chain variables known as Network Properties to help control and regulate various behaviors and characteristics of the SEKAI application on a network-wide basis. These parameters serve as the operational gears of the system, allowing for the adjustment of pivotal features such as KEX inflation rate, the minimum transaction fee for any on-chain message to ensure global transaction spam protection, or even the required minimum percentage of governance members necessary to vote on a proposal, making it valid. Such versatility is particularly beneficial, considering the ever-evolving needs of the community and the potential alterations in the network's operational dynamics. Any changes to these network properties require consensus from the network's governance, ensuring that any alterations align with the wishes of the majority of network participants.
+
+
+## Parameters {#6b3d949219294d29982ae09b9f70a8ba}
+
+
+All network properties and their respective default values (which can also be found [here](https://github.com/KiraCore/sekai/blob/master/proto/kira/gov/network_properties.proto))
+
+
+| #  | NAME                                  | TYPE     | GENESIS               | BOUNDS (min - max)                         | DESCRIPTION                                                                                                                                                                                                                               |
+| -- | ------------------------------------- | -------- | --------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | `min_tx_fee`                          | `uint64` | `100`                 |                                            | Minimum transaction fee in `ukex` that must be sent in order to submit any on-chain message. Global transaction spam protection measure.                                                                                                  |
+| 2  | `max_tx_fee`                          | `uint64` | `1000000`             |                                            | Maximum transaction fee in `ukex` that can be sent along any transaction type. Prevents potential loss of funds while specifying wrong transaction fee amount by the user.                                                                |
+| 3  | `vote_quorum`                         | `uint64` | `33`                  |                                            | Required, minimum percentage of governance members with permission to vote on a given proposal to make said proposal valid. If minimum quorum is not reached then passing said proposal is not possible.                                  |
+| 4  | `minimum_proposal_end_time`           | `uint64` | `300`                 |                                            | Minimum time in seconds that proposals must be active and default time for all proposals to remain pending. Duration time of individual proposal can be modified by governance as explained [here](/docs/backend---sekai/modules/governance/proposals--governance-structure).    |
+| 5  | `proposal_enactment_time`             | `uint64` | `300`                 |                                            | Minimum time in seconds for the proposals to take effect after they passed                                                                                                                                                                |
+| 6  | `min_proposal_end_blocks`             | `uint64` | `2`                   |                                            | Minimum number of blocks during which the proposals MUST remain active. This is used to prevent edge cases where `minimum_proposal_end_time` is set to value shorter than a single block time, thus making it impossible to vote in time. |
+| 7  | `min_proposal_enactment_blocks`       | `uint64` | `1`                   |                                            | Minimum number of blocks that must pass after proposal passed for the proposal to take effect.                                                                                                                                            |
+| 8  | `enable_foreign_fee_payments`         | `bool`   | `true`                |                                            | Allow transaction fee payments with tokens other than KEX                                                                                                                                                                                 |
+| 9  | `mischance_rank_decrease_amount`      | `uint64` | `10`                  |                                            | When it's certain that validator is offline and failed to participate in a block production, decrease its global rank by the specified value.                                                                                             |
+| 10 | `max_mischance`                       | `uint64` | `10`                  |                                            | How many consecutive blocks must the validator miss for the network to change validator status to `inactive`                                                                                                                              |
+| 11 | `mischance_confidence`                | `uint64` | `110`                 |                                            | How many consecutive blocks must the validator miss for the network to be certain that the node is offline and not participating in the block signing                                                                                     |
+| 12 | `inactive_rank_decrease_percent`      | `float`  | `0.50`                |                                            | By what percentage should the validator global rank decrease when the said validator node status changes to `inactive` due to not participating in signing new blocks.                                                                    |
+| 13 | `min_validators`                      | `uint64` | `1000000`             |                                            | When [poor network conditions](/docs/backend---sekai/modules/governance/poor-network-conditions) occur, sets the maximum value in `ukex` that can be transferred between accounts.                                                                                       |
+| 14 | `poor_network_max_bank_send`          | `uint64` | `1`                   |                                            | Minimum number of consensus nodes that must be active for the network to be considered healthy. If number of validators falls below this value then [poor network conditions](/docs/backend---sekai/modules/governance/poor-network-conditions) occur.                   |
+| 15 | `unjail_max_time`                     | `uint64` | `600`                 | < `slashing_period`                        | Maximum amount of time in seconds which a jailed node has to request to be unjailed before becoming permanently jailed (tombstoned).                                                                                                      |
+| 16 | `enable_token_whitelist`              | `bool`   | `false`               |                                            | Enables whitelist of tokens transferable on the network                                                                                                                                                                                   |
+| 17 | `enable_token_blacklist`              | `bool`   | `true`                |                                            | Enable blacklist of tokens transferable on the network                                                                                                                                                                                    |
+| 18 | `min_identity_approval_tip`           | `uint64` | `200`                 |                                            | Minimum tip in `ukex` amount that must be sent along [Untitled](/docs/backend---sekai/modules/governance/identity-registrar) record verification request                                                                                       |
+| 19 | `unique_identity_keys`                | `string` | `moniker,username`    |                                            | Key values that must remain unique in the [Untitled](/docs/backend---sekai/modules/governance/identity-registrar)                                                                                                                              |
+| 20 | `ubi_hardcap`                         | `uint64` | `6000000`             |                                            | Maximum amount of additional KEX that can be created per year by the UBI module                                                                                                                                                           |
+| 21 | `validators_fee_share`                | `float`  | `0.50`                | `0` - `0.5`                                | Percentage cut a block proposer takes from the block’s transaction fees rewards.                                                                                                                                                          |
+| 22 | `inflation_rate`                      | `float`  | `0.18`                | `0` - `0.5`                                | KEX inflation percentage                                                                                                                                                                                                                  |
+| 23 | `inflation_period`                    | `uint64` | `31557600`            | `2629800` - `31557600`                     | Period of time in seconds over which current KEX supply is inflated by `inflation_rate`                                                                                                                                                   |
+| 24 | `unstaking_period`                    | `uint64` | `2629800`             | `604800` - `31557600` or `slashing_period` | Undelegation cooling period (in seconds)                                                                                                                                                                                                  |
+| 25 | `max_delegators`                      | `uint64` | `100`                 |                                            | Maximum number of delegators allowed per staking pool above which `min_delegation_pushout` can be triggered.                                                                                                                              |
+| 26 | `min_delegation_pushout`              | `uint64` | `10`                  |                                            | The minimum stake multiplier amount a user need to provide to push out the weakest delegator of a staking pool who reach its `max_delegators` capacity                                                                                    |
+| 27 | `slashing_period`                     | `uint64` | `3600`                | > `unstaking_period`                       | The time window in seconds in which a collusion of double-signing event must occur in order for a slashing proposal to be automatically rised                                                                                             |
+| 28 | `max_jailed_percentage`               | `float`  | `0.25`                | < one third of `active` nodes              | The percentage threshold of consensus nodes that must double-sign within the time window `slashing_period` in order for a slashing proposal to be automatically rised.                                                                    |
+| 29 | `max_slashing_percentage`             | `float`  | `0.01`                | `0` - `1`                                  | Maximum percentage of slashing that can be applied by governance to a jailed consensus node.                                                                                                                                              |
+| 30 | `min_custody_reward`                  | `uint64` | `200`                 |                                            |                                                                                                                                                                                                                                           |
+| 31 | `max_custody_buffer_size`             | `uint64` | `8192`                |                                            |                                                                                                                                                                                                                                           |
+| 32 | `max_custody_tx_size`                 | `uint64` | `10`                  |                                            |                                                                                                                                                                                                                                           |
+| 33 | `abstention_rank_decrease_amount`     | `uint64` | `1`                   |                                            | Amount of rank decrease when absent                                                                                                                                                                                                       |
+| 34 | `max_abstention`                      | `uint64` | `2`                   |                                            | Max abstention count for councilor                                                                                                                                                                                                        |
+| 35 | `min_collective_bond`                 | `uint64` | `100000`              |                                            | Minimum bond amount for the collective to be activated                                                                                                                                                                                    |
+| 36 | `min_collective_bonding_time`         | `uint64` | `86400`               |                                            | Allowed time to reach min_collective_bond                                                                                                                                                                                                 |
+| 37 | `max_collective_outputs`              | `uint64` | `10`                  |                                            | Limitation on the maximum number of spending pools configuration per collective                                                                                                                                                           |
+| 38 | `min_collective_claim_period`         | `uint64` | `14400`               |                                            | In seconds                                                                                                                                                                                                                                |
+| 39 | `validator_recovery_bond`             | `uint64` | `300000`              |                                            | Amount of KEX to spend for issuing validator recovery token                                                                                                                                                                               |
+| 40 | `max_annual_inflation`                | `float`  | `0.35`                |                                            | Maximum % of KEX by which supply can increase over the period of 1 year                                                                                                                                                                   |
+| 41 | `max_proposal_title_size`             | `uint64` | `128`                 |                                            | Maximum title size in the proposal                                                                                                                                                                                                        |
+| 42 | `max_proposal_description_size`       | `uint64` | `1024`                |                                            | Maximum description size in the proposal                                                                                                                                                                                                  |
+| 43 | `max_proposal_poll_option_size`       | `uint64` | `64`                  |                                            | Maximum option size in the proposal                                                                                                                                                                                                       |
+| 44 | `max_proposal_poll_option_count`      | `uint64` | `128`                 |                                            | Maximum possible choices in the proposal                                                                                                                                                                                                  |
+| 45 | `max_proposal_reference_size`         | `uint64` | `512`                 |                                            | Maximum reference size in the proposal                                                                                                                                                                                                    |
+| 46 | `max_proposal_checksum_size`          | `uint64` | `128`                 |                                            | Maximum checksum size in the proposal                                                                                                                                                                                                     |
+| 47 | `min_dapp_bond`                       | `uint64` | `1000000`             |                                            | -                                                                                                                                                                                                                                         |
+| 48 | `max_dapp_bond`                       | `uint64` | `10000000`            |                                            | -                                                                                                                                                                                                                                         |
+| 49 | `dapp_liquidation_threshold`          | `uint64` |                       |                                            | -                                                                                                                                                                                                                                         |
+| 50 | `dapp_liquidation_period`             | `uint64` |                       |                                            | -                                                                                                                                                                                                                                         |
+| 51 | `dapp_bond_duration`                  | `uint64` | `604800`              |                                            | -                                                                                                                                                                                                                                         |
+| 52 | `dapp_verifier_bond`                  | `float`  | `0.1`                 |                                            | Percentage of LP token supply to be put to be the verifier of the DApp                                                                                                                                                                    |
+| 53 | `dapp_auto_denounce_time`             | `uint64` | `60`                  |                                            | In seconds, time the DApp leader is allowed to send execute-dapp-tx                                                                                                                                                                       |
+| 54 | `dapp_mischance_rank_decrease_amount` | `uint64` | `1`                   |                                            | -                                                                                                                                                                                                                                         |
+| 55 | `dapp_max_mischance`                  | `uint64` | `10`                  |                                            | -                                                                                                                                                                                                                                         |
+| 56 | `dapp_inactive_rank_decrease_percent` | `uint64` | `10`                  |                                            | -                                                                                                                                                                                                                                         |
+| 57 | `dapp_pool_slippage_default`          | `float`  | `0.1`                 |                                            | Default                                                                                                                                                                                                                                   |
+| 58 | `minting_ft_fee`                      | `uint64` | `100_000_000_000_000` |                                            | -                                                                                                                                                                                                                                         |
+| 59 | `minting_nft_fee`                     | `uint64` | `100_000_000_000_000` |                                            | -                                                                                                                                                                                                                                         |
+| 60 | `autocompound_interval_num_blocks`    | `uint64` | `17280`               |                                            | Block interval for auto-compounding of rewards                                                                                                                                                                                            |
+|    |                                       |          |                       |                                            |                                                                                                                                                                                                                                           |
+
+
+## CLI Syntax & Examples {#dd165dbb682e4cb9b41ccbecbe8874da}
+
+
+:::note
+
+Each CLI command and proposal process in KIRA requires specific permissions. These permissions must be added to the account's whitelist or obtained as sudo permissions for direct changes. Refer to the [Roles & Permissions](/docs/backend---sekai/modules/governance/roles--permissions) documentation for more details. 
+
+:::
+
+
+
+
+:::note
+
+`$SIGNER` represents the transaction signer's account name or address. For instructions on setting common flags as environment variables, such as `$FLAGS_TX` and `$FLAGS_QR`, see the [CLI Guide](/docs/backend---sekai/cli-guide) page.
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="transactions" label="Transactions">
+
+
+## Transactions {#c7b1bcd0db474f468e03cbbcfdb65094}
+
+
+There is no transactions apart from the governance ones for this su-module.
+
+
+
+</TabItem>
+<TabItem value="queries" label="Queries">
+
+
+## Queries {#d0f3dff516504a20955bde702560a0c6}
+
+
+| `network-properties` | list all network properties and corresponding value |
+| -------------------- | --------------------------------------------------- |
+
+
+#### Query Network Properties {#21971178f4ac42c0be7dcc5885715064}
+
+
+List all network properties and corresponding values using the `network-properties` command.
+
+
+```bash
+sekaid query customgov network-properties $FLAGS_QR | jq
+```
+
+
+
+</TabItem>
+<TabItem value="governance" label="Governance">
+
+
+## Governance {#21a4bf9b246540458e513ba56c82c5d5}
+
+
+| `set-network-property` | Set a network property’s value |
+| ---------------------- | ------------------------------ |
+
+
+#### Set a Network Property {#28134ca7a8f74dc7919c699ec7927cf3}
+
+
+Create a proposal to set a value on a network property using the `set-network-property` command followed by the network property `$PROPERTY` and its respective value `$VALUE`.
+
+
+**Args**
+
+
+`$PROPERTY`: The network property to be updated. All properties are available [here](https://github.com/KiraCore/sekai/blob/master/proto/kira/gov/network_properties.proto).
+
+
+`$VALUE`: The value to be set for the network property.
+
+
+**Flags**
+
+
+	`$TITLE`: The title of the proposal.
+
+
+	`$DESCRIPTION`: The description of the proposal, it can be a URL, some text, etc.
+
+
+```bash
+sekaid tx customgov proposal set-network-property \
+--from=$SIGNER $FLAGS_TX \
+--title=$TITLE --description=$DESCRIPTION \
+$PROPERTY $VALUE
+```
+
+
+
+</TabItem></Tabs>
+

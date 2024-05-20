@@ -1,0 +1,20 @@
+---
+title: KIRA’s Approach to Data Availability
+sidebar_position: 1
+slug: kiras-approach-to-data-availability
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+Traditional systems often treat all application data uniformly—both user balances and arbitrary data— a method that compromises UX and practicality. This is particularly true when quick access to essential and trusted information, like user balances, is required during unexpected interruptions in the application’s sequencing process (e.g. requests rate limiting). KIRA addresses this by clearly distinguishing these types of data. Specifically, user balances can be directly settled on SEKAI, KIRA’s base layer, leveraging account abstraction. This arrangement allows Layer 2 applications to be treated similarly to user accounts, enabling them to perform on-chain actions such as issuing tokens, participating in governance, staking, and even communicating with other applications as if they were autonomous humans. 
+
+
+In managing and ensuring the availability of arbitrary application data, INTERX adopts a specialized implementation designed to enhance the data replication versus network overhead ratio. This implementation is underpinned by four foundational concepts:
+
+- **Integrated Data Management:** Consensus nodes operate and autoscale INTERX containers alongside their RollApp execution containers, akin to how edge nodes function within traditional Web2 networks. An edge node serves as a conduit between local environments (SEKAI and RollApp containers in KIRA’s case) and the external world. In this setup, essential data is directly accessible on the same devices that execute the application, thus reducing latency and the dependency issues seen when DA is handled by an external network.
+- **Dedicated DA Sub-networks**: Leveraging its node discovery capabilities, INTERX assigns each RollApp its own firewalled and rate-limited DA 'subnet'. This architecture optimizes bandwidth utilization and resource allocation by reducing the exchange and management of the application’s data only to the nodes directly relevant to the application—namely, its executors and verifiers.
+- **Adaptive Data Replication**: Traditional DA systems often employ a one-size-fits-all replication factor. Essentially, they define the level of redundancy through a fixed number of copies distributed within the network to ensure data availability. In practice, however, individual applications have distinct requirements for data access speed and replication based on the data type. With INTERX, RollApp data is replicated based on the individual needs of executors and verifiers. Developers can scale this replication level to align precisely with their application's needs, such as minimum bandwidth utilization for noncritical data and/or maximum possible security for application-critical data.
+- **Caching:** INTERX implements a caching mechanism to efficiently manage high-demand scenarios and prevent system overload. This feature is especially important in KIRA, where SEKAI’s block time can be extended based on the number of consensus nodes involved, influencing the likelihood of data being queried multiple times before any updates occur. By storing data after its initial retrieval, INTERX can swiftly respond to duplicate requests, conserving resources required to perform complex queries and thus maintaining network responsiveness.

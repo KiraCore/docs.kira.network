@@ -1,0 +1,79 @@
+---
+title: Consensus
+sidebar_position: 1
+slug: consensus
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Tendermint {#f82263dd7b3a455bb49cf5292b3f30df}
+
+
+SEKAI is a “server application” deriving from Tendermint a consistent PoS [BFT](https://en.wikipedia.org/wiki/Byzantine_fault_tolerance) (Proof of Stake Byzantine Fault Tolerant) consensus algorithm, meaning that it can tolerate up to 1/3 faulty nodes. It provides instant finality which minimizes the likelihood of forks at the consensus layer, making it suitable for high-speed RollApps.
+
+
+:::note
+
+For more information regarding Tendermint, visit the following link. [https://docs.tendermint.com/v0.34/](https://docs.tendermint.com/v0.34/)
+
+:::
+
+
+
+
+## Governance-curated Consensus Node Set {#1e2b19cfb65f434ba3c2d2b848c9f549}
+
+
+KIRA has customized Tendermint to establish a strong and simple governance-curated system for managing its Consensus node set. Through this mechanism, network governance exercises direct control over Consensus node inclusion and removal. Only candidates meeting specific criteria—such as proof of individuality, community engagement, and adherence to the network's Code of Conduct—are qualified to participate in consensus and governance roles. Unlike permissionless models with a fixed number of committee members, SEKAI's validator set composition is dynamically adjustable, enabling the eviction of malicious nodes or the regulation of block speed to maintain network integrity and performance.
+
+
+SEKAI's Consensus node set expands through the actions of its active members, governed by a principle of inclusivity with no upper limit on the number of nodes. This ensures that the network can scale dynamically while adjusting block production speeds to accommodate Consensus nodes worldwide, regardless of their geographical locations or the quality of their hardware and networking capabilities. Candidates seeking to join must have their KIRA addresses officially recognized as ‘validators’, a distinction awarded through governance proposals that are submitted and voted on exclusively by existing Consensus nodes. These proposals evaluate the candidate’s commitment to and compliance with the network's standards such as the Code of Conduct. This process guarantees that the growth of the Consensus node set is not only self-sustained but also strictly adheres to SEKAI’s ethos, ensuring optimal security and performance across its expanding infrastructure.
+
+
+By prioritizing adherence to community values over wealth status, KIRA aims to be the first inclusive PoS network that combines human alignment alongside assets at stake to secure the consensus. By subsidizing governance members and Consensus nodes through the Universal Basic Income (UBI), KIRA makes it possible to guarantee the sustainability of hardware operations and their continuous alignment with the long-term network goals without depending on exponentially inflating the KEX token supply and wealth redistribution only to the hands of a small set of privileged nodes and stakeholders.
+
+
+:::note
+
+For a comprehensive overview of SEKAI's governance mechanism, including its structure, roles, and permissions, visit the [Governance](/learn/what-is-kira/backend---sekai/governance) page.
+
+:::
+
+
+
+
+## Multi-bonded Proof of Stake {#38c624fbdc324bd093974d2abb46c689}
+
+
+Proof-of-stake is a Sybil resistance mechanism that complements blockchain consensus protocols. In a proof-of-stake system, Consensus nodes are required to stake the chain's native asset as slashable collateral. PoS bolsters the security of the chain by aligning the Consensus nodes' economic interests with those of the network. Since not all Consensus nodes can afford a large number of assets at stake, “delegated staking” is often used to increase the “trust” in the network Consensus node set by allowing anyone to put the tokens at the risk of slashing in the hands of nodes they trust.
+
+
+KIRA iterates upon this mechanism with its Multi-Bonded Proof-of-Stake. Any assets whitelisted by governance, including those not issued on SEKAI, may be staked to Consensus nodes, in addition to the native asset. There are no limitations on the types of assets that can be staked, such as NFTs, RWA, LP tokens, and stablecoins. However, SEKAI maintains the relevancy of its native asset by ensuring a minimum allocation of 50% of block and fee rewards, a figure that governance can adjust.
+
+
+In SEKAI, block production operates on an equal round-robin mechanism. This is distinct from conventional PoS systems, where the chance to produce a block is proportional to stake size; thus, SEKAI effectively treats all nodes as if they had the same stake amount. This approach extends to on-chain governance, which operates on a per-capita basis as well, ensuring equitable influence on network decisions among all participants.
+
+
+:::note
+
+Unlike traditional PoS systems, block production in KIRA is separate from onchain governance. For more details on governance, visit the [Governance](/learn/what-is-kira/backend---sekai/governance) page.
+
+:::
+
+
+
+
+To form a secure, scalable foundation for complex economic activity, the base layer should natively support the liquidity of all staked assets. Multi-asset staking is necessary to scale both security and liquidity available within the network in an increasingly multichain world. By allowing chain governance to whitelist any asset that it recognizes to hold fundamental value, KIRA attracts liquidity from all spheres of crypto to assume a productive role in its network, thereby presenting a strong value proposition to retain and grow on-chain liquidity through natively supported Liquid Staking Derivatives (LSD). This unlocks the potential for frictionless integration of multichain LSDs and restaking-powered DeFi while decreasing the systematic risk of any single external (non-native) LSD protocol failure.
+
+
+:::note
+
+The [Rewards and Incentives Structure](/learn/kira’s-economics/rewards-and-incentives-structure) page discusses economic incentives for consensus nodes and their delegators.
+
+:::
+
+
+

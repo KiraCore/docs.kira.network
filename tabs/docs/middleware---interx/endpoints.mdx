@@ -1,0 +1,1602 @@
+---
+title: Endpoints
+sidebar_position: 2
+slug: endpoints
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+Description of all available endpoints including their accepted parameter and expected response format can be queried though `<IP>:11000/api/metadata` endpoint.
+
+
+**Example Metadata Endpoint Response**
+
+
+```json
+{
+  "functions": {
+    "Broadcast": {
+      "endpoint": "/api/kira/txs",
+      "description": "Broadcast is a function to broadcast signed transaction.",
+      "parameters": {
+        "mode": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the broadcast mode. (block, sync, async)"
+        },
+        "tx": {
+          "type": "byte[]",
+          "description": "This represents the transaction bytes."
+        }
+      },
+      "response": null
+    },
+    "Download": {
+      "endpoint": "/download",
+      "description": "Download is a function to download a data reference or arbitrary data.",
+      "parameters": {
+        "key": {
+          "type": "string",
+          "description": "This represents the reference key. (It saves reference data with hashed name. e.g. 2CEE6B1689EDDDD6F08EB1EAEC7D3C4E.)"
+        },
+        "module": {
+          "type": "string",
+          "description": "This represents the module name. (e.g. DRR for data reference registry.)"
+        }
+      },
+      "response": null
+    },
+    "Faucet": {
+      "endpoint": "/api/kira/faucet?",
+      "description": "Faucet is a function to claim tokens to the account for free.",
+      "parameters": {
+        "claim": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the kira account address."
+        },
+        "token": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the token name."
+        }
+      },
+      "response": {
+        "hash": {
+          "description": "The faucet transaction hash"
+        }
+      }
+    },
+    "FaucetInfo": {
+      "endpoint": "/api/kira/faucet",
+      "description": "FaucetInfo is a function to return the available faucet amount",
+      "parameters": null,
+      "response": {
+        "address": {
+          "description": "The faucet kira address"
+        },
+        "balances": {
+          "description": "The balances array (amount \u0026 denom)"
+        }
+      }
+    },
+    "QueryAccount": {
+      "endpoint": "/api/kira/accounts/{address}",
+      "description": "QueryAccount is a function to query the account info.",
+      "parameters": {
+        "address": {
+          "type": "string",
+          "description": "This represents the account address."
+        }
+      },
+      "response": {
+        "account": {
+          "description": "The account info with address, pubkey and sequence."
+        }
+      }
+    },
+    "QueryAllIdentityRecordVerifyRequests": {
+      "endpoint": "/api/kira/gov/all_identity_verify_requests",
+      "description": "QueryAllIdentityRecordVerifyRequests is a function to query all identity record verify requests.",
+      "parameters": {
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        }
+      },
+      "response": {
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        },
+        "verify_records": {
+          "type": "array",
+          "description": "The identity record verify request info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The request address of identity record"
+            },
+            "id": {
+              "type": "number",
+              "description": "The verify request id"
+            },
+            "lastRecordEditDate": {
+              "type": "string",
+              "description": "The latest edit timestamp"
+            },
+            "recordIds": {
+              "type": "array\u003cnumber\u003e",
+              "description": "The array of identity record id"
+            },
+            "tip": {
+              "type": "Coin",
+              "description": "The tip amount for verification",
+              "fields": {
+                "amount": {
+                  "type": "string",
+                  "description": ""
+                },
+                "denom": {
+                  "type": "string",
+                  "description": ""
+                }
+              }
+            },
+            "verifier": {
+              "type": "string",
+              "description": "The verifier address of identity record"
+            }
+          }
+        }
+      }
+    },
+    "QueryAllIdentityRecords": {
+      "endpoint": "/api/kira/gov/all_identity_records",
+      "description": "QueryAllIdentityRecords is a function to query all identity records.",
+      "parameters": {
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        }
+      },
+      "response": {
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        },
+        "records": {
+          "type": "array",
+          "description": "The identity records info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The address of identity record"
+            },
+            "date": {
+              "type": "string",
+              "description": "The identity record timestamp"
+            },
+            "id": {
+              "type": "number",
+              "description": "The identity record id"
+            },
+            "key": {
+              "type": "string",
+              "description": "The identity record key"
+            },
+            "value": {
+              "type": "string",
+              "description": "The identity record value"
+            },
+            "verifiers": {
+              "type": "array\u003cstring\u003e",
+              "description": "The address list of verifiers"
+            }
+          }
+        }
+      }
+    },
+    "QueryBalance": {
+      "endpoint": "/api/kira/balances/{address}",
+      "description": "QueryBalance is a function to query the account balances.",
+      "parameters": {
+        "address": {
+          "type": "string",
+          "description": "This represents the account address."
+        },
+        "count_total": {
+          "type": "number",
+          "optional": true,
+          "description": "This represents the option to return total count of data reference keys."
+        },
+        "limit": {
+          "type": "number",
+          "description": "This represents the page size"
+        },
+        "offset": {
+          "type": "number",
+          "description": "This represents the page number"
+        }
+      },
+      "response": {
+        "balances": {
+          "type": "Coin[]",
+          "description": "The account balances with pagination"
+        },
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        }
+      }
+    },
+    "QueryBlockByHeightOrHash": {
+      "endpoint": "/api/blocks/{height}",
+      "description": "QueryBlockByHeightOrHash is a function to query block by height or hash.",
+      "parameters": {
+        "height": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option of block height or hash."
+        }
+      },
+      "response": {
+        "block": {
+          "description": "The block information"
+        },
+        "block_id": {
+          "description": "The block hash inforamtion"
+        }
+      }
+    },
+    "QueryBlockTransactions": {
+      "endpoint": "/api/blocks/{height}/transactions",
+      "description": "QueryBlockTransactions is a function to query block transactions by height.",
+      "parameters": {
+        "height": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option of block height."
+        }
+      },
+      "response": {
+        "total_count": {
+          "description": "The total transaction count"
+        },
+        "txs": {
+          "description": "The transaction information array"
+        }
+      }
+    },
+    "QueryBlocks": {
+      "endpoint": "/api/blocks",
+      "description": "QueryBlocks is a function to query blocks with pagination.",
+      "parameters": {
+        "maxHeight": {
+          "type": "string",
+          "optional": true,
+          "description": "This is the option of the maximum block height."
+        },
+        "minHeight": {
+          "type": "string",
+          "optional": true,
+          "description": "This is the option of the minimum block height."
+        }
+      },
+      "response": {
+        "block_metas": {
+          "description": "The array of block informations"
+        },
+        "last_height": {
+          "description": "The last block height"
+        }
+      }
+    },
+    "QueryConsensus": {
+      "endpoint": "/api/consensus",
+      "description": "QueryConsensus is a function to query consensus info.",
+      "parameters": null,
+      "response": {
+        "average_block_time": {
+          "description": "average block time in seconds"
+        },
+        "commit_time": {
+          "description": "The latest commit timestamp"
+        },
+        "consensus_stopped": {
+          "description": "If the consensus is stopped or not"
+        },
+        "height": {
+          "description": "The latest block height"
+        },
+        "noncommits": {
+          "description": "The validators array with no commits"
+        },
+        "precommits": {
+          "description": "The validators array with pre commits"
+        },
+        "prevotes": {
+          "description": "The validators array with prevotes"
+        },
+        "proposer": {
+          "description": "The current proposer kira address"
+        },
+        "round": {
+          "description": "The consensus round"
+        },
+        "start_time": {
+          "description": "The consensus start timestamp"
+        },
+        "step": {
+          "description": "RoundStepNewHeight"
+        },
+        "triggered_timeout_precommit": {
+          "description": "true or false"
+        }
+      }
+    },
+    "QueryDashboard": {
+      "endpoint": "/api/dashboard",
+      "description": "QueryDashboard is a function to query data for the dashboard.",
+      "parameters": null,
+      "response": {
+        "blocks": {
+          "type": "struct",
+          "description": "The blocks consensus status",
+          "fields": {
+            "average_time": {
+              "type": "number",
+              "description": "The average block confirm time"
+            },
+            "current_height": {
+              "type": "number",
+              "description": "The current block height"
+            },
+            "current_transactions": {
+              "type": "number",
+              "description": "The count of current transactions"
+            },
+            "latest_time": {
+              "type": "number",
+              "description": "The latest block confirm time"
+            },
+            "pending_transactions": {
+              "type": "number",
+              "description": "The count of pending transactions"
+            },
+            "since_genesis": {
+              "type": "number",
+              "description": "The block count after genesis block"
+            }
+          }
+        },
+        "consensus_health": {
+          "description": "Float value between 0 and 1, represents the health status of the consensus."
+        },
+        "current_block_validator": {
+          "type": "struct",
+          "description": "The current block validator info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The validator's address"
+            },
+            "moniker": {
+              "type": "string",
+              "description": "The validator's moniker"
+            }
+          }
+        },
+        "proposals": {
+          "type": "struct",
+          "description": "The proposals count info",
+          "fields": {
+            "active": {
+              "type": "number",
+              "description": "The count of active proposals"
+            },
+            "enacting": {
+              "type": "number",
+              "description": "The count of enacting proposals"
+            },
+            "finished": {
+              "type": "number",
+              "description": "The count of finished proposals"
+            },
+            "proposers": {
+              "type": "number",
+              "description": "The count of proposers"
+            },
+            "successful": {
+              "type": "number",
+              "description": "The count of successful proposals"
+            },
+            "total": {
+              "type": "number",
+              "description": "The count of total proposals"
+            },
+            "voters": {
+              "type": "number",
+              "description": "The count of voters"
+            }
+          }
+        },
+        "validators": {
+          "type": "struct",
+          "description": "The validators count info",
+          "fields": {
+            "active": {
+              "type": "number",
+              "description": "The count of active validators"
+            },
+            "inactive": {
+              "type": "number",
+              "description": "The count of in-active validators"
+            },
+            "jailed": {
+              "type": "number",
+              "description": "The count of jailed validators"
+            },
+            "paused": {
+              "type": "number",
+              "description": "The count of paused validators"
+            },
+            "total": {
+              "type": "number",
+              "description": "The count of total validators"
+            },
+            "waiting": {
+              "type": "number",
+              "description": "The count of waiting validators"
+            }
+          }
+        }
+      }
+    },
+    "QueryDataReference": {
+      "endpoint": "/api/kira/gov/data/{key}",
+      "description": "QueryDataReference is a function to query data reference by a key.",
+      "parameters": {
+        "key": {
+          "type": "string",
+          "description": "This represents data reference key."
+        }
+      },
+      "response": null
+    },
+    "QueryDataReferenceKeys": {
+      "endpoint": "/api/kira/gov/data_keys",
+      "description": "QueryDataReferenceKeys is a function to query data reference keys with pagination.",
+      "parameters": {
+        "count_total": {
+          "type": "number",
+          "optional": true,
+          "description": "This represents the option to return total count of data reference keys."
+        },
+        "limit": {
+          "type": "number",
+          "description": "This represents the page size"
+        },
+        "offset": {
+          "type": "number",
+          "description": "This represents the page number"
+        }
+      },
+      "response": null
+    },
+    "QueryExecutionFee": {
+      "endpoint": "/api/kira/gov/execution_fee",
+      "description": "QueryExecutionFee is a function to query execution fee by transaction type.",
+      "parameters": {
+        "message": {
+          "type": "string",
+          "description": "This is an option of a transaction type"
+        }
+      },
+      "response": {
+        "fee": {
+          "description": "The execution fee info"
+        }
+      }
+    },
+    "QueryExecutionFees": {
+      "endpoint": "/api/kira/gov/execution_fees",
+      "description": "QueryExecutionFees is a function to query all execution fees.",
+      "parameters": null,
+      "response": {
+        "fees": {
+          "type": "array",
+          "description": "All execution fees"
+        }
+      }
+    },
+    "QueryGenesis": {
+      "endpoint": "/api/genesis",
+      "description": "QueryGenesis is a function to query genesis.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryGenesisSum": {
+      "endpoint": "/api/gensum",
+      "description": "QueryGenesisSum is a function to query genesis checksum.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryIdentityRecord": {
+      "endpoint": "/api/kira/gov/identity_record/{id}",
+      "description": "QueryIdentityRecord is a function to query identity record by id.",
+      "parameters": {
+        "id": {
+          "type": "number",
+          "description": "This is the identity record id."
+        }
+      },
+      "response": {
+        "record": {
+          "description": "The identity record info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The address of identity record"
+            },
+            "date": {
+              "type": "string",
+              "description": "The identity record timestamp"
+            },
+            "id": {
+              "type": "number",
+              "description": "The identity record id"
+            },
+            "key": {
+              "type": "string",
+              "description": "The identity record key"
+            },
+            "value": {
+              "type": "string",
+              "description": "The identity record value"
+            },
+            "verifiers": {
+              "type": "array\u003cstring\u003e",
+              "description": "The address list of verifiers"
+            }
+          }
+        }
+      }
+    },
+    "QueryIdentityRecordVerifyRequest": {
+      "endpoint": "/api/kira/gov/identity_verify_record/{request_id}",
+      "description": "QueryIdentityRecordVerifyRequest is a function to query identity record verify request.",
+      "parameters": {
+        "request_id": {
+          "type": "number",
+          "description": "This is the identity record verify request id."
+        }
+      },
+      "response": {
+        "verify_record": {
+          "description": "The identity record verify request info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The request address of identity record"
+            },
+            "id": {
+              "type": "number",
+              "description": "The verify request id"
+            },
+            "lastRecordEditDate": {
+              "type": "string",
+              "description": "The latest edit timestamp"
+            },
+            "recordIds": {
+              "type": "array\u003cnumber\u003e",
+              "description": "The array of identity record id"
+            },
+            "tip": {
+              "type": "Coin",
+              "description": "The tip amount for verification",
+              "fields": {
+                "amount": {
+                  "type": "string",
+                  "description": ""
+                },
+                "denom": {
+                  "type": "string",
+                  "description": ""
+                }
+              }
+            },
+            "verifier": {
+              "type": "string",
+              "description": "The verifier address of identity record"
+            }
+          }
+        }
+      }
+    },
+    "QueryIdentityRecordVerifyRequestsByApprover": {
+      "endpoint": "/api/kira/gov/identity_verify_requests_by_approver/{approver}",
+      "description": "QueryIdentityRecordVerifyRequestsByApprover is a function to query identity record verify request by approver.",
+      "parameters": {
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        },
+        "requester": {
+          "type": "string",
+          "description": "This is the identity record verify request approver address."
+        }
+      },
+      "response": {
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        },
+        "verify_records": {
+          "type": "array",
+          "description": "The identity record verify request info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The request address of identity record"
+            },
+            "id": {
+              "type": "number",
+              "description": "The verify request id"
+            },
+            "lastRecordEditDate": {
+              "type": "string",
+              "description": "The latest edit timestamp"
+            },
+            "recordIds": {
+              "type": "array\u003cnumber\u003e",
+              "description": "The array of identity record id"
+            },
+            "tip": {
+              "type": "Coin",
+              "description": "The tip amount for verification",
+              "fields": {
+                "amount": {
+                  "type": "string",
+                  "description": ""
+                },
+                "denom": {
+                  "type": "string",
+                  "description": ""
+                }
+              }
+            },
+            "verifier": {
+              "type": "string",
+              "description": "The verifier address of identity record"
+            }
+          }
+        }
+      }
+    },
+    "QueryIdentityRecordVerifyRequestsByRequester": {
+      "endpoint": "/api/kira/gov/identity_verify_requests_by_requester/{requester}",
+      "description": "QueryIdentityRecordVerifyRequestsByRequester is a function to query identity record verify request by requester.",
+      "parameters": {
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option for pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        },
+        "requester": {
+          "type": "string",
+          "description": "This is the identity record verify requester address."
+        }
+      },
+      "response": {
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        },
+        "verify_records": {
+          "type": "array",
+          "description": "The identity record verify request info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The request address of identity record"
+            },
+            "id": {
+              "type": "number",
+              "description": "The verify request id"
+            },
+            "lastRecordEditDate": {
+              "type": "string",
+              "description": "The latest edit timestamp"
+            },
+            "recordIds": {
+              "type": "array\u003cnumber\u003e",
+              "description": "The array of identity record id"
+            },
+            "tip": {
+              "type": "Coin",
+              "description": "The tip amount for verification",
+              "fields": {
+                "amount": {
+                  "type": "string",
+                  "description": ""
+                },
+                "denom": {
+                  "type": "string",
+                  "description": ""
+                }
+              }
+            },
+            "verifier": {
+              "type": "string",
+              "description": "The verifier address of identity record"
+            }
+          }
+        }
+      }
+    },
+    "QueryIdentityRecordsByAddress": {
+      "endpoint": "/api/kira/gov/identity_records/{creator}",
+      "description": "QueryIdentityRecordsByAddress is a function to query identity records by address.",
+      "parameters": {
+        "creator": {
+          "type": "string",
+          "description": "This is the identity record creator address."
+        }
+      },
+      "response": {
+        "records": {
+          "type": "array",
+          "description": "The identity records info",
+          "fields": {
+            "address": {
+              "type": "string",
+              "description": "The address of identity record"
+            },
+            "date": {
+              "type": "string",
+              "description": "The identity record timestamp"
+            },
+            "id": {
+              "type": "number",
+              "description": "The identity record id"
+            },
+            "key": {
+              "type": "string",
+              "description": "The identity record key"
+            },
+            "value": {
+              "type": "string",
+              "description": "The identity record value"
+            },
+            "verifiers": {
+              "type": "array\u003cstring\u003e",
+              "description": "The address list of verifiers"
+            }
+          }
+        }
+      }
+    },
+    "QueryInterxFunctions": {
+      "endpoint": "/api/metadata",
+      "description": "QueryInterxFunctions is a function to query interx functions.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryInterxList": {
+      "endpoint": "/api/interx_list",
+      "description": "QueryInterxList is a function to query all interx list.",
+      "parameters": {
+        "ip_only": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only ip addresses separated by comma."
+        }
+      },
+      "response": {
+        "last_update": {
+          "type": "number",
+          "description": "The last updated timestamp"
+        },
+        "node_list": {
+          "description": "The node list array",
+          "fields": {
+            "faucet": {
+              "type": "string",
+              "description": "The faucet kira address"
+            },
+            "id": {
+              "type": "string",
+              "description": "The interx public key"
+            },
+            "ip": {
+              "type": "string",
+              "description": "The public ip address"
+            },
+            "moniker": {
+              "type": "string",
+              "description": "From interx configuration"
+            },
+            "ping": {
+              "type": "number",
+              "description": "The time duration in miliseconds to dial INTERX and verify pub_key"
+            },
+            "type": {
+              "type": "string",
+              "description": "The node type from interx configuration"
+            },
+            "version": {
+              "type": "string",
+              "description": "The interx version from interx configuration"
+            }
+          }
+        },
+        "scanning": {
+          "type": "bool",
+          "description": "If discovery is still running or not"
+        }
+      }
+    },
+    "QueryInterxStatus": {
+      "endpoint": "/api/status",
+      "description": "QueryInterxStatus is a function to query interx informations.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryKiraFunctions": {
+      "endpoint": "/api/kira/metadata",
+      "description": "QueryKiraFunctions is a function to query kira functions.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryKiraStatus": {
+      "endpoint": "/api/kira/status",
+      "description": "QueryKiraStatus is a function to query the node status",
+      "parameters": null,
+      "response": {
+        "node_info": {
+          "description": "The connected node information"
+        },
+        "sync_info": {
+          "description": "The sync status of connected node"
+        },
+        "validator_info": {
+          "description": "The validator information of connect node"
+        }
+      }
+    },
+    "QueryKiraTokensAliases": {
+      "endpoint": "/api/kira/tokens/aliases",
+      "description": "QueryKiraTokensAliases is a function to query all tokens aliases.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryKiraTokensRates": {
+      "endpoint": "/api/kira/tokens/rates",
+      "description": "QueryKiraTokensRates is a function to query all tokens rates.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryNetworkProperties": {
+      "endpoint": "/api/kira/gov/network_properties",
+      "description": "QueryNetworkProperties is a function to query network properties.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryPermissionsByAddress": {
+      "endpoint": "/api/kira/gov/permissions_by_address/{val_addr}",
+      "description": "QueryPermissionsByAddress is a function to query all permissions by an address.",
+      "parameters": {
+        "val_addr": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the kira account address."
+        }
+      },
+      "response": null
+    },
+    "QueryPrivP2PList": {
+      "endpoint": "/api/priv_p2p_list",
+      "description": "QueryPrivP2PList is a function to query all private nodes list.",
+      "parameters": {
+        "connected": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only connected ips."
+        },
+        "format": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query nodes in a specific format. usecase: order=simple"
+        },
+        "ip_only": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only ip addresses separated by comma."
+        },
+        "order": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query nodes in a specific order. usecase: order=random"
+        },
+        "peers_only": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only peers separated by comma. \u003cnode_id\u003e@\u003cip\u003e:\u003cport\u003e"
+        }
+      },
+      "response": {
+        "last_update": {
+          "type": "number",
+          "description": "The last updated timestamp"
+        },
+        "node_list": {
+          "description": "The node list array",
+          "fields": {
+            "connected": {
+              "type": "bool",
+              "description": "If the node is connected with this node"
+            },
+            "id": {
+              "type": "string",
+              "description": "The private node id"
+            },
+            "ip": {
+              "type": "string",
+              "description": "The local ip address"
+            },
+            "peers": {
+              "type": "array\u003cstring\u003e",
+              "description": "The list of node ids"
+            },
+            "ping": {
+              "type": "number",
+              "description": "The time duration in miliseconds to dial p2p and verify p2p node id"
+            },
+            "port": {
+              "type": "number",
+              "description": "The p2p port number"
+            }
+          }
+        },
+        "scanning": {
+          "type": "bool",
+          "description": "If discovery is still running or not"
+        }
+      }
+    },
+    "QueryProposal": {
+      "endpoint": "/api/kira/gov/proposals/{proposal_id}",
+      "description": "QueryProposal is a function to query a proposal by a given proposal_id.",
+      "parameters": {
+        "proposal_id": {
+          "type": "number",
+          "description": "This is an option of a proposal id"
+        }
+      },
+      "response": {
+        "proposal": {
+          "description": "The proposal information"
+        }
+      }
+    },
+    "QueryProposals": {
+      "endpoint": "/api/kira/gov/proposals",
+      "description": "QueryProposals is a function to query all proposals.",
+      "parameters": {
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        },
+        "reverse": {
+          "type": "bool",
+          "optional": true,
+          "description": "This an option to sort proposals."
+        },
+        "voter": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the kira account address."
+        }
+      },
+      "response": {
+        "proposals": {
+          "description": "The array of proposals information"
+        }
+      }
+    },
+    "QueryPubP2PList": {
+      "endpoint": "/api/pub_p2p_list",
+      "description": "QueryPubP2PList is a function to query all public nodes list.",
+      "parameters": {
+        "connected": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only connected ips."
+        },
+        "format": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query nodes in a specific format. usecase: order=simple"
+        },
+        "ip_only": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only ip addresses separated by comma."
+        },
+        "order": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query nodes in a specific order. usecase: order=random"
+        },
+        "peers_only": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only peers separated by comma. \u003cnode_id\u003e@\u003cip\u003e:\u003cport\u003e"
+        }
+      },
+      "response": {
+        "last_update": {
+          "type": "number",
+          "description": "The last updated timestamp"
+        },
+        "node_list": {
+          "description": "The node list array",
+          "fields": {
+            "connected": {
+              "type": "bool",
+              "description": "If the node is connected with this node"
+            },
+            "id": {
+              "type": "string",
+              "description": "The public node id"
+            },
+            "ip": {
+              "type": "string",
+              "description": "The public ip address"
+            },
+            "peers": {
+              "type": "array\u003cstring\u003e",
+              "description": "The list of node ids"
+            },
+            "ping": {
+              "type": "number",
+              "description": "The time duration in miliseconds to dial p2p and verify p2p node id"
+            },
+            "port": {
+              "type": "number",
+              "description": "The p2p port number"
+            }
+          }
+        },
+        "scanning": {
+          "type": "bool",
+          "description": "If discovery is still running or not"
+        }
+      }
+    },
+    "QueryRPCMethods": {
+      "endpoint": "/api/rpc_methods",
+      "description": "QueryRPCMethods is a function to query all rpc methods available.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryRoles": {
+      "endpoint": "/api/kira/gov/all_roles",
+      "description": "QueryRoles is a function to query all roles.",
+      "parameters": null,
+      "response": null
+    },
+    "QueryRolesByAddress": {
+      "endpoint": "/api/kira/gov/roles_by_address/{val_addr}",
+      "description": "QueryRolesByAddress is a function to query all roles by an address.",
+      "parameters": {
+        "val_addr": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the kira account address."
+        }
+      },
+      "response": null
+    },
+    "QuerySnapList": {
+      "endpoint": "/api/snap_list",
+      "description": "QuerySnapList is a function to query all snapshot node list.",
+      "parameters": {
+        "ip_only": {
+          "type": "bool",
+          "optional": true,
+          "description": "This is an option to query only ip addresses separated by comma."
+        }
+      },
+      "response": {
+        "last_update": {
+          "type": "number",
+          "description": "The last updated timestamp"
+        },
+        "node_list": {
+          "description": "The node list array",
+          "fields": {
+            "checksum": {
+              "type": "string",
+              "description": "The snapshot checksum (SHA256)"
+            },
+            "ip": {
+              "type": "string",
+              "description": "The public ip address"
+            },
+            "port": {
+              "type": "number",
+              "description": "The interx port number"
+            },
+            "size": {
+              "type": "number",
+              "description": "The snapshot size in bytes"
+            }
+          }
+        },
+        "scanning": {
+          "type": "bool",
+          "description": "If discovery is still running or not"
+        }
+      }
+    },
+    "QuerySpendingPoolProposals": {
+      "endpoint": "/api/kira/spending-pool-proposals",
+      "description": "QuerySpendingPoolProposals is a function to query list of all spending pool proposals.",
+      "parameters": null,
+      "response": {
+        "names": {
+          "description": "The list of all spending pool proposals"
+        }
+      }
+    },
+    "QuerySpendingPools": {
+      "endpoint": "/api/kira/spending-pools",
+      "description": "QuerySpendingPools is a function to query list of all spending pool names.",
+      "parameters": {
+        "account": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the kira account address."
+        },
+        "name": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the pool name."
+        }
+      },
+      "response": {
+        "names": {
+          "description": "The list of all spending pools"
+        }
+      }
+    },
+    "QueryTotalSupply": {
+      "endpoint": "/api/kira/supply",
+      "description": "QueryTotalSupply is a function to query total supply.",
+      "parameters": null,
+      "response": {
+        "supply": {
+          "type": "Coin[]",
+          "description": "The total supply of the network"
+        }
+      }
+    },
+    "QueryTransactionHash": {
+      "endpoint": "/api/kira/txs/{hash}",
+      "description": "QueryTransactionHash is a function to query transaction details from transaction hash.",
+      "parameters": {
+        "hash": {
+          "type": "string",
+          "description": "This represents the transaction hash. (e.g. 0x20.....)"
+        }
+      },
+      "response": {
+        "hash": {
+          "description": "The transaction hash"
+        },
+        "height": {
+          "description": "The block height of transation"
+        },
+        "tx": {
+          "description": "The base-64 encoded transaction"
+        },
+        "tx_result": {
+          "description": "The result of transaction with events, gas info, logs and error code"
+        }
+      }
+    },
+    "QueryTransactionResult": {
+      "endpoint": "/api/transactions/{txHash}",
+      "description": "QueryTransactionResult is a function to query transaction result by hash.",
+      "parameters": {
+        "txHash": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option of a transaction hash."
+        }
+      },
+      "response": {
+        "block_height": {
+          "description": "The block height"
+        },
+        "block_timestamp": {
+          "description": "The block timestamp"
+        },
+        "confirmation": {
+          "description": "The block confirmations of this transaction"
+        },
+        "fees": {
+          "description": "The transaction fee"
+        },
+        "gas_used": {
+          "description": "The gas amount used in transaction"
+        },
+        "gas_wanted": {
+          "description": "The gas limit amount for transaction"
+        },
+        "hash": {
+          "description": "The transaction hash"
+        },
+        "memo": {
+          "description": "The transaction memo"
+        },
+        "msgs": {
+          "description": "The transaction msgs"
+        },
+        "status": {
+          "description": "The transaction status"
+        }
+      }
+    },
+    "QueryTransactions": {
+      "endpoint": "/api/transactions",
+      "description": "QueryTransactions is a function to query transactions of the account filtered by various options like msg type, date, and so on.",
+      "parameters": {
+        "account": {
+          "type": "string",
+          "description": "This represents the kira account address."
+        },
+        "dateEnd": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the ending point in timestamp or date(DD/MM/YY) format."
+        },
+        "dateStart": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the starting point in timestamp or date(DD/MM/YY) format."
+        },
+        "direction": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents direction of the transaction(outbound, inbound)."
+        },
+        "limit": {
+          "type": "int",
+          "optional": true,
+          "description": "This represents the limit of total results to be shown. (1 ~ 100)"
+        },
+        "offset": {
+          "type": "int",
+          "optional": true,
+          "description": "This represents the offset of the first transaction."
+        },
+        "page": {
+          "type": "int",
+          "optional": true,
+          "description": "This represents the page number of results."
+        },
+        "page_size": {
+          "type": "int",
+          "optional": true,
+          "description": "This represents the pageSize number of results. (1 ~ 100)"
+        },
+        "sort": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents how the transactions should be sorted(dateASC, dateDESC)."
+        },
+        "status": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the transaction status(pending, confirmed, failed)."
+        },
+        "type": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the transaction type."
+        }
+      },
+      "response": {
+        "total_count": {
+          "description": "The total transaction count"
+        },
+        "transactions": {
+          "description": "The array of transactions"
+        }
+      }
+    },
+    "QueryUBIRecords": {
+      "endpoint": "/api/kira/ubi-records",
+      "description": "QueryUBIRecords is a function to query ubi records.",
+      "parameters": {
+        "name": {
+          "type": "string",
+          "optional": true,
+          "description": "This represents the pool name."
+        }
+      },
+      "response": {
+        "record": {
+          "optional": true,
+          "description": "ubi record"
+        },
+        "records": {
+          "optional": true,
+          "description": "All ubi records"
+        }
+      }
+    },
+    "QueryUnconfirmedTxs": {
+      "endpoint": "/api/unconfirmed_txs",
+      "description": "QueryUnconfirmedTxs is a function to query unconfirmed transactions.",
+      "parameters": {
+        "limit": {
+          "type": "int",
+          "optional": true,
+          "description": "This represents the limit of the transaction. (1 ~ 1000)"
+        }
+      },
+      "response": null
+    },
+    "QueryValidatorInfos": {
+      "endpoint": "/api/valoperinfos",
+      "description": "QueryValidatorInfos is a function to query validator infos.",
+      "parameters": {
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        }
+      },
+      "response": {
+        "info": {
+          "description": "The array of validators information"
+        },
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        }
+      }
+    },
+    "QueryValidators": {
+      "endpoint": "/api/valopers",
+      "description": "QueryValidators is a function to query validators.",
+      "parameters": {
+        "address": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query validator by a given kira address"
+        },
+        "all": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query all validators."
+        },
+        "countTotal": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. count_total is set to true  to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set."
+        },
+        "key": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. key is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set."
+        },
+        "limit": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. limit is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app."
+        },
+        "moniker": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query validator by a given moniker"
+        },
+        "offset": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to validators pagination. offset is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set."
+        },
+        "proposer": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query validators by a given proposer address"
+        },
+        "pubkey": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query validator by a given pubkey"
+        },
+        "status": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query validators by a given status"
+        },
+        "status_only": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query only status of all validators."
+        },
+        "valkey": {
+          "type": "string",
+          "optional": true,
+          "description": "This is an option to query validator by a given valoper address"
+        }
+      },
+      "response": {
+        "pagination": {
+          "description": "The pagination response information like total and next_key"
+        },
+        "validators": {
+          "description": "The array of validators information"
+        }
+      }
+    },
+    "QueryVoters": {
+      "endpoint": "/api/kira/gov/voters/{proposal_id}",
+      "description": "QueryVoters is a function to query voters by a given proposal id.",
+      "parameters": {
+        "proposal_id": {
+          "type": "number",
+          "description": "This is an option of a proposal id"
+        }
+      },
+      "response": null
+    },
+    "QueryVotes": {
+      "endpoint": "/api/kira/gov/votes/{proposal_id}",
+      "description": "QueryVotes is a function to query votes by a given proposal id.",
+      "parameters": {
+        "proposal_id": {
+          "type": "number",
+          "description": "This is an option of a proposal id"
+        }
+      },
+      "response": {
+        "votes": {
+          "description": "The array of votes information"
+        }
+      }
+    }
+  },
+  "response_header": {
+    "Interx_block": {
+      "type": "number",
+      "description": "This represents the current block number."
+    },
+    "Interx_blocktime": {
+      "type": "number",
+      "description": "This represents the current block timestamp."
+    },
+    "Interx_chain_id": {
+      "type": "number",
+      "description": "This represents the current chain id."
+    },
+    "Interx_hash": {
+      "type": "string",
+      "description": "This represents the interx response hash."
+    },
+    "Interx_ref": {
+      "type": "string",
+      "description": "This represents link to download the data reference."
+    },
+    "Interx_request_hash": {
+      "type": "string",
+      "description": "This represents the hash of request parameters."
+    },
+    "Interx_signature": {
+      "type": "string",
+      "description": "This represents the interx response signature."
+    },
+    "Interx_timestamp": {
+      "type": "string",
+      "description": "This represents the current interx timestamp."
+    }
+  }
+}
+```
+

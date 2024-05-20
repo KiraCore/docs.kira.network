@@ -1,0 +1,34 @@
+---
+title: Governance
+sidebar_position: 2
+slug: governance
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+KIRA introduces a governance system that fundamentally departs from the conventional stake-weighted voting mechanisms prevalent in blockchain networks. Instead, it adopts a per-capita approach, ensuring that every vote carries equal weight, irrespective of the voter's stake. Within this system, Consensus nodes hold a foundational role by serving as the primary decision-makers. They form the initial group of Councilors, which defines any network participants endowed with the right to propose and vote on network decisions. Anyone can become a Councilor; the group is open to all users, contingent upon receiving endorsement from the existing council. 
+
+
+## Roles & Permissions {#4a92d1418ae641c7aae19bdb862b6ead}
+
+
+KIRA's governance structure is underpinned by a detailed system of permissions, where specific actions, such as voting and proposing, are tied to unique permissions. These permissions dictate whether an account can execute a specific transaction. This granularity in permissions serves as the building blocks for 'roles,' which bundle permissions into comprehensive profiles that define the capabilities and responsibilities of subsets of council members. Being assigned a role equates to having all the permissions it encompasses. Roles, by their nature, are constructs of governance; the only pre-defined role in KIRA is that of ‘validator’ automatically given to Consensus nodes. All other roles are conceptualized and established through governance actions. The creation of new roles is initiated at the network's inception by Consensus nodes, who use their permissions to propose and approve the establishment of these roles through governance proposals.
+
+
+## Governance Structure {#3c994110ecf44f89ab62ecadfe43b8a8}
+
+
+KIRA's governance is inherently flexible and designed to evolve organically within its decentralized framework. Starting with the principle that each Consensus node possesses equal voting power (per capita), they form the cornerstone of governance. They have the autonomy to delegate various governance responsibilities to other verified groups through the definition of roles. This could lead to a dynamic where one group may have certain authority over another, and vice versa, depending on the distribution of responsibilities related to matters such as proposal voting or the management of malicious activities within the network. The governance model's modular design facilitates customized configurations, including multicameral systems for specialized proposal handling and checks and balances to mitigate centralization risks. This adaptability ensures KIRA's governance can evolve to meet diverse network conditions and requirements, underlining the network's capacity for self-directed evolution without centralized oversight.
+
+
+## Decision-making Framework {#97310261cd6643c59e08f59fa9662fe1}
+
+
+KIRA governance decisions are voted on-chain to immutably record outcomes on the blockchain itself. However, discussions primarily take place through off-chain coordination amongst Councilors and community members. When a proposal is created, only Councilors can vote if they have the required permission. A proposal passes if over 50% of votes are 'yes', otherwise it is rejected. A minority veto rejection is also possible if over 33.4% of all votes are 'veto’. Proposals require a quorum of 33% to be valid to reflect adequate Councilor participation and representation. If quorum is not reached, the proposal fails. After the voting period ends, there is a defined enactment time before changes take effect, allowing the community to prepare for the outcome. The minimum enactment time is configured by governance and applies to all proposals. Governance can additionally configure different voting periods for individual proposals. This structured on-chain process enables transparent and definitive decision-making.
+
+
+KIRA does not utilize on-chain signaling proposals, which commonly lead to inefficient binary outcomes that fail to capture nuanced perspectives. Instead, it offers on-chain Polls to efficiently gauge sentiment and build consensus on complex issues. Polls allow for multiple customized voting options that cater to the diverse views within the community. This flexibility makes them well-suited for achieving consensus on matters like upgrade timeframes, future protocol changes, and other key issues. The Poll module provides an inclusive signaling mechanism that complements off-chain discussion. Ultimately, Polls enable KIRA's governance to reach timely decisions informed by the authentic and varied opinions of participants.
+

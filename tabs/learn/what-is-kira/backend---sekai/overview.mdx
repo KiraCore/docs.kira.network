@@ -1,0 +1,31 @@
+---
+title: Overview
+sidebar_position: 0
+slug: overview
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+SEKAI (世界) is KIRA's core blockchain, managing all on-chain logic, including processing transactions and state transitions. SEKAI iterates upon Tendermint consensus with its own Multi-Bonded Proof of Stake (MBPoS), which enables the staking of multiple whitelisted assets as well as KEX, KIRA’s native token and natively supported Liquid Staking Derivatives. Consensus Nodes, or 'validators,' propose new states of SEKAI blockchain application derived from blocks that contain an ordered list of transactions carrying instructions (user requests). Those instructions are then executed by each full node following the SEKAI codebase which defines how to interpret and apply them.
+
+
+Unlike most existing base layers, SEKAI is not a monolithic chain application. Instead, it depends on multiple modular off-chain components to enable parallel scaling of the execution, storage, and networking capabilities of the network. Those other components are [INTERX (Content Availability Layer)](/learn/what-is-kira/middleware---interx/overview) and [RYOKAI (Smart Resource Orchestrator)](/learn/what-is-kira/orchestrator---ryokai).
+
+
+The primary role of SEKAI in the KIRA hypermodular (hyper-connected modular) network is to facilitate the settlement of user balances, provide shared security to the RollApp-centric execution layer, and facilitate data and token transfers. Each consensus nodes has a supporting role of providing the resources necessary to run both SEKAI and the L2 applications (RollApps). SEKAI is used as a coordination hub allowing Consensus nodes to signal which RollApps they want to run and which they don’t or currently can’t afford to run due to their hardware or networking limitations.
+
+
+SEKAI greatly simplifies RollApps deployment process - that’s where [Controllers](/learn/glossary#eb32e36246ef424186f9f01f7f527741) submit metadata describing their RollApp needs, which includes references to the execution and verification containers, networking configuration, infrastructure resources needed, and other essential data needed by RYOKAI to run the RollApp. Consensus nodes can then volunteer as Executors for these RollApps and consequently be incentivized by them as well as KIRA’s native liquidity protocol (AMM fees). Based on metadata, they can locate and download the necessary containers, to subsequently run them and propose updates to the app's state and balances on SEKAI. The verification container is then made available to other Consensus nodes and users (acting as Fishermen) for participation in the verification of the RollApp execution process.
+
+
+:::note
+
+To learn more about how KIRA's RollApps function and how they differ from traditional models, visit our detailed discussion in the [Layer 2](/learn/what-is-kira/layer-2/overview) section.
+
+:::
+
+
+

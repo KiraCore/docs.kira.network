@@ -1,0 +1,59 @@
+---
+title: chaosnet-2
+sidebar_position: 0
+slug: chaosnet-2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Description {#9e790ab44c764cf9a4e17ba8705fef76}
+
+- Chain Identifier: `chaosnet-2`
+- KIRA Manager CID: `TBD`
+- KIRA Manager version: `TBD`
+- Genesis File Checksum: `TBD`
+- Initial Block Height: `TBD`
+- Block Height Reached: `TBD`
+- Peers: `TBD`
+
+## Changelog {#6e80b47c4bd0481a9e27b2bab70affcb}
+
+
+### Sekai {#b4d7cfebcae74e07b903dba29b504792}
+
+- Added flag for filtering only required modules for migration, [#630](https://github.com/KiraCore/sekai/pull/630).
+- Fixed issues with Genesis initialization.
+- **Fee Processing**: Improved CLI with flags for execution fees proposal, [#626](https://github.com/KiraCore/sekai/issues/626).
+- **Slashing Module**: Integrated slashing module params to gov module properties.
+- **Identity Registrar**:
+	- Removed abandoned record ids from request records.
+	- Fixed bugs in identity registrar verification and handling of non-existing identity records key from an address, [#579](https://github.com/KiraCore/sekai/issues/579).
+	- Introduced unique identity keys [#569](https://github.com/KiraCore/sekai/issues/569).
+- **Network Properties**: Optimized network properties handling, [#555](https://github.com/KiraCore/sekai/issues/555).
+- **Webhook & Static Build**: Implemented webhook and static build features.
+- **Token Module**: Updated default parameters type from bool to uint64 on codec metadata and added default denom on `AllTokenAliases` response.
+- **Cosmos SDK**: Upgraded Cosmos SDK version to v0.47.6.
+- **Multistaking Module**:
+	- Introduced autocompound interval addition, added validations for commission range, and improved CLI command for `upsert-staking-pool`.
+	- Resolved claim undelegation issue [#577](https://github.com/KiraCore/sekai/issues/577).
+- **Token Basket Module**: Enhanced the basket module for issues [#442](https://github.com/KiraCore/sekai/issues/442), [#441](https://github.com/KiraCore/sekai/issues/441), [#590](https://github.com/KiraCore/sekai/issues/590), [#591](https://github.com/KiraCore/sekai/issues/591), [#592](https://github.com/KiraCore/sekai/issues/592), and [#594](https://github.com/KiraCore/sekai/issues/594). Also supported multiple swaps at once.
+- **Spending Pool Module**: Enhanced the spending module for issue [#597](https://github.com/KiraCore/sekai/issues/597).
+- **Gitflow Docker Base-image**: Updated from v0.11.2 to v0.13.14.
+- **Governance**: Added a gRPC endpoint & CLI for querying custom prefixes, implemented missing proposal by voter query filter, and introduced gov properties metadata for `ValidatorRecoveryBond` and `MaxAnnualInflation`.
+
+### Interx {#fad4c9caaf1d4817870e5cf5e8e6ccdf}
+
+- **Delegation and Metadata Endpoints**: Introduced a new delegation endpoint along with an updated metadata endpoint with accompanying unit/integration tests.
+- **Proposals Endpoint**: Optimized the proposals endpoint for better query performance from the frontend. Tests for this endpoint were updated.
+- **Staking-pool and Valoper Endpoint Issues**: Fixed issues with staking-pool and valoper endpoints, as well as identity record querying issues.
+- **Custom Denom and Bech32 Prefix**: Implemented custom denom and bech32 prefix.
+- **QueryTransactions Endpoint**: Fixed minor issues for QueryTransactions endpoint.
+- **QueryUndelegations Endpoint**: Implemented QueryUndelegations endpoint.
+- **QueryKiraTokensAliases Endpoint**: Added DefaultDenom and Bech32Prefix to QueryKiraTokensAliases endpoint.
+- **Snapshot Checksum**: Made sleep interval for snapshot checksum.
+- **Webhook for Sekin Repo**: Added a webhook for the Sekin repo.
+- **Pub_p2p_list Endpoint and Bin**: Fixed issues with the pub_p2p_list endpoint and deleted bin.
+- **Sekai Version Bump**: v0.3.40

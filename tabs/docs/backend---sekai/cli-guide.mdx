@@ -1,0 +1,120 @@
+---
+title: CLI Guide
+sidebar_position: 4
+slug: cli-guide
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+:::note
+
+For the latest status on the functionality of Sekai CLI commands and flags, refer to this KM CLI documentation. This resource meticulously tracks the operability of each feature, offering a clear view of what's currently functional along with examples and additional information: [KIRA Network CLI Status](https://github.com/MrLutik/kira2.0/blob/master/docs/sekai.md).
+
+:::
+
+
+
+
+### Commands Syntax {#e4a1051b836c4dde8929033559feaba1}
+
+
+SEKAI provides a command-line interface (CLI) that enables users to interact with its modules. Using the CLI, users can create, sign, and submit `Msg` transactions, as well as query the blockchain's state and node information. Each module has its own set of CLI commands, which can be accessed through the main CLI entrypoint `sekaid`. These commands fall into two categories: transactions `tx`, which require signing, and queries `query`, which do not. To create a transaction using the CLI, users need to specify the transaction command, as well as any required arguments and flags. For more information on the available commands for a specific module, users can refer to the module's documentation or use the `--help` flag. For example, to see all available CLI commands for bank module, users can run `sekaid tx bank --help` for transactions or `sekaid query bank --help` for queries.
+
+
+ For example, to send tokens from one account to another, users can run the following command:
+
+
+```bash
+sekaid tx bank send $from_key_or_address $to_address $amount --chain-id=$NETWORK_NAME --home=$SEKAID_HOME --fees=100ukex --keyring-backend=test --yes --broadcast-mode=block --log_format=json --output=json.
+```
+
+
+To query the blockchain state or node information, users can use the `query` command followed by the relevant subcommand and arguments. For example, to query the balance of an account, users can run the following command: 
+
+
+```bash
+sekaid query bank balance $address --home=$SEKAID_HOME --chain-id=$NETWORK_NAME --output=json
+```
+
+
+:::note
+
+`$NETWORK_NAME` and `$SEKAID_HOME` env variables should have been set up during [SEKAI installation](/docs/backend---sekai/sekai-installation) process and all other flags can be set as env variable. More on this in the section below.
+
+:::
+
+
+
+
+### Flags Configuration {#9aced983c64b4b898302f62c5b06bd78}
+
+
+:::note
+
+Some flags may be required by specific CLIs.
+
+:::
+
+
+
+
+SEKAI CLIs offers a range of flags that can be used to customize the behavior of commands and gather additional information from the transaction signer, such as the amount of `--fees` the user is willing to pay. Some common flags include `--home`, which allows users to specify the location of the data directory, and `--chain-id`, which allows users to specify the chain ID. Additionally, users can specify the keys storage backend with `--keyring-backend`. A full list of available flags can be below or accessed using the `--help` flag with the relevant CLI.
+
+
+To streamline the process of specifying flags for transactions, users can use the `bash-utils` tool developed by KIRA. This tool, which has been installed alongside SEKAID, allows users to easily set environment variables for common flags and load them as needed. For example, to set common flags for transactions on the testnet (such as `--keyring-backend=test`), users can add the following environment variable:
+
+
+```bash
+setGlobEnv FLAGS_TX "--home=$SEKAID_HOME --chain-id=$NETWORK_NAME --fees=100ukex --keyring-backend=test --yes --broadcast-mode=block --log_format=json --output=json"
+```
+
+
+Similar to transactions, users can also set environment variables for common flags used in queries. For example, to set common flags for queries, users can add the following environment variable:
+
+
+```bash
+setGlobEnv FLAGS_QR "--home=$SEKAID_HOME --chain-id=$NETWORK_NAME --output=json"
+```
+
+
+To use those newly created environment variables, simply call the `loadGlobEnvs` function:
+
+
+```bash
+loadGlobEnvs
+```
+
+
+#### List of Flags  {#17069fece0de4a84bb83b7e16b9a6dba}
+
+
+| **FLAG**            | **DEFAULT**             | **DESCRIPTION**                                                                                                                                                                                                |
+| ------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--output`          | `"json"`                | Output format (`text` or `json`)                                                                                                                                                                               |
+| `--keyring-dir`     |                         | The client Keyring directory; if omitted, the default 'home' directory will be used                                                                                                                            |
+| `--from`            |                         | Name or address of private key with which to sign the transaction                                                                                                                                              |
+| `--account-number`  | `0`                     | The account number of the signing account (offline mode only)                                                                                                                                                  |
+| `--sequence`        | `0`                     | The sequence number of the signing account (offline mode only)                                                                                                                                                 |
+| `--note`            |                         | Note to add a description to the transaction (previously `--memo`)                                                                                                                                             |
+| `--fees`            |                         | Fees to pay along with transaction; eg: `10ukex`                                                                                                                                                               |
+| `--gas-prices`      |                         | Gas prices in decimal format to determine the transaction fee (e.g. `0.1ukex`)                                                                                                                                 |
+| `--node`            | `tcp://localhost:26657` | `<host>:<port>` to tendermint rpc interface for this chain                                                                                                                                                     |
+| `--ledger`          | `false`                 | Use a connected Ledger device                                                                                                                                                                                  |
+| `--gas-adjustment`  | `DefaultGasAdjustment`  | adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored                                                                   |
+| `--broadcast-mode`  | `BroadcastSync`         | Transaction broadcasting mode (`sync` or `async` or `block`)                                                                                                                                                   |
+| `--dry-run`         | `false`                 | ignore the `--gas` flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)                                                                  |
+| `--generate-only`   | `false`                 | Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase only accessed when providing a key name)                                                                                 |
+| `--offline`         | `false`                 | Offline mode (does not allow any online functionality)                                                                                                                                                         |
+| `--yes`             | `false`                 | Skip tx broadcasting prompt confirmation                                                                                                                                                                       |
+| `--keyring-backend` | `DefaultKeyringBackend` | Select keyring's backend (`os` or `file` or `kwallet` or `pass` or `test` or `memory`)                                                                                                                         |
+| `--sign-mode`       |                         | Choose sign mode (`direct` or `amino-json` or `direct-aux`), this is an advanced feature                                                                                                                       |
+| `--timeout-height`  | `0`                     | Set a block timeout height to prevent the tx from being committed past a certain height                                                                                                                        |
+| `--fee-payer`       |                         | Fee payer pays fees for the transaction instead of deducting from the signer                                                                                                                                   |
+| `--fee-granter`     |                         | Fee granter grants fees for the transaction                                                                                                                                                                    |
+| `--tip`             |                         | Tip is the amount that is going to be transferred to the fee payer on the target chain. <br/>This flag is only valid when used with `--aux`, and is ignored if the target chain didn't enable the TipDecorator |
+| `--aux`             | `false`                 | Generate aux signer data instead of sending a tx                                                                                                                                                               |
+| `--gas`             |                         | gas limit to set per-transaction; set to "auto" to calculate sufficient gas automatically                                                                                                                      |
+
