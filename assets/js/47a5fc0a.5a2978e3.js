@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkkira_documentation=self.webpackChunkkira_documentation||[]).push([[3589],{4495:e=>{e.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"ecosystem"}')}}]);
