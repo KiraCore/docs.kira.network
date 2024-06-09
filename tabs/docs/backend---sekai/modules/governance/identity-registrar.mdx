@@ -15,7 +15,7 @@ import TabItem from '@theme/TabItem';
 The Identity Registrar is a central component of the KIRA network, designed to bolster the integrity and authenticity of user accounts. It addresses the critical challenge of "Sybil attacks", where a single entity poses as multiple users. Through the IR, KIRA emphasizes the significance of genuine, unique user representation, ensuring a more democratic and fair governance structure.
 
 
-At its core, the IR provides a mechanism for users to authenticate assertions about themselves, such as ownership of a website or an online handle. Unlike traditional centralized verification systems, the IR operates on mutual verification principles within the community. Users within the KIRA network can endorse the validity of claims made by others by giving their attestation, fostering an environment of collective trust. The framework of the IR is akin to a digital dictionary, allowing users to define key-value pairs relevant to their identity. For instance, associating a key `website` with the value `example.com` serves as proof of ownership of said website. Importantly, any alteration to these authenticated records necessitates re-verification, preserving the integrity of claims.
+At its core, the IR provides a mechanism for users to authenticate assertions about themselves, such as ownership of a website or an online handle. Unlike traditional centralized verification systems, the IR operates on mutual verification principles within the community. Users within the KIRA network can endorse the validity of claims made by others by giving their attestation, fostering an environment of collective trust. The framework of the IR is akin to a digital dictionary, allowing users to define records (key-value pairs) relevant to their identity. For instance, associating a key `website` with the value `example.com` serves as proof of ownership of said website. Importantly, any alteration to these authenticated records necessitates re-verification, preserving the integrity of claims.
 
 
 The essence of IR transcends mere claim verification. Addressing concerns of true sovereignty, IR refines the concept of social attestations. Instead of uniformly weighing attestations, the focus pivots to the trustworthiness of the attestor from an individual or application's perspective. This subjectivity highlights that in the vast sea of approvals, the ones deemed trustworthy to the user or a specific application are the ones that truly matter. It recognizes that while multiple individuals may appear non-sovereign from a network's viewpoint, in reality, their distinct identities hold weight. The IR thus fosters a nuanced, relative view of identity that adapts across applications and purposes, emphasizing the notion that when it comes to digital identity, objective truths are often overshadowed by the diverse perspectives they cater to.
@@ -27,7 +27,7 @@ The essence of IR transcends mere claim verification. Addressing concerns of tru
 The process of verifying an identity record involves a few steps:
 
 1. An user creates an on-chain transaction that includes the desired key and value for the identity record.
-2. It then requests verification from a publicly trusted KIRA account for the key-value pair, and include a tip as payment for the service provided.
+2. It then requests verification from a publicly trusted KIRA account for the record, and include a tip as payment for the service provided.
 3. If the verification is successful, the record will remain verified unless any changes are made to the verified key.
 4. If any changes are made to the key after the verification process, the record will no longer be considered verified.
 5. If any changes are made to the key, any pending request for that key are automatically canceled.
@@ -47,7 +47,7 @@ Once a key is made unique by governance, it cannot be reverted back to non-uniqu
 
 
 
-KIRA offers a range of dedicated identity keys designed to make interactions with the network more user-friendly. These keys store various user-related information that can be interpreted by wallets, explorers, visualizers, and other front-end applications. Notably, KIRA allows for the creation of **any** custom key within the Identity Registrar, but it reserves certain key names like `username` and `moniker` by default. These reserved keys have special significance since they affect the visibility of nodes or accounts across different applications. What's more, the governance of the KIRA can enforce these key-value pairs to remain globally unique, <u>provided they do not already exist</u>, which is managed by modifying the `unique_identity_keys` [network property](/docs/backend---sekai/modules/governance/network-properties). As a result, users can send assets not just to a KIRA address, but also by simply providing a unique username or moniker. Once these unique keys are created, they cannot be deleted, ensuring a more streamlined and user-friendly experience.
+KIRA offers a range of dedicated identity keys designed to make interactions with the network more user-friendly. These keys store various user-related information that can be interpreted by wallets, explorers, visualizers, and other front-end applications. Notably, KIRA allows for the creation of <u>any</u> custom key within the Identity Registrar, but it reserves certain key names like `username` and `moniker` by default. These reserved keys have special significance since they affect the visibility of nodes or accounts across different applications. KIRA’s governance can enforce these records to remain globally unique, <u>provided they do not already exist</u>, which is managed by modifying the `unique_identity_keys` [network property](/docs/backend---sekai/modules/governance/network-properties). As a result, users can send assets not just to a KIRA address, but also by simply providing a unique `username` or `moniker` associated to the address. Once these unique keys are created, they cannot be deleted, ensuring a more streamlined and user-friendly experience.
 
 
 #### Consensus Node Records Examples {#2c29fae12274406b915c3f6df714c39a}
@@ -130,7 +130,7 @@ Each CLI command and proposal process in KIRA requires specific permissions. The
 #### Adding & Editing Records {#62956e6786bf4d3a96b5cd70654c92a9}
 
 
-To add or edit identity records, use the `register-identity-records` CLI command. Provide the desired key-value pairs either in a JSON file by specifying its path with the `--infos-file` flag, or directly in the command as a JSON string using the `--infos-json` flag. Note that certain key names are reserved and may be required to be unique within the Identity Registrar.
+To add or edit identity records, use the `register-identity-records` CLI command. Provide the desired records either in a JSON file by specifying its path with the `--infos-file` flag, or directly in the command as a JSON string using the `--infos-json` flag. Note that certain key names are reserved and may be required to be unique within the Identity Registrar.
 
 
 **Flags**

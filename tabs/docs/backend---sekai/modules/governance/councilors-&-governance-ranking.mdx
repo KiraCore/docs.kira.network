@@ -18,7 +18,7 @@ A KIRA account is considered a Councilor if it has at least one whitelisted [**P
 ### Councilor Seat {#08032ef8b6e84b01b9b06ecc8be78ede}
 
 
-:::📌
+:::note
 
 Sending a `MsgClaimCouncilor` transaction is only allowed if the status of the Councilor is `waiting` (see next section). 
 
@@ -27,9 +27,19 @@ Sending a `MsgClaimCouncilor` transaction is only allowed if the status of the C
 
 
 
+:::caution
+
+Once a councilor seat is claimed, the `username` cannot be modified!
+
+:::
+
+
+
+
 Before any governance member can execute their right to create proposals or vote, they must first "claim" their Councilor Seat, similar to how consensus nodes claim their Validator Seat. This action acknowledges the network [**Code of Conduct**](/docs/backend---sekai/modules/governance/data-registry) and allows registering a KIRA user in the governance registrar. When submitting a `MsgClaimCouncilor` transaction using the `claim-councilor-seat` CLI, the user must supply the following information, which will be persisted in the [Identity Registrar](/docs/backend---sekai/modules/governance/identity-registrar):
 
-- `username` - (required) friendly governance member name with minimum 4 non-whitespace characters. It is globally unique and cannot be deleted (just like consensus nodes’ `moniker`).
+- `username` - (required) friendly governance member name with minimum 4 non-whitespace characters. It is globally unique and cannot be modified or deleted.
+- `moniker` - (required)
 - `description` - (optional) a longer description of the councilor
 - `social` - (optional) comma-separated URL list of any social profiles such as Twitter, Telegram, etc…
 - `contact` - (optional) email address, URL, or another emergency contact
@@ -131,11 +141,11 @@ Each CLI command and proposal process in KIRA requires specific permissions. The
 ## Transactions {#6839c0e109594116986c3bfdf282f92a}
 
 
-| **`councilor claim-seat`** | Claim a councilor seat.                                                       |
-| -------------------------- | ----------------------------------------------------------------------------- |
-| **`councilor pause`**      | Signal an absence as a councilor.                                             |
-| **`councilor unpause`**    | Signal re-availability as a councilor.                                        |
-| **`councilor activate`**   | Activate councilor status previously deactivated due to excessive abstention. |
+| `councilor claim-seat` | Claim a councilor seat.                                                       |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `councilor pause`      | Signal an absence as a councilor.                                             |
+| `councilor unpause`    | Signal re-availability as a councilor.                                        |
+| `councilor activate`   | Activate councilor status previously deactivated due to excessive abstention. |
 
 
 #### Claim Councilor Seat {#5f7c76ed81c247f7a6743a762dc04f7d}
@@ -220,11 +230,11 @@ sekaid tx customgov councilor activate \
 ## Queries {#615f1f023f3543ae9e4c1454ecac7bef}
 
 
-| **`councilors`**            | Query all councilors, including their statuses, ranks, and abstention counters.                         |
-| --------------------------- | ------------------------------------------------------------------------------------------------------- |
-| **`non-councilors`**        | Query all governance members that are not councilors.                                                   |
-| **`council-registry`**      | Query the governance registry by address or moniker.                                                    |
-| **`proposer-voters-count`** | Query separate counts for proposers and voters who can create or vote on at least one type of proposal. |
+| `councilors`            | Query all councilors, including their statuses, ranks, and abstention counters.                         |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| `non-councilors`        | Query all governance members that are not councilors.                                                   |
+| `council-registry`      | Query the governance registry by address or moniker.                                                    |
+| `proposer-voters-count` | Query separate counts for proposers and voters who can create or vote on at least one type of proposal. |
 
 
 #### Query Councilors {#26b717c801854e9793afe368e12d269a}

@@ -1,0 +1,61 @@
+---
+title: Loading & Choosing Network
+sidebar_position: 0
+slug: loading--choosing-network
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Loading Page {#d24b8855084c42e680d6a58e08b427d5}
+
+
+![](/notion_imgs/718736515.png)
+
+
+The loading page is responsible for connecting to the INTERX node. MIRO always tests the server hosting INTERX for availability before establishing a connection. Data can be extracted from two sources:
+
+1. **IPFS URL**: This is an example URL - at the end of the URL, there is an RPC address ([http://148.251.69.56](http://148.251.69.56/)). [https://ipfs.kira.network/ipfs/bafybeiggh6hd6p54zawzoh2wsh7rk3xagir5eglcpd2c7qqfxn72oijpny/#/app/dashboard?rpc=http://148.251.69.56:11000](https://ipfs.kira.network/ipfs/bafybeiggh6hd6p54zawzoh2wsh7rk3xagir5eglcpd2c7qqfxn72oijpny/#/app/dashboard?rpc=http://148.251.69.56:11000)
+2. **network_list_config.json file**: This file contains information about predefined servers in JSON format. MIRO automatically tries to connect to the first server on the list. The JSON structure is as follows:
+
+```json
+{
+  "refresh_interval_seconds": 60,
+  "proxy_server_url": "<https://cors.kira.network>",
+  "network_list": [
+    {
+      "name": "Public Node 1",
+      "address": "<http://148.251.69.56:11000>"
+    },
+    {
+      "name": "Public Node 2",
+      "address": "<http://128.140.42.2:11000>"
+    }
+  ]
+}
+```
+
+
+## Network List {#a2b41c1bcf7a4e3e867785fa86e7a69e}
+
+
+![](/notion_imgs/1005049361.png)
+
+
+The Network List Page displays after a failed response from INTERX. In MIRO, there are four possible states for an INTERX server:
+
+1. Unknown (grey) - MIRO is waiting for a response from INTERX which can take several minutes.
+2. Healthy (green) - MIRO will automatically connect if INTERX provides a correct response from the /api/status endpoint, the INTERX version is supported by MIRO, and the difference between the last block time and local user time is less than 5 minutes.
+3. Unhealthy (yellow) - MIRO will not connect automatically. User consent is required to connect if INTERX provides a correct response from the /api/status endpoint, but the INTERX version is not supported by MIRO, or the difference between the last block time and local user time exceeds 5 minutes.
+4. Offline (red) - If INTERX responds with a bad response code (40X or 50X), it's considered offline.
+
+:::note
+
+MIRO periodically checks the INTERX status, no more frequently than every 60 seconds. This interval can be lengthened in the **network_list_config.json** file. Any value below 60 will be reset to avoid unintended excessive requests to servers.
+
+:::
+
+
+

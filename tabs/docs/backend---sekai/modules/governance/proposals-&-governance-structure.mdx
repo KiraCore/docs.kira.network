@@ -78,13 +78,18 @@ The outcome of a proposal is determined based on the following rules:
 | `QuorumNotReached` | The quorum was not reach before `voting_end_time`.                                                                                                        |
 
 
-#### Relevant Network Properties {#5584c3f171f24ddfa7a616c344690c83}
+## Network Properties {#5584c3f171f24ddfa7a616c344690c83}
 
 
 Two fundamental [network properties](/docs/backend---sekai/modules/governance/network-properties) establish the baseline for proposal duration and enactment timeframes: `minimum_proposal_end_time` and `proposal_enactment_time`.
 
 - The `minimum_proposal_end_time` sets the lower limit for all proposals durations, also known as `voting_end_time` which can be adjusted by the governance for individual proposal [types](https://github.com/KiraCore/sekai/blob/master/types/Proposal.go).
 - The `proposal_enactment_time` creates a consistent rule that applies to all proposals. It sets each proposal's `enactment_end_time` by adding the `proposal_enactment_time` to that proposal's `voting_end_time`.
+
+There are two additional properties to consider:
+
+- The `min_proposal_end_blocks` sets the minimum number of blocks during which the proposals remain active, which prevails over `minimum_proposal_end_time`. This is used to prevent edge cases where `minimum_proposal_end_time` is set to a value shorter than a single block time, thus making it impossible to vote in time.
+- The `min_proposal_enactment_blocks` defines the minimum number of blocks that must pass after a proposal has passed for the proposal to take effect. It prevails over `proposal_enactment_time` for the same reason explained above.
 
 ## Parameters {#c87ca8ad5ef4402aab4f8f9c9768b78b}
 
@@ -98,17 +103,15 @@ Existing governance proposals types are listed [here](https://github.com/KiraCor
 #### Proposal {#e3cd55578cb74dc394f3c4346e73236c}
 
 
-| **NAME**                         | **TYPE**                    | **EXAMPLE**        | **DESCRIPTION**                                                                                              |
-| -------------------------------- | --------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `proposal_id`                    | `uint64`                    | `1`                | The unique identifier of the proposal.                                                                       |
-| `title`                          | `string`                    | `some title`       | The title of the proposal.                                                                                   |
-| `description`                    | `string`                    | `some description` | The description of the proposal.                                                                             |
-| `content`                        | `google.protobuf.Any`       |                    | The content of the proposal.                                                                                 |
-| `submit_time`                    | `google.protobuf.Timestamp` | `1677781730`       | The timestamp when the proposal was submitted.                                                               |
-| `voting_end_time`                | `google.protobuf.Timestamp` | `1678386530`       | The timestamp indicating the end of the voting period for the proposal.                                      |
-| `enactment_end_time`             | `google.protobuf.Timestamp` | `1678991330`       | The timestamp indicating the end of the enactment period for the proposal.                                   |
-| `min_voting_end_block_height`    | `int64`                     | `17500`            | `voting_end_time` corresponding minimum block height at which the voting period for the proposal ends.       |
-| `min_enactment_end_block_height` | `int64`                     | `18500`            | `enactment_end_time` corresponding minimum block height at which the enactment period for the proposal ends. |
+| **NAME**             | **TYPE**                    | **EXAMPLE**        | **DESCRIPTION**                                                            |
+| -------------------- | --------------------------- | ------------------ | -------------------------------------------------------------------------- |
+| `proposal_id`        | `uint64`                    | `1`                | The unique identifier of the proposal.                                     |
+| `title`              | `string`                    | `some title`       | The title of the proposal.                                                 |
+| `description`        | `string`                    | `some description` | The description of the proposal.                                           |
+| `content`            | `google.protobuf.Any`       |                    | The content of the proposal.                                               |
+| `submit_time`        | `google.protobuf.Timestamp` | `1677781730`       | The timestamp when the proposal was submitted.                             |
+| `voting_end_time`    | `google.protobuf.Timestamp` | `1678386530`       | The timestamp indicating the end of the voting period for the proposal.    |
+| `enactment_end_time` | `google.protobuf.Timestamp` | `1678991330`       | The timestamp indicating the end of the enactment period for the proposal. |
 
 
 #### Vote Types {#c48673132aeb432d977a1554e8a86434}
@@ -122,19 +125,19 @@ Existing governance proposals types are listed [here](https://github.com/KiraCor
 | `VOTE_OPTION_NO_WITH_VETO (4)` | Councilor strongly disagrees with a proposal and wants to prevent it from passing successfully bypassing the majority vote percentage requirements for approval due to concerns highly impacting network operations or safety. |
 
 
-#### Proposal Status {#703d5727415642f2a6b4d33cd6acff0a}
+#### Proposal Statuses {#703d5727415642f2a6b4d33cd6acff0a}
 
 
-| **STATUS**                              | **DESCRIPTION**                                                                              |
-| --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `VOTE_RESULT_UNKNOWN (0)`               | Result of the proposal is not yet known/defined                                              |
-| `VOTE_RESULT_PASSED (1)`                | Proposal reached quorum, passed successfully, was enacted and took effect                    |
-| `VOTE_RESULT_REJECTED (2)`              | Proposal reached quorum but did NOT pass by lacking a minimum of >50% `yes (1)` votes        |
-| `VOTE_RESULT_REJECTED_WITH_VETO (3)`    | Proposal reached quorum but did NOT pass due to rejection of >50% `veto (4)` votes           |
-| `VOTE_PENDING (4)`                      | Proposal is not finalized yet and is still awaiting votes                                    |
-| `VOTE_RESULT_QUORUM_NOT_REACHED (5)`    | Proposal failed to reach quorum and thus was rejected                                        |
-| `VOTE_RESULT_ENACTMENT (6)`             | Proposal was successful but is awaiting enactment time to be passed and thus enforced        |
-| `VOTE_RESULT_PASSED_WITH_EXEC_FAIL (7)` | Execution of the proposal logic failed with an unforeseen exception and no changes were made |
+| **STATUS**                              | **DESCRIPTION**                                                                                        |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `VOTE_RESULT_UNKNOWN (0)`               | Result of the proposal is not yet known/defined                                                        |
+| `VOTE_RESULT_PASSED (1)`                | Proposal reached quorum, passed successfully, was enacted and took effect                              |
+| `VOTE_RESULT_REJECTED (2)`              | Proposal reached quorum but did NOT pass by lacking a minimum of >50% `VOTE_OPTION_YES (1)` votes      |
+| `VOTE_RESULT_REJECTED_WITH_VETO (3)`    | Proposal reached quorum but did NOT pass due to rejection of >50% `VOTE_OPTION_NO_WITH_VETO (4)` votes |
+| `VOTE_PENDING (4)`                      | Proposal is not finalized yet and is still awaiting votes                                              |
+| `VOTE_RESULT_QUORUM_NOT_REACHED (5)`    | Proposal failed to reach quorum and thus was rejected                                                  |
+| `VOTE_RESULT_ENACTMENT (6)`             | Proposal was successful but is awaiting enactment time to be passed and thus enforced                  |
+| `VOTE_RESULT_PASSED_WITH_EXEC_FAIL (7)` | Execution of the proposal logic failed with an unforeseen exception and no changes were made           |
 
 
 ## CLI Syntax & Examples {#b82ffe5632d24d94997e6981477a132b}
