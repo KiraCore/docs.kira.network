@@ -12,11 +12,33 @@ Submit your project idea [here](https://github.com/KiraCore/docs.kira.network/tr
 ## Installation
 
 1. **Clone Repository**: Clone the repository to your local machine.
+```bash
+git clone https://github.com/KiraCore/docs.kira.network.git
+```
+2. **Install yarn and node**
+```bash
+sudo apt update
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install Yarn
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update
+sudo apt install yarn
+
+# Verify installations
+node -v
+npm -v
+yarn -v
+```
 3. **Install dependencies**:
 ```bash
 yarn install    # Install dependencies
 ```
-2. **Set Required Environment Variables**: Set `GIT_PASS` and `GIT_USER` for GitHub deployment, and `DOCU_NOTION_SAMPLE_ROOT_PAGE` and `DOCU_NOTION_INTEGRATION_TOKEN` for Notion integration.
+4. **Set Required Environment Variables**: Set `GIT_PASS` and `GIT_USER` for GitHub deployment, and `DOCU_NOTION_SAMPLE_ROOT_PAGE` and `DOCU_NOTION_INTEGRATION_TOKEN` for Notion integration.
 
    - For GitHub Deployment:
      ```bash
