@@ -33,29 +33,10 @@ const config = {
     ],
   ],
   plugins: [
-    
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'docs',
-        path: 'tabs/docs',
-        routeBasePath: '/docs/',
-        sidebarPath: undefined,
-        showLastUpdateTime: true,
-        remarkPlugins: [require('remark-math')],
-        rehypePlugins: [require('rehype-katex')],
-        editUrl: ({docPath, permalink}) => {
-          docPath = docPath.toLowerCase();
-          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
-          return repoUrl;
-        },
-      },
-    ],
-
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        // id: 'learn', // omitted => default instance
+        id: 'default', // == 'default' if omitted
         path: 'tabs/learn',
         routeBasePath: '/learn/',
         sidebarPath: undefined,
@@ -75,6 +56,23 @@ const config = {
         id: 'testnet',
         path: 'tabs/testnet',
         routeBasePath: '/testnet/',
+        sidebarPath: undefined,
+        showLastUpdateTime: true,
+        remarkPlugins: [require('remark-math')],
+        rehypePlugins: [require('rehype-katex')],
+        editUrl: ({docPath, permalink}) => {
+          docPath = docPath.toLowerCase();
+          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
+          return repoUrl;
+        },
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'docs',
+        path: 'tabs/docs',
+        routeBasePath: '/docs/',
         sidebarPath: undefined,
         showLastUpdateTime: true,
         remarkPlugins: [require('remark-math')],
@@ -161,28 +159,41 @@ const config = {
           //   position: "right",
           // },
           {
-            label: 'Docs',
-            to: '/docs/',
-            position: 'left',
-            activeBaseRegex: '^/docs/',
-          },
-          {
+            type: 'doc',
             label: 'Learn',
-            to: '/learn/',
+            docId: 'what-is-kira/introduction',
+            docsPluginId: 'default', // default because learn plugin id is not defined
             position: 'left',
             activeBaseRegex: '^/learn/',
           },
           {
-            label: 'Testnet',
-            to: '/testnet/',
+            type: 'doc',
+            label: 'Docs',
+            docId: 'introduction',
+            docsPluginId: 'docs',
             position: 'left',
-            activeBaseRegex: '^/testnet/',
+            activeBaseRegex: '^/docs/',
           },
           {
-            label: 'Ecosystem',
-            to: '/ecosystem/',
+            type: 'dropdown',
+            label: 'Build',
             position: 'left',
-            activeBaseRegex: '^/ecosystem/',
+            activeBaseRegex: '^/testnet/',
+            items: [
+              {
+                type: 'doc',
+                docId: 'introduction',
+                label: 'Testnet',
+                docsPluginId: 'testnet',
+                activeBaseRegex: '^/testnet/',
+              },
+              {
+                type: 'doc',
+                docId: 'index',
+                label: 'Ecosystem',
+                docsPluginId: 'ecosystem',
+              },
+            ]
           },
           {
             label: 'Links',
