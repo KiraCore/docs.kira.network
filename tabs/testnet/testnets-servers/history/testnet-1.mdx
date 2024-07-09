@@ -1,0 +1,38 @@
+---
+title: testnet-1
+sidebar_position: 9
+slug: testnet-1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Description {#40a0527efe0e4875be7d8d5022eae3e3}
+
+- Chain Identifier: `testnet-1`
+- KIRA Manager Checksum: `26237215b968ecfd201d92c61a13b4c4ce84aa65d57465fe949b2b49f8e66db0`
+- Genesis File Checksum: `d00fd0d0b846a68d93f425ba9655bebae18c31ee5687999935899e5d96b4d0be`
+- Block Height Reached: `49999`
+
+## Post Mortem {#e2a7e3452f5b4b848823c3c596c2b046}
+
+
+Duplication of the validator when it's added to the validator set by the state machine. Most likely cause was a validator reactivation & validator claim call occurring at the same time or pause/unpause transaction sent in the same block.
+
+
+## Files {#4069104e2fe944cc950a50d6b3051fa3}
+
+
+[consensus.json](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/89201084-f3a3-4ae6-af04-fdda7f896378/consensus.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45HZZMZUHI%2F20240709%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240709T102922Z&X-Amz-Expires=3600&X-Amz-Signature=66fa623d53341da0af3e554bacabc9e9c52f203672e42d63ee721c41c6ef1ef5&X-Amz-SignedHeaders=host&x-id=GetObject)
+
+
+[file](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/fdcca3cd-3f19-4bdb-b428-2861b627bec2/error.log.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45HZZMZUHI%2F20240709%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240709T102922Z&X-Amz-Expires=3600&X-Amz-Signature=31c8de49c769ea310cef025ba2faac83961fcc6f47092a71385a7b608f11c681&X-Amz-SignedHeaders=host&x-id=GetObject)
+
+
+[genesis.json](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/eac70b61-df42-4db4-be13-81a4ef0de236/genesis.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45HZZMZUHI%2F20240709%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240709T102922Z&X-Amz-Expires=3600&X-Amz-Signature=1088cc7a42e91e51104fc49dfc2e2bd5fcca76561fbc178b8114ec4ebbfc44cb&X-Amz-SignedHeaders=host&x-id=GetObject)
+
+
+[valopers.json](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/b6595835-c77f-4847-96da-5a8817aac68a/valopers.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45HZZMZUHI%2F20240709%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240709T102922Z&X-Amz-Expires=3600&X-Amz-Signature=cf00d8e42cddf669b6338d5baabcda50dbf81eee09d896945b352813e13d2468&X-Amz-SignedHeaders=host&x-id=GetObject)
+

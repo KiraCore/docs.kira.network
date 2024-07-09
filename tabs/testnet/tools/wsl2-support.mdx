@@ -1,0 +1,103 @@
+---
+title: WSL2 Support
+sidebar_position: 2
+slug: wsl2-support
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+The only supported OS for the host machine is Ubuntu, if you find yourself using windows exclusively and want to test KIRA without dedicated hardware you can utilize windows subsystem for linux. Please note that any commands suggested in this document you input on your own risk.
+
+1. **Console**
+
+	All commands presented here should be executed in the [git-bash console](https://git-scm.com/downloads), you have to install it before you can proceed and start the process as administrator.
+
+2. **Initial Setup**
+
+	```bash
+	# Install WSL
+	wsl --install
+	
+	# Ensure WSL is up to date
+	wsl --update
+	
+	# Verify that your WSL version is 1.1.6.0 or higher otherwise the systemd services will not work!
+	wsl --version
+	
+	# Re/Install Ubuntu
+	wsl --install -d Ubuntu-20.04 && \
+	 wsl --setdefault Ubuntu-20.04 && \
+	 wsl --set-version Ubuntu-20.04 2
+	```
+
+1. **Update Ubuntu Image**
+
+	```bash
+	# Open your Ubuntu OS and replace <username> with your username
+	# NOTE: Your username can NOT be called 'root'
+	wsl -d Ubuntu-20.04 --user <username> --cd ~
+	
+	# Within WSL set default user and enable systemd service
+	# Replace <username> in the code below with your username
+	sudo tee -a /etc/wsl.conf <<EOF
+	[user]
+	default=<username>
+	[boot]
+	systemd=true
+	EOF
+	
+	# Update your ubunu instance for faster KM boot
+	sudo apt-get update -y --fix-missing
+	
+	# Exit and return to your git-bash console
+	exit
+	```
+
+1. **Create base image for easy recovery**
+
+	```bash
+	# Create directory to save image
+	mkdir -p /c/linux
+	
+	# Export base image
+	cd /c/linux && wsl --export Ubuntu-20.04 ubuntu-base-20.04.tar
+	```
+
+2. **Copy or recover backup of your base image**
+
+	```bash
+	# Import base image copy as new "kira" VM
+	wsl --import kira /c/linux/kira /c/linux/ubuntu-base-20.04.tar
+	
+	# You can delete and recreate "kira" VM at any time
+	wsl --terminate kira || echo "WARNING: Could NOT terminate kira VM" && \
+	 wsl --unregister kira || echo "WARNING: Could NOT unregister kira VM" && \
+	 rm -rfv /c/linux/kira && \
+	 wsl --import kira /c/linux/kira /c/linux/ubuntu-base-20.04.tar && \
+	 echo "success" || echo "failure"
+	```
+
+1. **Enter virtual machine**
+
+	```bash
+	# stop VM if it was started
+	wsl --terminate kira
+	
+	# start VM
+	# Replace <username> in the code below with your username
+	wsl -d kira --user <username> --cd ~
+	
+	# within VM 
+	# enter sudo mode
+	sudo -s
+	# navigate to /tmp folder
+	cd /tmp
+	# you are now ready to install KM...
+	
+	# exit VM whenever needed
+	exit
+	```
+
