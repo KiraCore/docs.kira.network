@@ -189,7 +189,7 @@ const config = {
               },
               {
                 type: 'doc',
-                docId: 'index',
+                docId: 'kira-ecosystem',
                 label: 'Ecosystem',
                 docsPluginId: 'ecosystem',
               },
