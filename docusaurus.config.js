@@ -125,18 +125,7 @@ const config = {
         // language: ["en", "fr"],
         indexBlog: false,
         indexPages: false,
-        docsRouteBasePath: [
-          "learn",
-          "testnet",
-          "docs",
-          "ecosystem"
-        ],
-        searchContextByPaths: [
-          { path: "learn", label: "Learn Docs" },
-          { path: "testnet", label: "Testnet Docs" },
-          { path: "docs", label: "Docs" },
-          { path: "ecosystem", label: "Ecosystem Docs" }
-        ],
+        docsRouteBasePath: "/",
       },
     ],
   ],
