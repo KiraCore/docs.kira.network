@@ -47,7 +47,7 @@
     --ifm-color-background-lighter: #232326;
     --ifm-color-background-lightest: #28282b;
 
-    --ifm-font-size-base: 1vw;
+    --ifm-font-size-base: 100%;
   }
 
   html[data-theme='dark'] {
@@ -132,6 +132,7 @@
   display: flex;
   position: relative;
   overflow: hidden;
+  font-size: 0.9vw;
 }
 
 .div-block-2 {
