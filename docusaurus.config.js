@@ -216,7 +216,7 @@ const config = {
           {
             href: "https://tg.kira.network",
             position: "right",
-            className: "header-tg-link",
+            className: "header-tg-link", 
             "aria-label": "Official Telegram Channel",
           },
           {
