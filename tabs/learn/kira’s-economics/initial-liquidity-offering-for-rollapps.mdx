@@ -1,7 +1,7 @@
 ---
-title: Initial Liquidity Offering
-sidebar_position: 3
-slug: initial-liquidity-offering
+title: Initial Liquidity Offering for RollApps
+sidebar_position: 4
+slug: initial-liquidity-offering-for-rollapps
 ---
 
 import Tabs from '@theme/Tabs';
@@ -9,25 +9,52 @@ import TabItem from '@theme/TabItem';
 
 
 
-## Overview {#f39ac66bdb804ce193d629d8d73415a9}
+## Overview {#104467da57b78043a0f1e5faa415a284}
 
 
-The Initial Liquidity Offering is a bootstrapping procedure for L2 (RollApps) deployed on KIRA. It is designed to ensure that dApp tokens have sufficient liquidity, and that developers, users, Verifiers, and Executors are commonly aligned towards their RollApp’s success.
+The Initial Liquidity Offering is a liquidity bootstrapping procedure for RollApps deployed on KIRA. It is designed to ensure that application’s tokens have sufficient liquidity at launch, and that developers, users, and application’s operators (Verifiers and Executors) are commonly aligned towards their RollApp’s success.
+
+
+This permissionless, crowdsourced process is similar to Polkadot parachain auctions. **However, the crowdsourced KEX remains liquid**: Upon approval, RollApp tokens representing ownership are minted and paired against bonded KEX in a Uniswap v2-like pool, and the LP tokens are distributed to all investors who contributed to crowdsource which grants the RollApp instant liquidity at launch. **Another key distinction of this approach is that KIRA's RollApp ecosystem is not limited to a fixed number of slots for which applications must compete to prove their quality**. Instead, KIRA governance sets the minimum bond level for applications submission dynamically, which allows for flexible calibration of the entry barrier to ensure a balance between accessibility and project quality. This governance-controlled approach offers more adaptability than a purely market-driven system.
+
+
+## Ilo Process {#104467da57b780c59582f8260d5eb428}
+
+
+When submitting a new RollApp, a minimum bond of KEX is required for the submission to pass:
+
+	- The total minimum bond must be reached before the deployment request expires. This bond can be crowdsourced from any users, but the controller must provide a portion from their own account.
+	- The controller's minimum contribution is set at 1% of the total minimum bond and is meant to demonstrate their commitment to the project.
+
+If the total minimum bond isn't reached before the proposal period ends, the RollApp is rejected and funds are returned to all participants. Note that there is also a cap on total deposits.
+
+
+### Procedure {#107467da57b780a49785cac5c410e283}
 
 
 The ILO procedure is as follows:
 
-1. RollApp deployer (Controller) creates a governance proposal for RollApp submission.
+1. RollApp Controller creates a governance proposal for RollApp submission.
 2. The minimum RollApp bond must be committed within the proposal duration, set to 7 days by default. This value is set to 1,000,000 KEX by default.
 3. For the proposal to pass, 1% of the minimum RollApp bond must be committed by the Controllers before 7 days have elapsed. The remaining 99% of the bond can be supplied by any other users similar to Polkadot auctions.
 4. RollApps gain approval to launch once this minimum bonding requirement is met. If the minimum bonding is not satisfied, all participants receive a full refund.
 5. After a RollApp launches, and a Consensus node is running its execution container, tokens representing stakeholder ownership of the RollApp are minted according to the token supply specified by Controllers in the submission proposal. These tokens are then paired with all bonded KEX tokens in a Uniswap-style automated market maker (AMM) pool governed by a constant product (x*y=k) bonding curve model.
 6. A [Spending Pool](/docs/backend---sekai/modules/spending-pool/spending-pools) is created for users who have bonded KEX. They are eligible to claim LP tokens from the Spending Pool, proportional to their respective bonded amounts. Depending on the dApp proposal, these LP tokens may be immediately claimable or progressively unlocked over time.
 
-## Flexible Rollapps’ Economics {#94d53dc46c5d403fb58a8541f7fb02a0}
+## Flexible Rollapps’ Economics {#104467da57b78097a838c4815d786828}
 
 
-KIRA allows Controllers to define in their RollApp submission proposal whether additional tokens may be issued during and/or after the launch. These are referred to as premint and postmint. The unlock rate of the Spending Pool is also defined within the proposal.
+KIRA allows Controllers to define complex vesting and token issuance strategies in their RollApp submission proposal. These strategies involve two distinct components:
+
+1. LP Token Vesting: Contributions from the ILO result in LP tokens, which can be subject to vesting. The unlock rate of these LP tokens in the Spending Pool is defined within the proposal.
+2. Additional Token Issuance: Controllers can specify if and how additional RollApp tokens may be issued. This includes:
+	- Premint: Tokens issued immediately upon RollApp approval
+	- Postmint: Tokens issued after a specified period following approval
+
+Both premint and postmint tokens can have their own vesting schedules, separate from the LP token vesting. This flexibility allows RollApps to design token economics that suit their specific needs, balancing immediate liquidity with long-term stability. 
+
+
+### Examples of Token Vesting and Issuance Strategies {#e277b005497e403db5723236391027e2}
 
 
 Here are a few examples of how these configurable parameters can be used:
@@ -36,7 +63,7 @@ Here are a few examples of how these configurable parameters can be used:
 - **User-Assisted Launch** - The LP Spending Pool is configured to slowly distribute LP tokens. The premint allowance is set to a small reasonable amount while the postmint function is not used. A small team needing to hire developers could configure emissions this way, allowing them to establish a token treasury and sell stake to users locked in the LP.
 - **Investor-Assisted Launch** - The LP Spending Pool slowly distributes LP tokens; premint and postmint have allowances. A large, complex project could configure emissions like this. Premint and postmint enable treasury creation and sale of SAFT agreements. Controllers can define when postminted tokens are issued and set up vesting/drip mechanisms to distribute tokens gradually without damaging investor confidence.
 
-## Aligned Incentives {#392794efdf994a678426e4369f9b68b8}
+## Aligned Incentives {#104467da57b7809d8a2cdb792594d692}
 
 
 To align ILO participants' incentives with the RollApp's success, a minimum 100,000 KEX collateral threshold is set for the RollApp’s liquidity pool. If the pool's KEX collateral falls below this, the RollApp enters a 28-day default depreciation phase, after which execution halts.
