@@ -17,21 +17,6 @@ const config = {
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
 
-  presets: [
-    [
-      '@docusaurus/preset-classic',
-      {
-        docs: false,
-        blog: false,
-        theme: {
-          customCss: [
-            require.resolve("./css/kira.css"),
-            require.resolve("./css/docu-notion-styles.css"),
-          ],
-        },
-      },
-    ],
-  ],
   plugins: [
     [
       '@docusaurus/plugin-content-docs',
@@ -118,6 +103,15 @@ const config = {
 
   themes: [
     [
+      '@docusaurus/theme-classic',
+      {
+        customCss: [
+          require.resolve("./css/kira.css"),
+          require.resolve("./css/docu-notion-styles.css"),
+        ],
+      },
+    ],
+    [
       require.resolve("@easyops-cn/docusaurus-search-local"),
       {
         // `hashed` is recommended as long-term-cache of index file is possible.
@@ -130,8 +124,7 @@ const config = {
     ],
   ],
   themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
+    {
       metadata: [
         {
           name: "keywords",
@@ -242,7 +235,7 @@ const config = {
         darkTheme: themes.dracula,
         additionalLanguages: ['bash','go'],
       },
-    }),
+    },
 };
 
 module.exports = config;
