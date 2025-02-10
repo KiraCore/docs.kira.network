@@ -1,14 +1,6 @@
-import React, { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import React from 'react';
+import { Redirect } from '@docusaurus/router';
 
-function RedirectToLearn() {
-  const history = useHistory();
-
-  useEffect(() => {
-    history.push('/learn/');
-  }, [history]);
-
-  return null;
+export default function Home() {
+  return <Redirect to="/learn/" />;
 }
-
-export default RedirectToLearn;
