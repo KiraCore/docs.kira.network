@@ -156,27 +156,13 @@ Claim a councilor seat using the `claim-seat` command.
 
 **Flags**
 
-
-	`$ADDRESS`: The address of the councilor.
-
-
-	`$MONIKER`: The moniker of the councilor.
-
-
-	`$USERNAME`: The username of the councilor.
-
-
-	`$DESCRIPTION`: The description of the councilor.
-
-
-	`$SOCIAL`: The social media handle of the councilor.
-
-
-	`$CONTACT`: The contact details of the councilor.
-
-
-	`$AVATAR`: The avatar of the councilor.
-
+	- `$ADDRESS`: The address of the councilor.
+	- `$MONIKER`: The moniker of the councilor.
+	- `$USERNAME`: The username of the councilor.
+	- `$DESCRIPTION`: The description of the councilor.
+	- `$SOCIAL`: The social media handle of the councilor.
+	- `$CONTACT`: The contact details of the councilor.
+	- `$AVATAR`: The avatar of the councilor.
 
 ```bash
 sekaid tx customgov councilor claim-seat \
@@ -267,12 +253,8 @@ Query the governance registry. The registry can be queried by either address or 
 
 **Flags**
 
-
-	`$ADDRESS`: The address you want to query information.
-
-
-	`$MONIKER`: The moniker you want to query information.
-
+	- `$ADDRESS`: The address you want to query information.
+	- `$MONIKER`: The moniker you want to query information.
 
 ```bash
 sekaid query customgov council-registry \
@@ -313,18 +295,12 @@ Create a proposal to jail specific councilors using the `proposal-jail-councilor
 
 **Args**
 
-
-	`$COUNCILORS`: List of councilors to be jailed, comma separated list of addresses.
-
+	- `$COUNCILORS`: List of councilors to be jailed, comma separated list of addresses.
 
 **Flags**
 
-
-	`$TITLE`: The title of the proposal.
-
-
-	`$DESCRIPTION`: The description of the proposal, it can be a URL, some text, etc.
-
+	- `$TITLE`: The title of the proposal.
+	- `$DESCRIPTION`: The description of the proposal, it can be a URL, some text, etc.
 
 ```bash
 sekaid tx customgov proposal proposal-jail-councilor \
@@ -341,12 +317,8 @@ Create a proposal to reset all councilors rank using the `proposal-reset-whole-c
 
 **Flags**
 
-
-	`$TITLE`: The title of the proposal.
-
-
-	`$DESCRIPTION`: The description of the proposal, it can be a URL, some text, etc.
-
+	- `$TITLE`: The title of the proposal.
+	- `$DESCRIPTION`: The description of the proposal, it can be a URL, some text, etc.
 
 ```bash
 sekaid tx customgov proposal proposal-reset-whole-councilor-rank \

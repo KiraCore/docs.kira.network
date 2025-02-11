@@ -23,7 +23,7 @@ export default function FooterWrapper() {
             <a href="https://kira.network/" target="_blank" className="footer-link">Home</a>
             <a href="https://kira.network/token.html" target="_blank" className="footer-link">Token & Economics</a>
             <a href="https://kira.network/build.html" target="_blank" className="footer-link">Build on KIRA</a>
-            <Link to="/testnet" className="footer-link">Run a node</Link>
+            <Link to="/node-operators/" className="footer-link">Run a node</Link>
           </div>
           <div className="footer-links-wrapper">
             <div className="footer-link title">Resources</div>

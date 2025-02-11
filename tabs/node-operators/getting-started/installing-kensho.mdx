@@ -1,0 +1,120 @@
+---
+title: Installing KENSHO
+sidebar_position: 1
+slug: installing-kensho
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Prerequisites {#127467da57b780cb8462ec8970164c12}
+
+
+Before proceeding, please ensure that you meet the [minimum system & software requirements](/node-operators/getting-started/system-requirements) to operate a node. If these requirements are met, you should be able to launch a Consensus node (a.k.a Validator node) and other types of KIRA nodes in a home environment, even using off-the-shelf single-board computers like a Raspberry Pi. There are no slashing penalties for Consensus node going offline or becoming temporarily inaccessible. Nodes that remain offline for an extended period will become `inactivate` and be automatically removed from the consensus by the state machine, [SEKAI](/docs/backend---sekai/overview). For more details on enforcement rules, see [Jailing & Slashing Procedures](/docs/backend---sekai/modules/slashing/jailing--slashing-procedures) and for the rank-based uptime system, refer to [Consensus Nodes Ranking & Status Management](/docs/backend---sekai/modules/slashing/consensus-nodes-ranking--status-management). 
+
+
+The network is designed to halt if ≥ 1/3 of consensus nodes suddenly become unresponsive. However, if individual nodes randomly leave and enter the consensus, there should be no interruption to network operation. As long as the number of validators doesn't fall below `min_validators` (as defined in [Network Properties](/docs/backend---sekai/modules/governance/network-properties)), the chain will continue producing new blocks. For more details on the network's behavior in such cases, see [Poor Network Conditions](/docs/backend---sekai/modules/governance/poor-network-conditions).
+
+
+## Downloading and Installing Kensho {#127467da57b78066beeece4931fd21ad}
+
+
+Using KENSHO is the quickest way to run your node on the KIRA Network. KENSHO is a user-friendly Consensus node operator interface that replaces the deprecated Kira Manager 1.0 (a.k.a KM1). It allows you to easily deploy infrastructure, launch a full node, and claim a Consensus node seat on both the testnet and mainnet. Once you're comfortable with the process, you can refer to our [public documentation page](https://docs.kira.network/) for more detailed information on how to use SEKAI and INTERX.
+
+
+Currently, KENSHO supports Windows and Linux (Debian-based distributions). A MacOS version will be added soon, but can be built using [Fyne](https://docs.fyne.io/started/cross-compiling.html) for those who need it immediately. We also have plans to release an Android version in the future.
+
+
+<Tabs>
+<TabItem value="windows/linux" label="Windows/Linux">
+
+
+## Windows/linux {#1015a1b7699f4826b0bae6e178e63a0c}
+
+
+Visit the [KENSHO RELEASES](https://github.com/KiraCore/kensho/releases) page to choose the appropriate version for your system. Download the `.zip` or `.deb` file, unpack it, and launch the application.
+
+
+#### Windows {#388d0357c33341bd963465271b0fa8d1}
+
+1. **Download and unpack the .zip file**:
+	- Choose either `Kensho-windows-amd64.zip` or `Kensho-windows-arm64.zip` based on your system.
+	- Unzip the file using File Explorer or a tool like 7-Zip.
+2. **Launch Kensho**:
+Navigate to the unzipped folder and double-click the `kensho.exe` file to launch the application.
+
+#### Linux {#1edb1c5d92b14a1c9494103d827081b2}
+
+1. **Download and unpack the .deb file**:
+	- Choose either `kensho-amd64.deb` or `kensho-arm64.deb` based on your system's architecture.
+	- Download the file and unpack it using:
+
+	```shell
+	sudo dpkg -i kensho-amd64.deb
+	# or for ARM64
+	sudo dpkg -i kensho-arm64.deb
+	```
+
+2. **Launch Kensho**:
+After installing, you can run the application from the terminal:
+
+	```shell
+	kensho
+	```
+
+
+
+</TabItem>
+<TabItem value="mac" label="Mac">
+
+
+## Mac {#44f876a8ba6a4ef3af50541b570eff8d}
+
+
+:::note
+
+macOS support is coming soon to our CI/CD pipeline. Until then, please use `fyne-cross` to build KENSHO for macOS. Thanks for your patience!
+
+:::
+
+
+
+
+#### Prerequisites {#5464d05ad26c426ab85a717ea615a867}
+
+
+Ensure you have the following installed on your Mac:
+
+- **Go**: `brew install go`
+- **Fyne CLI**: `go install fyne.io/fyne/v2/cmd/fyne@latest`
+- **fyne-cross**: `go install github.com/fyne-io/fyne-cross@latest`
+
+#### Steps to Build Kensho {#265e8725bc644b2c82f87da13cbf4e60}
+
+1. **Clone the repository and switch to the master branch**:
+
+	```shell
+	git clone https://github.com/KiraCore/kensho.git
+	cd kensho
+	git checkout master
+	git pull origin master
+	```
+
+2. **Build for macOS (arm64)**:
+
+	```shell
+	fyne-cross darwin -arch arm64
+	```
+
+3. **Run the compiled binary**:
+
+	```shell
+	./fyne-cross/bin/darwin-arm64/kensho
+	```
+
+
+
+</TabItem></Tabs>
+

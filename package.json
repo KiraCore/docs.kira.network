@@ -9,7 +9,7 @@
     "//pull": "This uses the specific version of nocusaurus in package-lock.json, not necessarily the latest",
     "pull": "yarn run clear-docs && npx nocusaurus -n $NOTION_INTEGRATION_TOKEN -r $NOCUSAURUS_PROD_ROOT_PAGE -m ./temp -i ./static/notion_imgs -p /notion_imgs/ --yes --log-level verbose",
     "start": "docusaurus start",
-    "srcpages": "mv ./temp/srcpages/*.mdx ./src/pages/",
+    "srcpages": "mkdir -p ./src/pages/ && rsync -av ./tabs/srcpages/ ./src/pages/ && rm -r ./tabs/srcpages/",
     "update": "rsync -av --checksum --delete temp/ tabs/",
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",

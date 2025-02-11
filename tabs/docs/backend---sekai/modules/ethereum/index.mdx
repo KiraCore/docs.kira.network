@@ -1,0 +1,22 @@
+---
+title: Ethereum
+sidebar_position: 3
+slug: ethereum
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Overview  {#17f467da57b780f8a5e6f459bc1f3708}
+
+
+Ethereum wallets, such as Metamask, rely on JSON-RPC to interact with blockchains, making them incompatible with Cosmos-based networks like KIRA, which use distinct transaction formats and APIs. To address this, KIRA’s decentralized API, INTERX, translates Ethereum JSON-RPC queries into Cosmos-compatible formats, enabling Metamask to interact seamlessly with KIRA.
+
+
+While INTERX supports reading blockchain data, handling Ethereum-signed transactions is more complex. These transactions require a mechanism to be "wrapped" in a Cosmos-compatible format. By encoding Ethereum transactions using protocol buffers (protobuf), they can be relayed and executed on the Cosmos chain without losing their original integrity or purpose.
+
+
+The command `sekaid tx ethereum relay` creates a transaction on SEKAI (Cosmos-sdk based chain) that wraps an Ethereum transaction into a Cosmos-sdk compatible format for processing by SEKAI blockchain application.
+

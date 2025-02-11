@@ -1,0 +1,240 @@
+---
+title: COSIGN
+sidebar_position: 0
+slug: cosign
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+KIRA release files are signed using the [Sigstore Cosign tool](https://github.com/sigstore/cosign). All KIRA Release Files are signed using [sigstore cosign tool](https://github.com/sigstore/cosign). Cosign is a digital signature utility that is used to verify the authenticity and integrity of a file. When a file is signed with a digital signature, it provides a way to verify that the file has not been tampered with, and also to verify the identity of the person or entity who signed the file. It is used in Kira to sign and verify the authenticity of data, such as proprietary tools, binaries and scripts.
+
+
+To securely interact with KIRA’s testnet and mainnet tools, you must install and verify the integrity of Cosign. This guide outlines the process to achieve a secure setup.
+
+
+### Installing Cosign {#180467da57b780209e1ce0f2b798b530}
+
+
+<Tabs>
+<TabItem value="linux" label="Linux">
+
+
+## Linux {#197467da57b780659506f9992f642b49}
+
+
+#### Install Essential Dependencies {#180467da57b7803294a3fe8bf07fdec6}
+
+
+Begin by installing the necessary tools:
+
+
+```shell
+sudo -s  # Gain root permissions
+apt-get install -y wget  # Install wget for downloading files
+```
+
+
+#### Download Cosign {#180467da57b7807298d6c328e240fc8c}
+
+
+Download the appropriate Cosign binary and its signature file:
+
+
+```bash
+COSIGN_VERSION="v2.0.0" UBUNTU_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36" \
+ARCH=$(uname -m | grep -q "arm" && echo "arm64" || echo "amd64") PLATFORM=$(uname) FILE="cosign-${PLATFORM}-${ARCH}" cd /tmp && \
+wget --user-agent="$UBUNTU_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/$FILE -O $FILE && \
+wget --user-agent="$UBUNTU_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${FILE}.sig -O ${FILE}.sig
+```
+
+
+#### Verify the Downloaded File {#180467da57b78077aa03cd23ad0aecf1}
+
+
+Ensure the downloaded file matches the expected checksum to confirm its integrity. This step avoids using compromised or corrupted files.
+
+
+```shell
+# Expected SHA256 checksums
+COSIGN_HASH_ARM="8132cb2fb99a4c60ba8e03b079e12462c27073028a5d08c07ecda67284e0c88d"
+COSIGN_HASH_AMD="169a53594c437d53ffc401b911b7e70d453f5a2c1f96eb2a736f34f6356c4f2b"
+
+# Calculate the file’s checksum
+FILE_HASH=$(sha256sum $FILE | awk '{ print $1 }')
+
+# Validate checksum
+if [ "$FILE_HASH" != "$COSIGN_HASH_ARM" ] && [ "$FILE_HASH" != "$COSIGN_HASH_AMD" ]; then
+    echo "ERROR: Checksum mismatch. Expected '$COSIGN_HASH_ARM' or '$COSIGN_HASH_AMD', but got '$FILE_HASH'."
+    exit 1
+fi
+```
+
+
+Save cosign public key
+
+
+```shell
+cat > ./sigstore-cosign.pub << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhyQCx0E9wQWSFI9ULGwy3BuRklnt
+IqozONbbdbqz11hlRJy9c7SG+hdcFl9jE9uE/dwtuwU2MqU9T/cN0YkWww==
+-----END PUBLIC KEY-----
+EOL
+```
+
+
+Use the saved public key to verify the downloaded Cosign binary
+
+
+```shell
+cosign verify-blob --key="./sigstore-cosign.pub" --signature="./${FILE}.sig" "./$FILE"
+```
+
+
+If verification is successful, you can trust the downloaded binary and begin using it. Make the Cosign binary executable and move it to the system’s binary directory.
+
+
+```bash
+chmod +x -v ./$FILE && mv -fv ./$FILE /usr/local/bin/cosign
+```
+
+
+Confirm the installation by checking the Cosign version
+
+
+```shell
+cosign version
+```
+
+
+#### Saving and Using Kira’s Public Key {#180467da57b780b0b7abd5fd96defc8d}
+
+
+To verify KIRA’s signed files, save the public key for Cosign releases
+
+
+```bash
+KIRA_COSIGN_PUB=/usr/keys/kira-cosign.pub && mkdir -p /usr/keys && \
+ cat > $KIRA_COSIGN_PUB << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/IrzBQYeMwvKa44/DF/HB7XDpnE+
+f+mU9F/Qbfq25bBWV2+NlYMJv3KvKHNtu3Jknt6yizZjUV4b8WGfKBzFYw==
+-----END PUBLIC KEY-----
+EOL
+
+# Add key to env
+echo "export KIRA_COSIGN_PUB=\"$KIRA_COSIGN_PUB\"" >> /etc/profile
+```
+
+
+
+</TabItem>
+<TabItem value="macos" label="MacOS">
+
+
+## Macos {#197467da57b78097a16dc9401033f3d6}
+
+
+#### Install Essential Dependencies {#197467da57b780419f09dec6b4486ea3}
+
+
+```bash
+brew install wget
+```
+
+
+#### Download Cosign {#197467da57b780efb768ea02ff84ff60}
+
+
+```bash
+COSIGN_VERSION="v2.0.0" && \
+MAC_AGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" && \
+if [[ "$(uname -m)" == *"ar"* ]] ; then ARCH="arm64"; else ARCH="amd64" ; fi && \
+ cd /tmp && PLATFORM=$(uname) && declare -l FILE="cosign-${PLATFORM}-${ARCH}" && rm -rfv ./$FILE ./${FILE}.sig && \
+ wget --user-agent="$MAC_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/$FILE -O ./$FILE && \
+ wget --user-agent="$MAC_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${FILE}.sig -O ./${FILE}.sig
+```
+
+
+#### Verify the Downloaded File {#197467da57b7801fa199e469b5140a5b}
+
+
+Ensure the downloaded file matches the expected checksum to confirm its integrity. This step avoids using compromised or corrupted files.
+
+
+```bash
+COSIGN_HASH_ARM="9d7821e1c05da4b07513729cb00d1070c9a95332c66d90fa593ed77d8c72ca2a" && \
+COSIGN_HASH_AMD="d2c8fc0edb42a1e9745da1c43a2928cee044f3b8a1b8df64088a384c7e6f5b5d" && \
+FILE_HASH=$(shasum -a 256 ./$FILE | awk '{ print $1 }' | xargs || echo -n "") && \
+if [ "$FILE_HASH" != "$COSIGN_HASH_ARM" ] && [ "$FILE_HASH" != "$COSIGN_HASH_AMD" ] ; then
+    echo "ERROR: Failed to download cosign tool, expected checksum to be '$COSIGN_HASH_ARM' or '$COSIGN_HASH_AMD', but got '$FILE_HASH'"
+    exit 1
+else
+    echo "Cosign tool downloaded successfully."
+fi
+```
+
+
+Save cosign public key
+
+
+```bash
+cat > ./sigstore-cosign.pub << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhyQCx0E9wQWSFI9ULGwy3BuRklnt
+IqozONbbdbqz11hlRJy9c7SG+hdcFl9jE9uE/dwtuwU2MqU9T/cN0YkWww==
+-----END PUBLIC KEY-----
+EOL
+```
+
+
+Use the saved public key to verify the downloaded Cosign binary
+
+
+```bash
+cosign verify-blob --key="./sigstore-cosign.pub" --signature="./${FILE}.sig"  "./$FILE"
+```
+
+
+If verification is successful, you can trust the downloaded binary and begin using it. Make the Cosign binary executable and move it to the system’s binary directory.
+
+
+```bash
+chmod +x ./$FILE && mv -fv ./$FILE /usr/local/bin/cosign 
+```
+
+
+Confirm the installation by checking the Cosign version
+
+
+```bash
+cosign version
+```
+
+
+#### Saving and Using Kira’s Public Key {#197467da57b7802ca021cf5191cf3540}
+
+
+To verify KIRA’s signed files, save the public key for Cosign releases
+
+
+```bash
+KIRA_COSIGN_PUB="$HOME/keys/kira-cosign.pub" && mkdir -p $HOME/keys && \
+ cat > $KIRA_COSIGN_PUB << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/IrzBQYeMwvKa44/DF/HB7XDpnE+
+f+mU9F/Qbfq25bBWV2+NlYMJv3KvKHNtu3Jknt6yizZjUV4b8WGfKBzFYw==
+-----END PUBLIC KEY-----
+EOL
+
+# Add key to env
+echo "export KIRA_COSIGN_PUB=\"$KIRA_COSIGN_PUB\"" >> /etc/profile
+```
+
+
+
+</TabItem></Tabs>
+

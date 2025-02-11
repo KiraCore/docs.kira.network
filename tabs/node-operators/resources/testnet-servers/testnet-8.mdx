@@ -1,0 +1,36 @@
+---
+title: testnet-8
+sidebar_position: 8
+slug: testnet-8
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Description {#129467da57b781a18d88e88c04147f4a}
+
+- Chain Identifier: `testnet-8`
+- KIRA Manager Checksum: `0feca1c125f2291596dd115ff2cf720032a7098030f8aa97c164afa9ca79644e`
+- Genesis File Checksum: `0x8b688297b8a6f0ce9924eb163a4c254dfe647fe1b0c0d891cff9457869e650b7`
+- Initial Block Height: `138403`
+- Block Height Reached: `920527`
+
+## Post Mortem {#129467da57b781e58891ee632ed8d021}
+
+- Testnet was expected to be depreciated due to planned hard fork at 4:30 PM 2022-01-07.
+- During generation of the new genesis file, export tool failed to convert `proposal_end_time` into `minimum_proposal_end_time` and `jail_max_time` into `unjail_max_time`, resulting in the `panic: unknown field "proposal_end_time" & "jail_max_time" in types.NetworkProperties` exception and failure to successfully start SEKAI process.
+- After manually fixing network properties in genesis, new issue was found were old proposals become incompatible with the new version of the chain resulting in `panic: can't unmarshal Any nested proto *types.SetNetworkPropertyProposal: unknown value "PROPOSAL_END_TIME" for enum kira.gov.NetworkProperty`
+
+## Files {#129467da57b781e1b3fcf029b7cd464f}
+
+
+[genesis.json](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/cd34a624-3b15-4cb1-83a9-3c4886be4430/genesis.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466U3NO47YJ%2F20250211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250211T172801Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEMH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIGv9UFufh0b%2BRbvu%2FXgA733UIvUlOKWZiHY62ML4WYNkAiEAy1L4Da6KMN1J12Qqf%2F312tVcAv%2Ffre3s0QK583s4uC8qiAQI2v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDPwDgefJjbmIx5ZibyrcA4WfOUyT8HFu7hCsAOeDzosd8%2F1ItcoekWqbLfgi6pcrWeut3v1QYueRc0lKimou0AJmw0XQw0Hfjbe%2FXYXhn8qMinS1WIhPp9DllsVfQVOxrpxqFuDT7tFyKrFLcxpOCo2PmHV8jkNxgpeMe7q8K01koJ5gv3DionvHCQusV47bUn9RLchG%2FQ0Osvpl%2F8HcXk5mq%2BvgmoY7fh%2BhKgpo6kmBFDayZbnFNWOpk0bUHT6iu6%2FInJBe0OQTmqR7QpxqBQ4WvaoUrEbvdTPdoOqocjtEh9WRMim%2BYigBwPOvtkwPWkC3JB8EJ7NVp7gY4fUOQz67siCaWVp3qwvj%2FTuZfSu7LyP7B8yVv7iZdPM907KqkscF%2F6wCL2FSHUeyw1XYmrXbuWcTHkK7mKVAn2OsGMDbeaOma%2FOKJHSGXAX6gqNgJtPP2F0QHDA8XvWZD4aCYKObfJmWMyQczux3tTM4oh%2FncL3sWdTM7vIHtF6DaPw9brDh%2FfF2xGNh%2BrBo1BrvDuxVUICZhJDusFVSsMEXUq9BBWL2B4T1VhOtj4wXOQarcvWT2icl4i5sUSc4xwB%2FR7fuTvfVqV0ue7p7LeXOJ9YwIjk%2Ff1uXmzlxsE0lFLWjuH%2BPjyvKbiDV%2Bu5FMNT3rb0GOqUBJ9HbluwgsDB8S4cbTmiEh6vTeBs7nIdlZVx%2FPWwjZJpsOyAOOoXxUCEPqtOVr4Nn8LOn7nPmKyRa2ohh6H44zOuC7KT84VdgzBVvup81YEtudgMgDlvYX%2BvIp9FlhERFqC8qzfz8U6YuRNxkvJz1esECV0eRriNYwPA5ZLPcnQRKWB4zgL1pMOwvAVHKgHvQ8D%2BBGI3GbLXRARTzAxFJ1qBAPQiR&X-Amz-Signature=a9734894b3a4255322d98568671f2a506477c127210a88fba0ea98f71c6fd734&X-Amz-SignedHeaders=host&x-id=GetObject)
+
+
+[valopers-airdrop-snap.json](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/e760d76c-a924-4982-8abc-f779e0952dff/valopers-airdrop-snap.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466U3NO47YJ%2F20250211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250211T172801Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEMH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIGv9UFufh0b%2BRbvu%2FXgA733UIvUlOKWZiHY62ML4WYNkAiEAy1L4Da6KMN1J12Qqf%2F312tVcAv%2Ffre3s0QK583s4uC8qiAQI2v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDPwDgefJjbmIx5ZibyrcA4WfOUyT8HFu7hCsAOeDzosd8%2F1ItcoekWqbLfgi6pcrWeut3v1QYueRc0lKimou0AJmw0XQw0Hfjbe%2FXYXhn8qMinS1WIhPp9DllsVfQVOxrpxqFuDT7tFyKrFLcxpOCo2PmHV8jkNxgpeMe7q8K01koJ5gv3DionvHCQusV47bUn9RLchG%2FQ0Osvpl%2F8HcXk5mq%2BvgmoY7fh%2BhKgpo6kmBFDayZbnFNWOpk0bUHT6iu6%2FInJBe0OQTmqR7QpxqBQ4WvaoUrEbvdTPdoOqocjtEh9WRMim%2BYigBwPOvtkwPWkC3JB8EJ7NVp7gY4fUOQz67siCaWVp3qwvj%2FTuZfSu7LyP7B8yVv7iZdPM907KqkscF%2F6wCL2FSHUeyw1XYmrXbuWcTHkK7mKVAn2OsGMDbeaOma%2FOKJHSGXAX6gqNgJtPP2F0QHDA8XvWZD4aCYKObfJmWMyQczux3tTM4oh%2FncL3sWdTM7vIHtF6DaPw9brDh%2FfF2xGNh%2BrBo1BrvDuxVUICZhJDusFVSsMEXUq9BBWL2B4T1VhOtj4wXOQarcvWT2icl4i5sUSc4xwB%2FR7fuTvfVqV0ue7p7LeXOJ9YwIjk%2Ff1uXmzlxsE0lFLWjuH%2BPjyvKbiDV%2Bu5FMNT3rb0GOqUBJ9HbluwgsDB8S4cbTmiEh6vTeBs7nIdlZVx%2FPWwjZJpsOyAOOoXxUCEPqtOVr4Nn8LOn7nPmKyRa2ohh6H44zOuC7KT84VdgzBVvup81YEtudgMgDlvYX%2BvIp9FlhERFqC8qzfz8U6YuRNxkvJz1esECV0eRriNYwPA5ZLPcnQRKWB4zgL1pMOwvAVHKgHvQ8D%2BBGI3GbLXRARTzAxFJ1qBAPQiR&X-Amz-Signature=981371b4d4869c2bce28a88f298d21f2129df2d19e937993fea1e8a981936c1a&X-Amz-SignedHeaders=host&x-id=GetObject)
+
+
+[votes-upgrade-proposal.json](https://prod-files-secure.s3.us-west-2.amazonaws.com/9b5bfc45-bdb5-4b46-80e6-aabe3cae64d0/1b221e68-6ef6-4068-808d-6f56c83b7f9d/votes-upgrade-proposal.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB466U3NO47YJ%2F20250211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250211T172801Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEMH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIGv9UFufh0b%2BRbvu%2FXgA733UIvUlOKWZiHY62ML4WYNkAiEAy1L4Da6KMN1J12Qqf%2F312tVcAv%2Ffre3s0QK583s4uC8qiAQI2v%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjMxODM4MDUiDPwDgefJjbmIx5ZibyrcA4WfOUyT8HFu7hCsAOeDzosd8%2F1ItcoekWqbLfgi6pcrWeut3v1QYueRc0lKimou0AJmw0XQw0Hfjbe%2FXYXhn8qMinS1WIhPp9DllsVfQVOxrpxqFuDT7tFyKrFLcxpOCo2PmHV8jkNxgpeMe7q8K01koJ5gv3DionvHCQusV47bUn9RLchG%2FQ0Osvpl%2F8HcXk5mq%2BvgmoY7fh%2BhKgpo6kmBFDayZbnFNWOpk0bUHT6iu6%2FInJBe0OQTmqR7QpxqBQ4WvaoUrEbvdTPdoOqocjtEh9WRMim%2BYigBwPOvtkwPWkC3JB8EJ7NVp7gY4fUOQz67siCaWVp3qwvj%2FTuZfSu7LyP7B8yVv7iZdPM907KqkscF%2F6wCL2FSHUeyw1XYmrXbuWcTHkK7mKVAn2OsGMDbeaOma%2FOKJHSGXAX6gqNgJtPP2F0QHDA8XvWZD4aCYKObfJmWMyQczux3tTM4oh%2FncL3sWdTM7vIHtF6DaPw9brDh%2FfF2xGNh%2BrBo1BrvDuxVUICZhJDusFVSsMEXUq9BBWL2B4T1VhOtj4wXOQarcvWT2icl4i5sUSc4xwB%2FR7fuTvfVqV0ue7p7LeXOJ9YwIjk%2Ff1uXmzlxsE0lFLWjuH%2BPjyvKbiDV%2Bu5FMNT3rb0GOqUBJ9HbluwgsDB8S4cbTmiEh6vTeBs7nIdlZVx%2FPWwjZJpsOyAOOoXxUCEPqtOVr4Nn8LOn7nPmKyRa2ohh6H44zOuC7KT84VdgzBVvup81YEtudgMgDlvYX%2BvIp9FlhERFqC8qzfz8U6YuRNxkvJz1esECV0eRriNYwPA5ZLPcnQRKWB4zgL1pMOwvAVHKgHvQ8D%2BBGI3GbLXRARTzAxFJ1qBAPQiR&X-Amz-Signature=0c201b97bff1874689ee593687ff6ce94adeb335533873e75147ac92d4086db3&X-Amz-SignedHeaders=host&x-id=GetObject)
+

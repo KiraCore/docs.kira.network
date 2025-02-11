@@ -1,0 +1,591 @@
+---
+title: Installation
+sidebar_position: 2
+slug: installation
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+:::caution
+
+Since the launch of [KENSHO](/node-operators/getting-started/installing-kensho), our infrastructure manager interface, this process has been streamlined. See [Deploying Infrastructure](/node-operators/getting-started/deploying-infrastructure). This page remains available for testing purposes.
+
+:::
+
+
+
+
+<Tabs>
+<TabItem value="linux/ubuntu" label="Linux/Ubuntu">
+
+
+## Linux/ubuntu {#b879a02837014f48ac435a1b2d2d2db5}
+
+
+## Required Tools {#5629790c26bb4cedb9025ab46dd70fa2}
+
+
+KIRA requires the installation of two tools, Cosign and Bash-utils, in order to secure the network and simplify the execution of various tasks.
+
+
+### Cosign {#95ea60da4e6647de9391afabd8b9c38f}
+
+
+All KIRA Release Files are signed using [sigstore cosign tool](https://github.com/sigstore/cosign). Cosign is a digital signature utility that is used to verify the authenticity and integrity of a file. When a file is signed with a digital signature, it provides a way to verify that the file has not been tampered with, and also to verify the identity of the person or entity who signed the file. It is used in Kira to sign and verify the authenticity of data, such as proprietary tools, binaries and scripts. 
+
+
+```bash
+
+# Assume root permissions
+sudo -s
+
+# Install essential dependencies
+apt-get install -y wget
+
+# Download Cosign
+COSIGN_VERSION="v2.0.0" && \
+UBUNTU_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36" && \
+if [[ "$(uname -m)" == *"ar"* ]] ; then ARCH="arm64"; else ARCH="amd64" ; fi && \
+ cd /tmp && PLATFORM=$(uname) && declare -l FILE="cosign-${PLATFORM}-${ARCH}" && rm -rfv ./$FILE ./${FILE}.sig && \
+ wget --user-agent="$UBUNTU_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/$FILE -O ./$FILE && \
+ wget --user-agent="$UBUNTU_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${FILE}.sig -O ./${FILE}.sig
+
+# If you do NOT have cosign installed already you should check that the "$FILE" has one of the below hashes 
+# Hashes are only for the 'linux' platform, for other platforms please refer to the github repository
+COSIGN_HASH_ARM="8132cb2fb99a4c60ba8e03b079e12462c27073028a5d08c07ecda67284e0c88d" && \
+COSIGN_HASH_AMD="169a53594c437d53ffc401b911b7e70d453f5a2c1f96eb2a736f34f6356c4f2b" && \
+FILE_HASH=$(sha256sum ./$FILE | awk '{ print $1 }' | xargs || echo -n "") && \
+if [ "$FILE_HASH" != "$COSIGN_HASH_ARM" ] && [ "$FILE_HASH" != "$COSIGN_HASH_AMD" ] ; then
+    echoErr "ERROR: Failed to download cosign tool, expected checksum to be '$COSIGN_HASH_ARM' or '$COSIGN_HASH_AMD', but got '$FILE_HASH'"
+    exit 1
+else
+    echo "Cosign tool downloaded successfully."
+fi
+
+# Save cosign public key
+cat > ./sigstore-cosign.pub << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhyQCx0E9wQWSFI9ULGwy3BuRklnt
+IqozONbbdbqz11hlRJy9c7SG+hdcFl9jE9uE/dwtuwU2MqU9T/cN0YkWww==
+-----END PUBLIC KEY-----
+EOL
+
+# Verify cosign release
+cosign verify-blob --key="./sigstore-cosign.pub" --signature="./${FILE}.sig"  "./$FILE"
+
+# Move cosign to bin directory
+chmod +x -v ./$FILE && mv -fv ./$FILE /usr/local/bin/cosign 
+
+# Check cosign version
+cosign version
+```
+
+
+Add KIRA’s public key
+
+
+```bash
+# Save KIRA public key allowing to verify signed releases
+KIRA_COSIGN_PUB=/usr/keys/kira-cosign.pub && mkdir -p /usr/keys && \
+ cat > $KIRA_COSIGN_PUB << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/IrzBQYeMwvKa44/DF/HB7XDpnE+
+f+mU9F/Qbfq25bBWV2+NlYMJv3KvKHNtu3Jknt6yizZjUV4b8WGfKBzFYw==
+-----END PUBLIC KEY-----
+EOL
+
+# Add key to env
+echo "export KIRA_COSIGN_PUB=\"$KIRA_COSIGN_PUB\"" >> /etc/profile
+```
+
+
+### Bash-utils {#229d311718aa4d5bbeeb225e7731cd40}
+
+
+[https://github.com/KiraCore/tools/releases](https://github.com/KiraCore/tools/releases)
+
+
+Bash-utils is a collection of utility functions and aliases for Bash shell scripts developed specifically for KIRA to streamline and simplify the process of executing tasks within the network. It provides various functions for managing environment variables, displaying information, and handling errors.
+
+
+:::note
+
+The prerequisite to securely install BU is [COSIGN tool](/docs/backend---sekai/installation#95ea60da4e6647de9391afabd8b9c38f) that will guarantee the integrity of the files. It MUST be installed and KIRA’s public key added before proceeding.
+
+:::
+
+
+
+
+:::note
+
+Always source /etc/profile with `. /etc/profile` when starting a new terminal to use BU. 
+
+:::
+
+
+
+
+```bash
+# assume root permissions
+sudo -s && . /etc/profile
+
+# Install essential dependencies
+apt-get install -y wget
+
+# Define version of BU you want to install
+TOOLS_VERSION="v0.3.46"
+
+# Download BU script
+if [ -z "$KIRA_COSIGN_PUB" ] ; then
+  echo "ERROR: KIRA_COSIGN_PUB variable is not set. Please refer to cosign installation to add KIRA's public key path as variable."
+  exit
+fi && \
+cd /tmp && FILE_NAME="bash-utils.sh" && rm -rfv ./$FILE_NAME ./${FILE_NAME}.sig && \
+ UBUNTU_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36" && \
+ wget --user-agent="$UBUNTU_AGENT" "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}" -O ./$FILE_NAME && \
+ wget --user-agent="$UBUNTU_AGENT" "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}.sig" -O ./${FILE_NAME}.sig
+
+# Verify cosign release
+cosign verify-blob --key "$KIRA_COSIGN_PUB" --signature "/tmp/${FILE_NAME}.sig" "/tmp/$FILE_NAME" --insecure-ignore-tlog --insecure-ignore-sct
+
+# Install BU
+chmod +x ./$FILE_NAME && ./$FILE_NAME bashUtilsSetup && ./etc/profile
+
+# Verify version of BU 
+bu bashUtilsVersion
+```
+
+
+## Dependencies {#07e9d84107ba48fa862297b2bf6acb74}
+
+
+#### Go {#974aeb0c853d4a4db37b900d9d0bec7f}
+
+
+```bash
+setGlobEnv GOROOT /usr/local/go && setGlobEnv GOPATH /home/go && setGlobEnv GOBIN /usr/local/go/bin && \
+loadGlobEnvs && setGlobPath $GOROOT && setGlobPath $GOPATH && setGlobPath $GOBIN && loadGlobEnvs && \
+( go clean -modcache -cache -n || : ) && rm -rfv "$GOROOT" "$GOBIN" "$GOPATH" && GO_VERSION="1.18.2" && \
+GO_TAR="go$GO_VERSION.$(getPlatform)-$(getArch).tar.gz" && cd /tmp && safeWget ./$GO_TAR https://dl.google.com/go/$GO_TAR \
+"fc4ad28d0501eaa9c9d6190de3888c9d44d8b5fb02183ce4ae93713f67b8a35b,e54bec97a1a5d230fc2f9ad0880fcbabb5888f30ed9666eca4a91c5a32e86cbc" && \
+tar -C /usr/local -xf $GO_TAR &>/dev/null && go version
+```
+
+
+#### Systemd Alternative (requires Python2 Package) {#74ddeb9a5add46c18c0561f80984473c}
+
+
+Systemd is a useful service manager that detects errors or memory overflow in the Sekai node and keeps it keeps it running even after system restarts or power outages.
+
+
+```bash
+wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl.py -O /usr/local/bin/systemctl2 && \
+chmod +x /usr/local/bin/systemctl2 && \
+systemctl2 --version
+```
+
+
+#### Others {#bec68255b94b4716b936663f8a1aea8f}
+
+
+```bash
+apt-get install jq
+```
+
+
+## Sekai Installation {#417da5606683484286cf1ff21a7340fa}
+
+
+Login as admin & load environment variables.
+
+
+```bash
+sudo -s
+```
+
+
+Set desired SEKAI release version and binaries repo as env variables within `/etc/profile` (with bash-utils or manually). Sourcing `/etc/profile` is necessary.
+
+
+```bash
+setGlobEnv SEKAI_VERSION "v0.3.42" && \
+setGlobEnv SEKAI_REPO "$HOME/sekai" && \
+setGlobEnv NETWORK_NAME "test" && \
+setGlobEnv SEKAID_HOME "~/.sekaid-$NETWORK_NAME" && \
+loadGlobEnvs
+```
+
+
+Clone repository and install
+
+
+```bash
+rm -fr $SEKAI_REPO && rm -fr $GOBIN/sekaid && mkdir $SEKAI_REPO && cd $SEKAI_REPO && \
+git clone https://github.com/KiraCore/sekai.git -b $SEKAI_VERSION $SEKAI_REPO && \
+chmod -R 777 ./scripts && make install && \
+echo "SUCCESS installed sekaid $(sekaid version)" || echo "FAILED"
+```
+
+
+Verify successful installation 
+
+
+```bash
+sekaid version --long
+```
+
+
+## Alternative Installation Processes {#63e27c2e5af940218ffe572be0f5320c}
+
+
+### Using Binaries  {#4b2b70902ddb4c879c948bd0c3cf59c1}
+
+
+```bash
+cd /tmp && \
+PLATFORM="$(getPlatform)" && \
+ARCHITECURE="$(getArch)" && \
+BIN_DEST="/usr/local/bin/sekaid" && \
+safeWget ./sekaid.deb "https://github.com/KiraCore/sekai/releases/download/$SEKAI_VERSION/sekai-${PLATFORM}-${ARCHITECURE}.deb" \
+"$KIRA_COSIGN_PUB" && dpkg-deb -x ./sekaid.deb ./sekaid && cp -fv "sekaid/bin/sekaid" $BIN_DEST && chmod -v 755 $BIN_DEST && \
+echoInfo "INFO: Installed bash-utils: " && bashUtilsVersion && \
+echoInfo "INFO: Installed sekaid: " && sekaid version
+```
+
+
+### (testing) Using a Docker Base-image Release {#564d5e42582e4067af0b7fcc4d1bbd99}
+
+
+[Latest base-image version](https://github.com/KiraCore/docker/pkgs/container/docker%2Fbase-image)
+
+
+Erase previous instances _(Optional)_ 
+
+
+	```bash
+	docker rm -f $(docker ps -a -q) && \
+	docker image prune -a -f
+	```
+
+
+Load base-image in container 
+
+
+	```bash
+	IMG_VERSION="v0.13.14"
+	
+	BASE_NAME="test" && BASE_IMG="[ghcr.io/kiracore/docker/base-image:](http://ghcr.io/kiracore/docker/kira-base:v0.11.4)$IMG_VERSION" && \
+	docker run -i -t -d --privileged --net bridge --name $BASE_NAME --hostname test.local $BASE_IMG /bin/bash
+	```
+
+
+Enter container
+
+
+	```bash
+	docker start -i $(timeout 3 docker ps --no-trunc -aqf "name=^${BASE_NAME}$" 2> /dev/null || echo -n "")
+	```
+
+
+Install Sekai
+
+
+	```bash
+	rm -fr $SEKAI_REPO && rm -fr $GOBIN/sekaid && mkdir $SEKAI_REPO && cd $SEKAI_REPO && \
+	git clone https://github.com/KiraCore/sekai.git -b $SEKAI_VERSION $SEKAI_REPO && \
+	chmod -R 777 ./scripts && make install && \
+	echo "SUCCESS installed sekaid $(sekaid version)" || echo "FAILED"
+	```
+
+
+Delete container 
+
+
+	```bash
+	docker rm -f $(timeout 3 docker ps --no-trunc -aqf "name=^${BASE_NAME}$" 2> /dev/null || echo -n "")
+	```
+
+
+
+</TabItem>
+<TabItem value="mac" label="Mac">
+
+
+## Mac {#04d8df0144c14d869178f8bcc13787b2}
+
+
+:::caution
+
+This macOS installation process is untested and may have issues. [KENSHO](/node-operators/getting-started/installing-kensho) is the recommended alternative for [Deploying Infrastructure](/node-operators/getting-started/deploying-infrastructure). 
+
+:::
+
+
+
+
+## Required Tools {#df90b4ff57684fec83660debdedfba39}
+
+
+### Bash V5 {#e12ff19e5f33489d91417d9c4bd8f954}
+
+
+Bash is the default command line interpreter for many Unix-based operating systems, including macOS. However MacOS, by default, comes with an older version of Bash (version 3.2.57) due to licensing reasons. Bash V5 is the latest major version and offers numerous improvements and features compared to previous versions. In KIRA, some commands used in scripts might require Bash V5 to properly execute.
+
+
+```bash
+# Install Bash V5
+brew install bash
+
+# Add Bash V5 to the list of acceptable shells
+echo "/usr/local/bin/bash" | sudo tee -a /etc/shells
+
+# Change your default shell to Bash V5
+chsh -s /usr/local/bin/bash
+
+# Restart your terminal and check version
+echo $BASH_VERSION
+```
+
+
+### Cosign {#0069f1f3f89b4b34a56731be349776be}
+
+
+Cosign is a digital signature utility that is used to verify the authenticity and integrity of a file. When a file is signed with a digital signature, it provides a way to verify that the file has not been tampered with, and also to verify the identity of the person or entity who signed the file. It is used in Kira to sign and verify the authenticity of data, such as proprietary tools, binaries and scripts.
+
+
+```bash
+
+# Install essential dependencies
+brew install wget
+
+# Download Cosign
+COSIGN_VERSION="v2.0.0" && \
+MAC_AGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36" && \
+if [[ "$(uname -m)" == *"ar"* ]] ; then ARCH="arm64"; else ARCH="amd64" ; fi && \
+ cd /tmp && PLATFORM=$(uname) && declare -l FILE="cosign-${PLATFORM}-${ARCH}" && rm -rfv ./$FILE ./${FILE}.sig && \
+ wget --user-agent="$MAC_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/$FILE -O ./$FILE && \
+ wget --user-agent="$MAC_AGENT" https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${FILE}.sig -O ./${FILE}.sig
+
+# If you do NOT have cosign installed already you should check that the "$FILE" has one of the below hashes 
+# Hashes are only for the 'mac' platform, for other platforms please refer to the github repository
+COSIGN_HASH_ARM="9d7821e1c05da4b07513729cb00d1070c9a95332c66d90fa593ed77d8c72ca2a" && \
+COSIGN_HASH_AMD="d2c8fc0edb42a1e9745da1c43a2928cee044f3b8a1b8df64088a384c7e6f5b5d" && \
+FILE_HASH=$(shasum -a 256 ./$FILE | awk '{ print $1 }' | xargs || echo -n "") && \
+if [ "$FILE_HASH" != "$COSIGN_HASH_ARM" ] && [ "$FILE_HASH" != "$COSIGN_HASH_AMD" ] ; then
+    echo "ERROR: Failed to download cosign tool, expected checksum to be '$COSIGN_HASH_ARM' or '$COSIGN_HASH_AMD', but got '$FILE_HASH'"
+    exit 1
+else
+    echo "Cosign tool downloaded successfully."
+fi
+
+# Save cosign public key
+cat > ./sigstore-cosign.pub << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEhyQCx0E9wQWSFI9ULGwy3BuRklnt
+IqozONbbdbqz11hlRJy9c7SG+hdcFl9jE9uE/dwtuwU2MqU9T/cN0YkWww==
+-----END PUBLIC KEY-----
+EOL
+
+# Verify cosign release
+cosign verify-blob --key="./sigstore-cosign.pub" --signature="./${FILE}.sig"  "./$FILE"
+
+# Move cosign to bin directory
+chmod +x ./$FILE && mv -fv ./$FILE /usr/local/bin/cosign 
+
+# Check cosign version
+cosign version
+```
+
+
+Add KIRA’s public key
+
+
+```bash
+# Save KIRA public key allowing to verify signed releases
+KIRA_COSIGN_PUB="$HOME/keys/kira-cosign.pub" && mkdir -p $HOME/keys && \
+ cat > $KIRA_COSIGN_PUB << EOL
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/IrzBQYeMwvKa44/DF/HB7XDpnE+
+f+mU9F/Qbfq25bBWV2+NlYMJv3KvKHNtu3Jknt6yizZjUV4b8WGfKBzFYw==
+-----END PUBLIC KEY-----
+EOL
+
+# Add key to env
+echo "export KIRA_COSIGN_PUB=\"$KIRA_COSIGN_PUB\"" >> /etc/profile
+```
+
+
+### Bash-utils {#bf886ff931294e1aad96372d39449386}
+
+
+[https://github.com/KiraCore/tools/releases](https://github.com/KiraCore/tools/releases)
+
+
+:::note
+
+The prerequisite to install BU is [COSIGN tool](/docs/backend---sekai/installation#0069f1f3f89b4b34a56731be349776be) that will guarantee the integrity of the files and [Bash V5](/docs/backend---sekai/installation#e12ff19e5f33489d91417d9c4bd8f954) for better compatibility. They MUST be installed and KIRA’s public key added before proceeding.
+
+:::
+
+
+
+
+:::note
+
+Unfortunately, certain commands within the bash-utils tool may not behave properly on macOS due to slight variations in command behavior, such as the 'sed' command, which exhibit differences between Mac and Linux platforms.
+
+:::
+
+
+
+
+Bash-utils is a collection of utility functions and aliases for Bash shell scripts. It provides various functions for managing environment variables, displaying information, and handling errors. Bash-utils is used in KIRA to streamline and simplify the process of executing various tasks within the network.
+
+
+```bash
+sudo -s && . /etc/profile
+
+TOOLS_VERSION="v0.3.46" && FILE_NAME="bash-utils.sh" && \
+if [ -z "$KIRA_COSIGN_PUB" ] ; then
+  echo "ERROR: KIRA_COSIGN_PUB variable is not set. Please refer to cosign installation to add KIRA's public key path as variable."
+  exit
+fi && \
+wget "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}" -O ./$FILE_NAME && \
+wget "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}.sig" -O ./${FILE_NAME}.sig && \
+cosign verify-blob --key="$KIRA_COSIGN_PUB" --signature=./${FILE_NAME}.sig ./$FILE_NAME && \
+chmod -v 555 ./$FILE_NAME && ./$FILE_NAME bashUtilsSetup "/var/kiraglob" && . /etc/profile && \
+echo "Installed bash-utils $(bash-utils bashUtilsVersion)"
+```
+
+
+## Dependencies {#4bae39ed625c475494b196975893306b}
+
+
+#### Golang {#66072169c89349f79786b5b4c388b676}
+
+
+Install Go
+
+
+:::note
+
+$GOBIN is required as environment variable for building SEKAI
+
+:::
+
+
+
+
+:::note
+
+`setGlobEnv` and `setGlobPath` are amongst the commands that do not behave properly. Consider adding/editing the environment variable manually.
+
+:::
+
+
+
+
+```bash
+# Install Go 
+brew install go
+
+# Assume root permissions 
+sudo -s
+
+# Set environment variables (manually)
+goVersion=$(go version | awk '{print $3}' | cut -c 3-) && \
+GOROOT="/usr/local/Cellar/go/$goVersion" && \
+GOBIN="$GOROOT/bin" && \
+GOPATH="$HOME/go" && \
+PATH="$GOBIN:$GOPATH:$PATH"
+
+# Add variables to /etc/profile
+echo "export GOROOT=\"$GOROOT\"" >> /etc/profile
+echo "export GOBIN=\"$GOBIN\"" >> /etc/profile
+echo "export GOPATH=\"$GOPATH\"" >> /etc/profile
+echo "export PATH=\"$PATH\"" >> /etc/profile
+```
+
+
+#### Others {#3bbb84dbac5748b5870a1930d94970b6}
+
+
+```bash
+brew install jq
+```
+
+
+## Sekai Installation {#fec5cf22760f4560b4a43d52328dff3f}
+
+
+Login as admin & load environment variables. Using bash shell and _sourcing /etc/profile is necessary._
+
+
+```bash
+# Assume sudo 
+sudo -s && . /etc/profile
+```
+
+
+Set desired SEKAI release version and binaries repo _(requires bash-utils)._
+
+
+```bash
+setGlobEnv SEKAI_VERSION "v0.3.39" && \
+setGlobEnv SEKAI_REPO "$HOME/sekai" && \
+loadGlobEnvs
+```
+
+
+Clone repo and install
+
+
+```bash
+rm -fr $SEKAI_REPO && rm -fr $GOBIN/sekaid && mkdir $SEKAI_REPO && cd $SEKAI_REPO && \
+git clone https://github.com/KiraCore/sekai.git -b $SEKAI_VERSION $SEKAI_REPO && \
+chmod -R 777 ./scripts && make install && \
+echo "SUCCESS installed sekaid $(sekaid version)" || echo "FAILED"
+```
+
+
+
+</TabItem></Tabs>
+
+
+## Starting & Testing  {#0dbeaabf1c9d400596731df653b604e4}
+
+
+#### Start  {#0773614fcfd64317bc7ebf0f8255dfb2}
+
+
+```bash
+cd $SEKAI_HOME/sekai && \
+make network-start
+```
+
+
+#### Stop {#1988428569484528bf9071b77a171046}
+
+
+```bash
+cd $SEKAI_HOME/sekai && \
+make network-stop
+```
+
+
+#### Integration Tests {#00258775c9f4458bb9ca14d0134429a6}
+
+
+```bash
+# Full integration test (duration > 1h) :
+make test-local 
+
+# Individual integration test : 
+# available integration tests can be found @ sekai/scripts/test-local/
+make network-start && scripts/test-local/your-test.sh
+```
+

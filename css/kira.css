@@ -37,7 +37,7 @@
     --ifm-color-primary-light: #bae7bf;
     --ifm-color-primary-lighter: #d5f1d9;
     --ifm-color-primary-lightest: #f1faf2;
-    --ifm-code-font-size: 75%;
+    --ifm-code-font-size: 80%;
 
     --ifm-color-background: #000000;
     --ifm-color-background-dark: #18181a;
@@ -53,7 +53,7 @@
   html[data-theme='dark'] {
     --ifm-navbar-background-color: #000000 ;
     --ifm-background-color: #000000;
-    --ifm-color-content: #ffffffb3;
+    --ifm-color-content: #ffffffd9;
     --ifm-toc-border-color: var(--ifm-color-primary-darkest);
   }
 

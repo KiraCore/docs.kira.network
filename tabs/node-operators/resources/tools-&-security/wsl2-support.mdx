@@ -1,0 +1,151 @@
+---
+title: WSL2 Support
+sidebar_position: 2
+slug: wsl2-support
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+The only officially supported operating system for the host machine is **Ubuntu**. [MacOS support coming soon.](/node-operators/getting-started/installing-kensho)
+
+
+If you are using **Windows** exclusively and wish to test KIRA without dedicated hardware, you can utilize the **Windows Subsystem for Linux (WSL)**. Please note that all commands suggested in this document are executed at your own risk.
+
+
+### Console Setup {#180467da57b78089a82cf46ab74c28bd}
+
+
+Ensure you install the [Git Bash console](https://git-scm.com/downloads) before proceeding. All commands in this documentation must be executed using Git Bash with administrative privileges.
+
+
+### Initial Setup {#180467da57b78054b4cfc55a2816255f}
+
+
+Run the following commands to install and configure WSL on your system:
+
+
+```shell
+# Install WSL
+wsl --install
+
+# Ensure WSL is up to date
+wsl --update
+
+# Verify that your WSL version is 1.1.6.0 or higher (required for systemd services)
+wsl --version
+
+# Reinstall Ubuntu
+wsl --install -d Ubuntu-20.04 && \
+  wsl --setdefault Ubuntu-20.04 && \
+  wsl --set-version Ubuntu-20.04 2
+```
+
+
+### Updating Ubuntu Image {#180467da57b78067b588ca2a74d84ee1}
+
+
+Follow these steps to update your Ubuntu instance:
+
+1. Open the Ubuntu OS with the following command (replace `<username>` with your desired username):
+
+	```shell
+	wsl -d Ubuntu-20.04 --user <username> --cd ~
+	```
+
+2. Configure WSL to use your default user and enable systemd:
+
+	```shell
+	sudo tee -a /etc/wsl.conf <<EOF
+	[user]
+	default=<username>
+	[boot]
+	systemd=true
+	EOF
+	```
+
+3. Update your Ubuntu instance:
+
+	```shell
+	sudo apt-get update -y --fix-missing
+	```
+
+4. Exit Ubuntu and return to the Git Bash console:
+
+	```shell
+	exit
+	```
+
+
+### Creating a Base Image for Recovery {#180467da57b78095bb4ad2231161b718}
+
+
+To create a base image of your setup for easy recovery:
+
+1. Create a directory to save the image:
+
+	```shell
+	mkdir -p /c/linux
+	```
+
+2. Export the base image:
+
+	```shell
+	cd /c/linux && wsl --export Ubuntu-20.04 ubuntu-base-20.04.tar
+	```
+
+
+### Recovering or Copying a Backup Base Image {#180467da57b780d59e57ed152b98da6f}
+
+
+To restore or create a new WSL instance from the base image:
+
+1. Import the base image as a new "kira" VM:
+
+	```shell
+	wsl --import kira /c/linux/kira /c/linux/ubuntu-base-20.04.tar
+	```
+
+2. Delete and recreate the "kira" VM if needed:
+
+	```shell
+	wsl --terminate kira || echo "WARNING: Could NOT terminate kira VM" && \
+	  wsl --unregister kira || echo "WARNING: Could NOT unregister kira VM" && \
+	  rm -rfv /c/linux/kira && \
+	  wsl --import kira /c/linux/kira /c/linux/ubuntu-base-20.04.tar && \
+	  echo "success" || echo "failure"
+	```
+
+
+### Entering the Virtual Machine {#180467da57b780e1ba10fb8d1da14470}
+
+
+To start and enter the virtual machine:
+
+1. Stop the VM if it is already running:
+
+	```shell
+	wsl --terminate kira
+	```
+
+2. Start the VM and replace `<username>` with your default username:
+
+	```shell
+	wsl -d kira --user <username> --cd ~
+	```
+
+3. Once inside the VM, enter `sudo` mode and navigate to the `/tmp` folder to start installing KIRA:
+
+	```shell
+	sudo -s
+	cd /tmp
+	```
+
+4. Exit the VM as needed:
+
+	```shell
+	exit
+	```
+

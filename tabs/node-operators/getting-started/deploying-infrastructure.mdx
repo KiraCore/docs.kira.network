@@ -1,0 +1,59 @@
+---
+title: Deploying Infrastructure
+sidebar_position: 3
+slug: deploying-infrastructure
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+Navigate to the **Startup** section. If no infrastructure is currently running on your host machine, the status of **Interx, Sekai, and Shidai** will be marked as **Unavailable**. You will have the option to deploy the necessary components by clicking the **Deploy** button.
+
+
+## Connecting to Seed Nodes {#197467da57b780bb8231eb60142b08d5}
+
+
+:::caution
+
+When connecting to a new network, verify these critical details:
+1. **Peer count:** A high number of peers suggests network legitimacy (attackers are unlikely to host hundreds of active nodes).
+
+2. **Genesis Hash:** Must match the expected value for the intended chain.
+
+3. **Network name:** Confirm it's the correct chain you want to join.
+
+Always consult the active testnet information page for the correct genesis file hash and other crucial details before making the decision to join. This ensures you're connecting to the intended network and helps maintain security.
+
+:::
+
+
+
+
+Within the Startup tab of KENSHO's Menu, you'll need to specify the IP address of a trusted seed node. This step is important because your node will rely on this connection to synchronize with the network, ensuring it stays up-to-date with the latest blockchain data. You can obtain an IP address by either requesting one from fellow validators in the [testers' chat](https://testers.kira.network/) or using the address of a genesis validator listed in the relevant testnet section.
+
+
+:::note
+
+Each node has a connection limit, and the official genesis validator may face DOS/DDOS attacks, making it unresponsive. If that happens, node operators should coordinate in the [testers' chat](https://testers.kira.network/) to share IP/DNS addresses of personal validators, seeds, or sentry nodes. Alternatively, testers can find active nodes via any INTERX endpoint at `<IP>:11000/api/pub_p2p_list`, where `<IP>` is any public testnet node.
+
+:::
+
+
+
+
+If you're connecting to a local network, such as a personal test environment you're running, check the `local` option. Otherwise, leave it unchecked for public network connections such as for KIRA’s testnet or mainnet. 
+
+
+The RPC port, typically set to `26657`, allows external clients to interact with your node, whether querying data or submitting transactions. The P2P port, by default at `26656`, manages communication between your node and others, keeping it in sync with the network. Lastly, the INTERX port, by default `11000`, is used by the INTERX service to manage RollApps data flow and API interactions.
+
+
+You’ll also need to provide your sudo password, if necessary, to grant KENSHO the required permissions. Input your BIP39 mnemonic to authenticate your KIRA’s Consensus node address.
+
+
+Once everything’s set, click **Deploy** to connect and get your node running within the network.
+
+
+![](/notion_imgs/787853795.png)
+

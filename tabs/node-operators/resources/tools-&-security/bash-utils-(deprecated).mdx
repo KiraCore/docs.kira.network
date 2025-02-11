@@ -1,0 +1,102 @@
+---
+title: Bash Utils (Deprecated)
+sidebar_position: 3
+slug: bash-utils-deprecated
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+:::caution
+
+With the deprecation of KIRA Manager (KM), Bash Utils is also being deprecated. This documentation remains for internal purposes or for those who still prefer using Bash Utils locally.
+
+:::
+
+
+
+
+:::note
+
+The prerequisite to securely install BU is [COSIGN](/node-operators/resources/tools-&-security/cosign) that will guarantee the integrity of the files you want to download, you MUST install it before proceeding.
+
+:::
+
+
+
+
+Bash Utils (BU) is a lightweight bash script designed to simplify interactions with SEKAI and KM and streamline other bash-related tasks. This guide provides two installation methods: a simplified setup and a secure setup with signature verification.
+
+
+### Secure Installation {#180467da57b7805da64edade4cfadb72}
+
+
+#### Ensure KIRA Public Key Availability {#180467da57b7800eb932c100d79573bf}
+
+
+Check if the KIRA public key is already saved. If not, follow the [COSIGN](/node-operators/resources/tools-&-security/cosign) page to install COSIGN and save KIRA’s cosign public key.
+
+
+```shell
+KIRA_COSIGN_PUB=/usr/keys/kira-cosign.pub
+if [ ! -f "$KIRA_COSIGN_PUB" ]; then
+  echo "ERROR: KIRA public key not found. Please refer to the COSIGN setup guide to save the key."
+  exit 1
+fi
+```
+
+
+#### Download Bash Utils and Signature {#180467da57b780a08405cbf15910eee9}
+
+
+```shell
+TOOLS_VERSION="v0.3.42"  # Specify the BU version
+FILE_NAME="bash-utils.sh"
+UBUNTU_AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36"
+
+cd /tmp
+rm -rfv ./$FILE_NAME ./${FILE_NAME}.sig
+wget --user-agent="$UBUNTU_AGENT" "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/$FILE_NAME" -O ./$FILE_NAME
+wget --user-agent="$UBUNTU_AGENT" "https://github.com/KiraCore/tools/releases/download/$TOOLS_VERSION/${FILE_NAME}.sig" -O ./${FILE_NAME}.sig
+```
+
+
+#### Verify the Script {#180467da57b78045b329e4b2ae3265ab}
+
+
+Use the COSIGN tool to verify the downloaded script:
+
+
+```shell
+cosign verify-blob \
+  --key "$KIRA_COSIGN_PUB" \
+  --signature "/tmp/${FILE_NAME}.sig" \
+  "/tmp/$FILE_NAME" \
+  --insecure-ignore-tlog --insecure-ignore-sct
+```
+
+
+#### Install Bash Utils {#180467da57b780f9af0bc68673bb2a31}
+
+
+Run the installer script after verification:
+
+
+```shell
+chmod +x ./$FILE_NAME
+./$FILE_NAME bashUtilsSetup && ./etc/profile
+```
+
+
+#### Verify Installation {#180467da57b78015be92e24dcf863d7e}
+
+
+Confirm the installed version of Bash Utils:
+
+
+```shell
+bu bashUtilsVersion
+```
+

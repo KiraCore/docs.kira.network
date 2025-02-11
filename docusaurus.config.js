@@ -19,29 +19,19 @@ const config = {
 
   plugins: [
     [
+      '@docusaurus/plugin-content-pages',
+      {
+        path: 'src/pages',
+      },
+    ],
+    [
       '@docusaurus/plugin-content-docs',
       {
         id: 'default', // == 'default' if omitted
         path: 'tabs/learn',
         routeBasePath: '/learn/',
         sidebarPath: undefined,
-        showLastUpdateTime: true,
-        remarkPlugins: [require('remark-math')],
-        rehypePlugins: [require('rehype-katex')],
-        editUrl: ({docPath, permalink}) => {
-          docPath = docPath.toLowerCase();
-          const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
-          return repoUrl;
-        },
-      },
-    ],
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'testnet',
-        path: 'tabs/testnet',
-        routeBasePath: '/testnet/',
-        sidebarPath: undefined,
+        sidebarCollapsed: true,
         showLastUpdateTime: true,
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
@@ -72,10 +62,11 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'ecosystem',
-        path: 'tabs/ecosystem',
-        routeBasePath: '/ecosystem/',
+        id: 'node-operators',
+        path: 'tabs/node-operators',
+        routeBasePath: '/node-operators/',
         sidebarPath: undefined,
+        sidebarCollapsed: true,
         showLastUpdateTime: true,
         editUrl: ({docPath, permalink}) => {
           docPath = docPath.toLowerCase();
@@ -84,6 +75,22 @@ const config = {
         },
       },
     ],
+    // [
+    //   '@docusaurus/plugin-content-docs',
+    //   {
+    //     id: 'developers',
+    //     path: 'tabs/developers',
+    //     routeBasePath: '/developers/',
+    //     sidebarPath: undefined,
+    //     sidebarCollapsed: true,
+    //     showLastUpdateTime: true,
+    //     editUrl: ({docPath, permalink}) => {
+    //       docPath = docPath.toLowerCase();
+    //       const repoUrl = `https://github.com/KiraCore/docs.kira.network/issues/new?assignees=&labels=documentation,issue&projects=&template=report_an_issue.yaml&title=%5BISSUE+REPORT%5D&page-github=${permalink}&page-local=${docPath}`;
+    //       return repoUrl;
+    //     },
+    //   },
+    // ],
   ],
   stylesheets: [
     {
@@ -169,30 +176,51 @@ const config = {
           },
           {
             type: 'dropdown',
-            label: 'Build',
+            label: 'Guides',
             position: 'left',
-            activeBaseRegex: '^/testnet/',
+            // activeBaseRegex: '^/testnet/', TODO
             items: [
               {
                 type: 'doc',
                 docId: 'introduction',
-                label: 'Testnet',
-                docsPluginId: 'testnet',
-                activeBaseRegex: '^/testnet/',
-              },
-              {
-                type: 'doc',
-                docId: 'evangelist',
-                label: 'Ecosystem',
-                docsPluginId: 'ecosystem',
-              },
+                label: 'Node Operators',
+                docsPluginId: 'node-operators',
+                activeBaseRegex: '^/node-operators/',
+              }
+              // {
+              //   type: 'doc',
+              //   docId: 'introduction',
+              //   label: 'Developers',
+              //   docsPluginId: 'developers',
+              //   activeBaseRegex: '^/developers/',
+              // },
             ]
           },
           {
-            label: 'Links',
-            to: '/links/',
-            position: 'right',   
-            activeBaseRegex: '^/links/',         
+            type: 'dropdown',
+            label: 'Resources',
+            position: 'left',
+            activeClassName: 'navbar__link--active',
+            items: [
+              {
+                label: 'Ecosystem',
+                to: '/resources/ecosystem/',          
+              },
+              {
+                label: 'Evangelist',
+                to: '/resources/evangelist/',      
+              },
+              {
+                label: 'Links',
+                to: '/resources/links/',          
+              },
+              {
+                label: 'Blog',
+                to: 'https://blog.kira.network',
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              }
+            ]
           },
           {
             href: "https://github.kira.network",
