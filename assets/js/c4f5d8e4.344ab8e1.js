@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkkira_documentation=self.webpackChunkkira_documentation||[]).push([[2634],{192:(n,e,t)=>{t.r(e),t.d(e,{default:()=>c});var u=t(6540),a=t(6347);const c=function(){const n=(0,a.W6)();return(0,u.useEffect)((()=>{n.push("/learn/")}),[n]),null}}}]);

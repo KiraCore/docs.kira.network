@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkkira_documentation=self.webpackChunkkira_documentation||[]).push([[2634],{1560:(e,n,t)=>{t.r(n),t.d(n,{default:()=>u});t(6540);var a=t(6347),r=t(4848);function u(){return(0,r.jsx)(a.rd,{to:"/learn/"})}}}]);
