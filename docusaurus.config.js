@@ -18,6 +18,17 @@ const config = {
   onBrokenMarkdownLinks: "warn",
 
   plugins: [
+    async function myPlugin(context, options) {
+      return {
+        name: "docusaurus-tailwindcss",
+        configurePostCss(postcssOptions) {
+          // Appends TailwindCSS and AutoPrefixer.
+          postcssOptions.plugins.push(require("tailwindcss"));
+          postcssOptions.plugins.push(require("autoprefixer"));
+          return postcssOptions;
+        },
+      };
+    },
     [
       '@docusaurus/plugin-content-pages',
       {
@@ -113,8 +124,8 @@ const config = {
       '@docusaurus/theme-classic',
       {
         customCss: [
-          require.resolve("./css/kira.css"),
-          require.resolve("./css/docu-notion-styles.css"),
+          require.resolve("./src/css/custom.css"),
+          require.resolve("./src/css/fonts.css")
         ],
       },
     ],
@@ -149,9 +160,8 @@ const config = {
         logo: {
           alt: "Logo",
           src: "https://ipfs.kira.network/ipfs/QmcNyQRYDBD6qBH19Ab7eqtWZ59nLqBjvM4BCwnkexd78y/LOGO-SYMBOL/KIRA-WT-V2.svg",
-          href: '/learn/',
+          href: '/',
         },
-
         items: [
           // Langage selection dropdown menu
           // {

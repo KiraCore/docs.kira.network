@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Terminal page */
   [class^="terminal"] {
     white-space: pre-wrap;
@@ -29,15 +33,18 @@
   
 /* Docusaurus custom theme */ 
   :root {
-    --ifm-color-primary: #74cf7f;
-    --ifm-color-primary-dark: #519159;
-    --ifm-color-primary-darker: #3a6840;
-    --ifm-color-primary-darkest: #233e26;
-    --ifm-color-primary-uberdark: #0c150d;
-    --ifm-color-primary-light: #bae7bf;
-    --ifm-color-primary-lighter: #d5f1d9;
-    --ifm-color-primary-lightest: #f1faf2;
+    --ifm-color-primary-rgb: 131, 207, 140;
+    --ifm-color-primary: #83cf8c;
+
+    --ifm-color-primary-dark: #6bc675;
+    --ifm-color-primary-darker: #5ec16a;
+    --ifm-color-primary-darkest: #42ab4e;
+    --ifm-color-primary-light: #9bd8a3;
+    --ifm-color-primary-lighter: #a8ddae;
+    --ifm-color-primary-lightest: #ccebd0;
+
     --ifm-code-font-size: 80%;
+    --ifm-font-size-base: 100%;
 
     --ifm-color-background: #000000;
     --ifm-color-background-dark: #18181a;
@@ -47,14 +54,19 @@
     --ifm-color-background-lighter: #232326;
     --ifm-color-background-lightest: #28282b;
 
-    --ifm-font-size-base: 100%;
+    --kira-mainFont: "Gellix", sans-serif;
+    --kira-line-10: rgba(var(--ifm-color-primary-rgb), 0.1);
+    --kira-line-20: rgba(var(--ifm-color-primary-rgb), 0.2);
+    --kira-line-30: rgba(var(--ifm-color-primary-rgb), 0.3);
   }
 
   html[data-theme='dark'] {
     --ifm-navbar-background-color: #000000 ;
     --ifm-background-color: #000000;
-    --ifm-color-content: #ffffffd9;
-    --ifm-toc-border-color: var(--ifm-color-primary-darkest);
+    --ifm-color-content: #ffffffcc;
+    --ifm-toc-border-color: var(--kira-line-30);
+
+    --kira-card-background-color: #1a1a1a;
   }
 
 /* Tables */ 
