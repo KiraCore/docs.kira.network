@@ -1,0 +1,110 @@
+---
+title: Sekai Bridge Node
+sidebar_position: 0
+slug: sekai-bridge-node
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+The Sekai Bridge Node is the core component enabling secure multi-party signing for cross-chain transfers. It leverages the tss-lib library to implement a Multi-Party Threshold Signature Scheme (TSS) for both ECDSA and EdDSA, following the principles of Gennaro and Goldfeder 2020. This design ensures that no single entity controls the entire key.
+
+
+## Deployment  {#1b9467da57b78098aabff4cba43cff6b}
+
+
+```bash
+git clone https://github.com/KiraCore/torii.git
+cd torii/sekai_bridge
+```
+
+
+#### Run Docker {#1b9467da57b78083bce5f6236b983ed7}
+
+
+```bash
+make docker-build
+make docker-run
+```
+
+
+#### Standalone  {#1b9467da57b780fc8abad71d6910bd28}
+
+
+```bash
+make build
+make run
+```
+
+
+## Configuration {#1b9467da57b7804b833ce9adce2e8e20}
+
+
+The configuration file `config.yml` sets up the various operational aspects of the bridge service. 
+
+- `common`: Configures general server options for the service. It sets HTTP with `enabled` true and `port` 8885, WebSocket with `enabled` false and `port` 9080, and a `log_mode` of debug.
+- `p2p`: Manages peer-to-peer communications using saiP2P-go. It defines the main communication `port` as 9000, the number of connection `slot`s as 4, and an HTTP `port` for P2P operations as 8886.
+- `http`: Specifies the primary API endpoint for the bridge service with a `port` of 8080.
+- `udp`: Provides settings for fast, low-overhead messaging between nodes. It sets the `bufferSize` to 40000 bytes and the `interval` to 100ms.
+- `peers`: Specifies the list of peer nodes for P2P communication, intended to be populated with peer addresses as needed.
+- `tss`: Configures the Threshold Signature Scheme operations for secure multi-party signing. It includes a `public_key` (e.g., "1"), the number of participating nodes (`parties`) set to 3, a `threshold` of 2, and a signing `quorum` of 2.
+- `token`: Provides a security token used for authenticating internal API calls or inter-service communications.
+- `debug`: A Boolean flag that toggles detailed logging. When true, it enables extensive diagnostic logs.
+- `cache`: Improves performance by temporarily storing data. It defines a `ttl` (time-to-live) of 120 seconds for cache entries and a `clean` interval of 240 seconds to purge expired data.
+- `sekai`: Integrates the Cosmos-side component (Sekai) of the bridge. It sets the service `url` to "[http://localhost:1317](http://localhost:1317/)", specifies the `wallet` address used for signing transactions, identifies the target `network` (e.g., "testnet-1"), and configures transaction parameters like `gas_limit` (100000) and `fee` (750).
+- `interaction`: Defines endpoints for cross-chain interactions. It includes an `ethereum` endpoint (e.g., "[http://localhost:8882](http://localhost:8882/)") and a `cosmos` endpoint (e.g., "[http://localhost:8884](http://localhost:8884/)").
+
+## Api Reference {#1b9467da57b7805f9f0cfeb0a5a1f128}
+
+
+#### Get Stats for Node (for Debugging Purposes) {#1b9467da57b7804fa8b2ea3d5181751e}
+
+
+```bash
+curl --location --request GET 'http://<host:port>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"method":"stats"}'
+```
+
+
+#### Keygen {#1b9467da57b7801686f9d3641e6476ea}
+
+
+```bash
+curl --location --request GET 'http://<host:port>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"method": "keygen", "data": {}}'
+```
+
+
+#### Keysign {#1b9467da57b78013b0e0d1a223e1c955}
+
+
+```bash
+curl --location --request GET 'http://<host:port>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"method": "sign", "data": {"msg":"test"}}'
+```
+
+
+#### Keysign One Round {#1b9467da57b780a9af75de48c38212e8}
+
+
+```bash
+curl --location --request GET 'http://<host:port>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"method": "sign", "data": {"msg":"test","one_round_signing":true}}'
+```
+
+
+#### Verify Signature {#1b9467da57b780e2bbf1ffe828d6afa5}
+
+
+```bash
+curl --location --request GET 'http://<host:port>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"method": "verify", "data": {"msg":"test","signature":"eyJzaWduYXR1cmUiOiJmK013d0NscTl1OGpmNzJnWEFjTnVqTjU2OWdkMTNod0x6QzQwTFB3RzdnOGVjZU50VFUzY1lmQzFRekNwQ0xGZWxjM0Nkcy9OajRqTzNmL0E3R043UT09Iiwic2lnbmF0dXJlX3JlY292ZXJ5IjoiQVE9PSIsInIiOiJmK013d0NscTl1OGpmNzJnWEFjTnVqTjU2OWdkMTNod0x6QzQwTFB3RzdnPSIsInMiOiJQSG5IamJVMU4zR0h3dFVNd3FRaXhYcFhOd25iUHpZK0l6dDMvd094amUwPSIsIm0iOiJNVEF4TUE9PSJ9"}}'
+```
+

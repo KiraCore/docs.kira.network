@@ -1,0 +1,99 @@
+---
+title: Architecture
+sidebar_position: 1
+slug: architecture
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+
+## Overview {#1b9467da57b7812f86c1d06fbe67c6d3}
+
+
+Torii consists of multiple services, each exposing specific ports for API communication, inter-node coordination, and transaction processing. 
+
+
+![](/notion_imgs/1239739514.png)
+
+
+#### Workflow {#1b9467da57b781b9aa88cd1aef385f6d}
+
+1. **Initiation** – A request is sent to Sekai to transfer assets between Cosmos and Ethereum. CosmosIndexer or EthereumIndexer detects the transaction and forwards it to the bridge.
+2. **Signing** – SekaiBridgeTssApp nodes sign the transaction using TSS. The signature is verified before execution.
+3. **Execution** – The signed transaction is submitted to the respective blockchain.
+4. **Finalization** – The system indexes the transaction and updates storage.
+
+## Torii Components {#1b9467da57b781a3a150cf792dfb387f}
+
+
+### Sekai Bridge Nodes {#1b9467da57b781e983d0e0a8559bae62}
+
+
+The Sekai Bridge Node is the core component enabling secure multi-party signing for cross-chain transfers. It leverages the tss-lib library to ivmplement a Multi-Party Threshold Signature Scheme (TSS) for both ECDSA and EdDSA, following the principles of Gennaro and Goldfeder 2020. This design ensures that no single entity controls the entire key.
+
+
+**Sekai Bridge Nodes configuration and API reference**[broken link]
+
+
+**Ports**
+
+	- **8082** – Primary HTTP API endpoint.
+	- **8889, 8890** – Internal communication channels for signing and coordination.
+
+**Ethereum Services**
+
+
+	These services handle all interactions with the Ethereum blockchain, covering both transaction creation and event monitoring.
+
+	- **saiETHInteraction**
+
+		Acts as an HTTP proxy for creating and managing transactions to Ethereum smart contracts. It enables users and other services to interact with bridge contracts by invoking methods, as well as dynamically add or remove bridge contracts from its monitoring list. Configured via a central `config.yml`, this service streamlines the process of submitting Ethereum transactions through a simple, high-level API.
+
+
+		**Ports**
+
+			- **8882** – HTTP API for submitting Ethereum transactions.
+	- **saiEthIndexer**
+
+		Monitors the Ethereum blockchain for transactions involving specified contract addresses. It continuously scans blocks using a geth node, extracts relevant event data from matching transactions, and stores these details in a persistent storage layer. Additionally, it sends notifications to connected services when significant events occur. Its behavior is driven by parameters defined in a `config.json`, including settings for the Ethereum node, storage service, and notification mechanism.
+
+
+		**Ports**
+
+			- **8881** – HTTP API for Ethereum event indexing.
+
+**Cosmos Services**
+
+
+	These services facilitate interactions with Cosmos SDK-based blockchains, providing streamlined transaction creation and real-time transaction monitoring.
+
+	- **saiCosmosInteraction**
+
+		This service offers an HTTP API to create and submit transactions to Cosmos blockchains. It processes transaction requests by signing transactions with locally stored private keys and then sending them to the specified node. This setup simplifies the transaction process, allowing users and services to interact with Cosmos chains with ease.
+
+
+		**Ports**
+
+			- **8884** – HTTP API for executing Cosmos transactions.
+	- **saiCosmosIndexer**
+
+		Designed to monitor the Cosmos blockchain for transactions linked to specific addresses, this service continuously scans for new transactions starting from a defined block height. It filters and indexes these transactions for later retrieval and auditing. Additionally, it provides HTTP handlers to add or remove addresses dynamically, ensuring flexible and up-to-date transaction tracking.
+
+
+		**Ports**
+
+			- **8883** – HTTP API for indexing Cosmos events.
+
+**Storage Service (Explorer)**
+
+
+	This service uses MongoDB to store and manage data from the bridge components. It collects records such as transaction logs, event notifications, and other related metadata. The service offers a RESTful API for creating, reading, updating/upserting, and deleting documents, which helps in tracking and analyzing the bridge's operational history.
+
+
+	**Ports**
+
+		- **8880** – Primary HTTP API endpoint.
+		- **8881** – WebSocket connection.
+		- **8882** – Socket connection.

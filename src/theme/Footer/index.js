@@ -14,7 +14,7 @@ export default function FooterWrapper() {
             Building the future of trustless computing by enabling scalable solutions for resource-intensive applications
           </div>
           <div className="text-block-6">
-            2024 KIRA Network, All rights reserved.
+            2025 KIRA Network, All rights reserved.
           </div>
         </div>
         <div className="div-block-5">
